@@ -24,7 +24,6 @@ public:
 private:
 	void Swing();
 
-
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	USphereComponent*			mRoot;
@@ -37,6 +36,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
 	UCameraComponent*			mCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UProjectileMovementComponent* mProjectile;
+
 
 public:
 	void SetStaticMesh(const FString& path);
