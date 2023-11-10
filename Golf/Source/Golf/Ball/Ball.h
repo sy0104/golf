@@ -21,15 +21,22 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+private:
+	void Swing();
+
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	USphereComponent*		mRoot;
+	USphereComponent*			mRoot;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UStaticMeshComponent*	mStaticMesh;
+	UStaticMeshComponent*		mStaticMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	UCameraComponent*		mCamera;
+	USpringArmComponent*		mSpringArm;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	UCameraComponent*			mCamera;
 
 public:
 	void SetStaticMesh(const FString& path);

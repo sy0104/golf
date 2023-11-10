@@ -3,6 +3,7 @@
 
 #include "GFGameModeBase.h"
 #include "Ball/Ball.h"
+#include "Ball/BallController.h"
 
 AGFGameModeBase::AGFGameModeBase()
 {
@@ -18,6 +19,7 @@ AGFGameModeBase::AGFGameModeBase()
 	//	DefaultPawnClass = ABall::StaticClass();
 
 	DefaultPawnClass = ABall::StaticClass();
+	PlayerControllerClass = ABallController::StaticClass();
 
-	ABall* ball = NewObject<ABall>();
+	//ABall* ball = NewObject<ABall>();
 }

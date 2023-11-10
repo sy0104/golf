@@ -11,9 +11,13 @@ ABall::ABall()
 	mStaticMesh->SetupAttachment(mRoot);
 
 	mCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	mCamera->SetupAttachment(mRoot);
+
+	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	mSpringArm->SetupAttachment(mStaticMesh);
+	mCamera->SetupAttachment(mSpringArm);
 
 	mRoot->bVisualizeComponent = true;
+	mRoot->SetSphereRadius(2.25f);
 
 	// Mesh
 	const FString& path = TEXT("/Script/Engine.StaticMesh'/Game/Assets/GolfPack/Meshes/SM_Golfball.SM_Golfball'");
@@ -22,20 +26,16 @@ ABall::ABall()
 	if (IsValid(mesh))
 		mStaticMesh->SetStaticMesh(mesh);
 
-	mRoot->SetSphereRadius(2.25f);
-
-	// (X=3180.000000,Y=-800.000000,Z=214.250000)
-
 	SetActorLocation(FVector(0.0, 0.0, 0.0));
 	SetActorScale3D(FVector(10.0, 10.0, 10.0));
 
-	mCamera->SetRelativeLocation(FVector(-70.0, 0.0, 20.0));
-	mCamera->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
+	mSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 8.0));
 }
 
 void ABall::BeginPlay()
 {
 	Super::BeginPlay();
+
 }
 
 void ABall::Tick(float DeltaTime)
@@ -43,13 +43,19 @@ void ABall::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//PrintViewport(1.f, FColor::Red, TEXT("Tick"));
-
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAction<ABall>(TEXT("Swing"), EInputEvent::IE_Pressed, this, &ABall::Swing);
+}
+
+void ABall::Swing()
+{
+	PrintViewport(1.f, FColor::Red, TEXT("Swing"));
+	
 }
 
 void ABall::SetStaticMesh(const FString& path)
