@@ -10,6 +10,9 @@ ABall::ABall()
 	mStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	mStaticMesh->SetupAttachment(mRoot);
 
+	mCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	mCamera->SetupAttachment(mRoot);
+
 	mRoot->bVisualizeComponent = true;
 
 	// Mesh
@@ -19,25 +22,27 @@ ABall::ABall()
 	if (IsValid(mesh))
 		mStaticMesh->SetStaticMesh(mesh);
 
-	else
-		PrintViewport(1.f, FColor::Red, TEXT("NoMesh"));
+	mRoot->SetSphereRadius(2.25f);
 
-	SetActorLocation(FVector(360.0, 10.0, 212.0));
-	SetActorScale3D(FVector(5.0, 5.0, 5.0));
+	// (X=3180.000000,Y=-800.000000,Z=214.250000)
+
+	SetActorLocation(FVector(0.0, 0.0, 0.0));
+	SetActorScale3D(FVector(10.0, 10.0, 10.0));
+
+	mCamera->SetRelativeLocation(FVector(-70.0, 0.0, 20.0));
+	mCamera->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
 }
 
 void ABall::BeginPlay()
 {
 	Super::BeginPlay();
-	
-
 }
 
 void ABall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	PrintViewport(1.f, FColor::Red, TEXT("Tick"));
+	//PrintViewport(1.f, FColor::Red, TEXT("Tick"));
 
 }
 

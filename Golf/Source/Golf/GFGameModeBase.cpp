@@ -17,5 +17,7 @@ AGFGameModeBase::AGFGameModeBase()
 	//else
 	//	DefaultPawnClass = ABall::StaticClass();
 
-	//DefaultPawnClass = ABall::StaticClass();
+	DefaultPawnClass = ABall::StaticClass();
+
+	ABall* ball = NewObject<ABall>();
 }

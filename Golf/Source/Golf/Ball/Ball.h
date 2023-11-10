@@ -28,6 +28,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UStaticMeshComponent*	mStaticMesh;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	UCameraComponent*		mCamera;
+
 public:
 	void SetStaticMesh(const FString& path);
 };
