@@ -23,10 +23,10 @@ ABall::ABall()
 	// Camera & Spring Arm
 	mCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	mSpringArm->TargetArmLength = 100.f;
-	mSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 8.0));
-	mSpringArm->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
-	
+	//mSpringArm->TargetArmLength = 100.f;
+	//mSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 8.0));
+	//mSpringArm->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+	//
 	//mSpringArm->SetupAttachment(mRoot);
 	//mCamera->SetupAttachment(mSpringArm);
 
@@ -40,8 +40,8 @@ ABall::ABall()
 	SetActorScale3D(FVector(3.0, 3.0, 3.0));
 
 	//APlayerCameraManager* PlayerCameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
-	mCamera->bUsePawnControlRotation = true;
-	mSpringArm->bUsePawnControlRotation = true;
+	//mCamera->bUsePawnControlRotation = true;
+	//mSpringArm->bUsePawnControlRotation = true;
 
 	// Collision
 	mRoot->SetCollisionProfileName(TEXT("Ball"));
@@ -50,7 +50,7 @@ ABall::ABall()
 	
 	// Camera Offset
 	mCameraOffset = FVector(-120.0, 0.0, 45.0);
-	mCameraRotation = FRotator(0.0, -20.0, 0.0);
+	mCameraRotation = FRotator(0.0, 0.0, 0.0);
 }
 
 void ABall::BeginPlay()
@@ -94,27 +94,34 @@ void ABall::SetCamera()
 
 void ABall::Swing()
 {
-	PrintViewport(1.f, FColor::Red, TEXT("Ball::Swing"));
+	//PrintViewport(1.f, FColor::Red, TEXT("Ball::Swing"));
 
-	mProjectile->InitialSpeed = 30000.f;
-
+	mProjectile->InitialSpeed = 80000.f;
+	
 	FVector StartLoc = GetActorLocation();
 	//FVector TargetLoc = FVector(500, 0, 0);
-	FVector TargetLoc = FVector(500, 500, 0);
-	float arcValue = 0.5f;
+	FVector TargetLoc = FVector(10000, 0, 0);
+	float arcValue = 0.3f;
 	FVector outVelocity = FVector::ZeroVector;
 
-	if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-		this, outVelocity, StartLoc, TargetLoc, GetWorld()->GetGravityZ(), arcValue))
-	{
-		FPredictProjectilePathParams predictParams(20.0f, StartLoc, outVelocity, 15.0f);
-		predictParams.DrawDebugTime = 15.0f;
-		predictParams.DrawDebugType = EDrawDebugTrace::Type::ForDuration;
-		predictParams.OverrideGravityZ = GetWorld()->GetGravityZ();
+	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
+		this, outVelocity, StartLoc, TargetLoc, GetWorld()->GetGravityZ(), arcValue);
 
-		FPredictProjectilePathResult result;
-		UGameplayStatics::PredictProjectilePath(this, predictParams, result);
-	}
+	//if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(
+	//	this, outVelocity, StartLoc, TargetLoc, GetWorld()->GetGravityZ(), arcValue))
+	//{
+	//	FPredictProjectilePathParams predictParams(20.0f, StartLoc, outVelocity, 15.0f);
+	//	predictParams.DrawDebugTime = 15.0f;
+	//	predictParams.DrawDebugType = EDrawDebugTrace::Type::ForDuration;
+	//	predictParams.OverrideGravityZ = GetWorld()->GetGravityZ();
+
+	//	FPredictProjectilePathResult result;
+	//	UGameplayStatics::PredictProjectilePath(this, predictParams, result);
+	//}
+
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Velocity X: %f"), outVelocity.X));
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Velocity Y: %f"), outVelocity.Y));
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Velocity Z: %f"), outVelocity.Z));
 
 	mRoot->AddImpulse(outVelocity);
 
