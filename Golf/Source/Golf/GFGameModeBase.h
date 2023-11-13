@@ -11,7 +11,8 @@ UCLASS()
 class GOLF_API AGFGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	AGFGameModeBase();
+
 };

@@ -22,6 +22,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
+	void SetCamera();
 	void Swing();
 
 protected:
@@ -40,6 +41,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UProjectileMovementComponent* mProjectile;
 
+private:
+	FVector		mCameraOffset;
+	FRotator	mCameraRotation;
 
 public:
 	void SetStaticMesh(const FString& path);

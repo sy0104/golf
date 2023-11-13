@@ -23,30 +23,48 @@ ABall::ABall()
 	// Camera & Spring Arm
 	mCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	mSpringArm->SetupAttachment(mStaticMesh);
-	//mSpringArm->TargetArmLength
+	mSpringArm->TargetArmLength = 100.f;
 	mSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 8.0));
-	mCamera->SetupAttachment(mSpringArm);
+	mSpringArm->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+	
+	//mSpringArm->SetupAttachment(mRoot);
+	//mCamera->SetupAttachment(mSpringArm);
 
 	// Projectile
 	mProjectile = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile"));
 	mProjectile->SetUpdatedComponent(mRoot);
+	mProjectile->MaxSpeed = 100000.f;
 
-
-	SetActorLocation(FVector(0.0, 0.0, 0.0));
+	SetActorLocation(FVector(0.0, 0.0, 16.5));
 	//SetActorScale3D(FVector(5.0, 5.0, 5.0));
 	SetActorScale3D(FVector(3.0, 3.0, 3.0));
 
+	//APlayerCameraManager* PlayerCameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
+	mCamera->bUsePawnControlRotation = true;
+	mSpringArm->bUsePawnControlRotation = true;
+
 	// Collision
 	mRoot->SetCollisionProfileName(TEXT("Ball"));
-
 	mRoot->SetSimulatePhysics(true);
 	mRoot->SetLinearDamping(0.0f);
+	
+	// Camera Offset
+	mCameraOffset = FVector(-120.0, 0.0, 45.0);
+	mCameraRotation = FRotator(0.0, -20.0, 0.0);
 }
 
 void ABall::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
+	//PlayerController->PlayerCameraManager->ViewPitchMin = 0.f;
+	//PlayerController->PlayerCameraManager->ViewPitchMax = 0.f;
+	//PlayerController->PlayerCameraManager->ViewRollMin = 0.f;
+	//PlayerController->PlayerCameraManager->ViewRollMax = 0.f;
+	//PlayerController->PlayerCameraManager->ViewYawMin = 0.f;
+	//PlayerController->PlayerCameraManager->ViewYawMax = 0.f;
 
 }
 
@@ -55,6 +73,8 @@ void ABall::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//PrintViewport(1.f, FColor::Red, TEXT("Tick"));
+
+	SetCamera();
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -64,9 +84,19 @@ void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction<ABall>(TEXT("Swing"), EInputEvent::IE_Pressed, this, &ABall::Swing);
 }
 
+void ABall::SetCamera()
+{
+	FVector location = GetActorLocation() + mCameraOffset;
+
+	mCamera->SetRelativeLocation(location);
+	mCamera->SetRelativeRotation(mCameraRotation);
+}
+
 void ABall::Swing()
 {
 	PrintViewport(1.f, FColor::Red, TEXT("Ball::Swing"));
+
+	mProjectile->InitialSpeed = 30000.f;
 
 	FVector StartLoc = GetActorLocation();
 	//FVector TargetLoc = FVector(500, 0, 0);
