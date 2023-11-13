@@ -34,6 +34,7 @@ ABall::ABall()
 	mProjectile = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile"));
 	mProjectile->SetUpdatedComponent(mRoot);
 	mProjectile->MaxSpeed = 100000.f;
+	mProjectile->Friction = 0.8f;
 
 	SetActorLocation(FVector(0.0, 0.0, 16.5));
 	//SetActorScale3D(FVector(5.0, 5.0, 5.0));
@@ -49,8 +50,21 @@ ABall::ABall()
 	mRoot->SetLinearDamping(0.0f);
 	
 	// Camera Offset
-	mCameraOffset = FVector(-120.0, 0.0, 45.0);
+	mCameraOffset = FVector(-150.0, 0.0, 30.0);
 	mCameraRotation = FRotator(0.0, 0.0, 0.0);
+
+	// Swing
+	mSwingArc = 0.3f;
+	mStartPos = FVector(0.0, 0.0, 0.0);
+	mStartToTarget = mStartPos + FVector(10000, 0, 0);
+	mTargetPos = mStartPos + mStartToTarget;
+
+	// Physics
+	mInitialSpeed = 1000.f;		// ??
+	mGravityScale = 1.0f;
+	mIsBounce = true;
+	mBounciness = 0.6f;
+	mFriction = 0.8f;
 }
 
 void ABall::BeginPlay()
@@ -75,13 +89,17 @@ void ABall::Tick(float DeltaTime)
 	//PrintViewport(1.f, FColor::Red, TEXT("Tick"));
 
 	SetCamera();
+
+	float dis = GetDistanceToTarget(GetActorLocation());
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Dis: %f"), dis));
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction<ABall>(TEXT("Swing"), EInputEvent::IE_Pressed, this, &ABall::Swing);
+	PlayerInputComponent->BindAction<ABall>(TEXT("Swing"), EInputEvent::IE_Pressed, this, &ABall::SwingStraight);
+	PlayerInputComponent->BindAction<ABall>(TEXT("Roll"), EInputEvent::IE_Pressed, this, &ABall::Roll);
 }
 
 void ABall::SetCamera()
@@ -92,20 +110,30 @@ void ABall::SetCamera()
 	mCamera->SetRelativeRotation(mCameraRotation);
 }
 
-void ABall::Swing()
+void ABall::SwingStraight()
 {
-	//PrintViewport(1.f, FColor::Red, TEXT("Ball::Swing"));
+	PrintViewport(1.f, FColor::Red, TEXT("Swing"));
 
-	mProjectile->InitialSpeed = 80000.f;
+	mProjectile->InitialSpeed = 5000.f;
+
+	mProjectile->bShouldBounce = true;
+	mProjectile->Bounciness = 0.6f;
+	mProjectile->Friction = 0.8f;
+	mSwingArc = 0.3f;
 	
 	FVector StartLoc = GetActorLocation();
-	//FVector TargetLoc = FVector(500, 0, 0);
-	FVector TargetLoc = FVector(10000, 0, 0);
-	float arcValue = 0.3f;
+	// FVector TargetLoc = StartLoc + FVector(10000, 0, 0);
+	FVector TargetLoc = FVector(5000, 0, 0);
 	FVector outVelocity = FVector::ZeroVector;
 
+	mStartPos = GetActorLocation();
+	mTargetPos = mStartPos + mStartToTarget;
+
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-		this, outVelocity, StartLoc, TargetLoc, GetWorld()->GetGravityZ(), arcValue);
+		this, outVelocity, mStartPos, TargetLoc, GetWorld()->GetGravityZ(), mSwingArc);
+
+
+	//GetDistanceTo
 
 	//if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 	//	this, outVelocity, StartLoc, TargetLoc, GetWorld()->GetGravityZ(), arcValue))
@@ -119,14 +147,38 @@ void ABall::Swing()
 	//	UGameplayStatics::PredictProjectilePath(this, predictParams, result);
 	//}
 
-	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Velocity X: %f"), outVelocity.X));
-	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Velocity Y: %f"), outVelocity.Y));
-	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Velocity Z: %f"), outVelocity.Z));
+	mRoot->AddImpulse(outVelocity);
+}
+
+void ABall::SwingLeft()
+{
+
+}
+
+void ABall::SwingRight()
+{
+}
+
+void ABall::Roll()
+{
+	PrintViewport(1.f, FColor::Red, TEXT("Roll"));
+
+	mProjectile->bShouldBounce = false;
+	mProjectile->Bounciness = 0.f;
+	mProjectile->Friction = 1.f;
+	mSwingArc = 0.8f;
+
+	FVector StartLoc = GetActorLocation();
+	FVector TargetLoc = StartLoc + FVector(300, 0, 0);
+	FVector outVelocity = FVector::ZeroVector;
+
+	mStartPos = GetActorLocation();
+	mTargetPos = mStartPos + mStartToTarget;
+
+	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
+		this, outVelocity, mStartPos, mTargetPos, GetWorld()->GetGravityZ(), mSwingArc);
 
 	mRoot->AddImpulse(outVelocity);
-
-	//mProjectile->ProjectileGravityScale = 0.1f;
-	//mProjectile->bShouldBounce = true;
 }
 
 void ABall::SetStaticMesh(const FString& path)
@@ -135,5 +187,15 @@ void ABall::SetStaticMesh(const FString& path)
 
 	if (IsValid(StaticMesh))
 		mStaticMesh->SetStaticMesh(StaticMesh);
+}
+
+float ABall::GetDistanceToTarget(FVector pos)
+{
+	float dis = (pos - mTargetPos).Size();
+
+	if (dis < 0.f)
+		dis = 0.f;
+
+	return dis;
 }
 
