@@ -5,6 +5,7 @@
 #include "Ball/Ball.h"
 #include "Ball/BallController.h"
 #include "UMG/StartSceneBase.h"
+#include "UMG/MainHUDBase.h"
 
 AGFGameModeBase::AGFGameModeBase()
 {
@@ -15,9 +16,14 @@ AGFGameModeBase::AGFGameModeBase()
 
 	// Start Scene UI Class
 	ConstructorHelpers::FClassFinder<UUserWidget>
-		Finder(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UMG/UI_StartScene.UI_StartScene_C'"));
-	if (Finder.Succeeded())
-		mStartSceneUIClass = Finder.Class;
+		StartFinder(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UMG/UI_StartScene.UI_StartScene_C'"));
+	if (StartFinder.Succeeded())
+		mStartSceneUIClass = StartFinder.Class;
+
+	ConstructorHelpers::FClassFinder<UUserWidget> 
+		MainFinder(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UMG/UI_MainHUD.UI_MainHUD_C'"));
+	if (MainFinder.Succeeded())
+		mMainHUDClass = MainFinder.Class;
 }
 
 void AGFGameModeBase::BeginPlay()
@@ -31,6 +37,16 @@ void AGFGameModeBase::BeginPlay()
 		if (IsValid(mStartSceneUI))
 		{
 			mStartSceneUI->AddToViewport();
+		}
+	}
+
+	else if (UGameplayStatics::GetCurrentLevelName(GetWorld()) == L"Main" && IsValid(mMainHUDClass))
+	{
+		mMainHUD = Cast<UMainHUDBase>(CreateWidget(GetWorld(), mMainHUDClass));
+
+		if (IsValid(mMainHUD))
+		{
+			mMainHUD->AddToViewport();
 		}
 	}
 }

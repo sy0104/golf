@@ -23,4 +23,7 @@ public:
 private:
 	TSubclassOf<UUserWidget>	mStartSceneUIClass;
 	class UStartSceneBase*		mStartSceneUI;
+
+	TSubclassOf<UUserWidget>	mMainHUDClass;
+	class UMainHUDBase*			mMainHUD;
 };
