@@ -59,12 +59,19 @@ ABall::ABall()
 	mStartToTarget = mStartPos + FVector(10000, 0, 0);
 	mTargetPos = mStartPos + mStartToTarget;
 
-	// Physics
-	mInitialSpeed = 1000.f;		// ??
-	mGravityScale = 1.0f;
-	mIsBounce = true;
-	mBounciness = 0.6f;
-	mFriction = 0.8f;
+	// Spin
+	mIsSwingLeft = false;
+	mIsSwingRight = false;
+	mSpinForce = 200.f;
+
+	//// Physics
+	//mInitialSpeed = 1000.f;		// ??
+	//mGravityScale = 1.0f;
+	//mIsBounce = true;
+	//mBounciness = 0.6f;
+	//mFriction = 0.8f;
+
+	mRoot->SetLinearDamping(0.f);
 }
 
 void ABall::BeginPlay()
@@ -90,15 +97,22 @@ void ABall::Tick(float DeltaTime)
 
 	SetCamera();
 
-	float dis = GetDistanceToTarget(GetActorLocation());
-	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Dis: %f"), dis));
+	//float dis = GetDistanceToTarget(GetActorLocation());
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Dis: %f"), dis));
+
+	if (mIsSwingLeft)
+		AddForceToLeft();
+	else if (mIsSwingRight)
+		AddForceToRight();
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction<ABall>(TEXT("Swing"), EInputEvent::IE_Pressed, this, &ABall::SwingStraight);
+	PlayerInputComponent->BindAction<ABall>(TEXT("SwingStraight"), EInputEvent::IE_Pressed, this, &ABall::SwingStraight);
+	PlayerInputComponent->BindAction<ABall>(TEXT("SwingLeft"), EInputEvent::IE_Pressed, this, &ABall::SwingLeft);
+	PlayerInputComponent->BindAction<ABall>(TEXT("SwingRight"), EInputEvent::IE_Pressed, this, &ABall::SwingRight);
 	PlayerInputComponent->BindAction<ABall>(TEXT("Roll"), EInputEvent::IE_Pressed, this, &ABall::Roll);
 }
 
@@ -112,14 +126,17 @@ void ABall::SetCamera()
 
 void ABall::SwingStraight()
 {
-	PrintViewport(1.f, FColor::Red, TEXT("Swing"));
+	PrintViewport(1.f, FColor::Red, TEXT("SwingStraight"));
 
 	mProjectile->InitialSpeed = 5000.f;
 
 	mProjectile->bShouldBounce = true;
 	mProjectile->Bounciness = 0.6f;
 	mProjectile->Friction = 0.8f;
-	mSwingArc = 0.3f;
+	mSwingArc = 0.6f;
+
+	mIsSwingRight = false;
+	mIsSwingLeft = false;
 	
 	FVector StartLoc = GetActorLocation();
 	// FVector TargetLoc = StartLoc + FVector(10000, 0, 0);
@@ -127,16 +144,13 @@ void ABall::SwingStraight()
 	FVector outVelocity = FVector::ZeroVector;
 
 	mStartPos = GetActorLocation();
-	mTargetPos = mStartPos + mStartToTarget;
+	//mTargetPos = mStartPos + mStartToTarget;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-		this, outVelocity, mStartPos, TargetLoc, GetWorld()->GetGravityZ(), mSwingArc);
-
-
-	//GetDistanceTo
+		this, outVelocity, mStartPos, mTargetPos, GetWorld()->GetGravityZ(), mSwingArc);
 
 	//if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-	//	this, outVelocity, StartLoc, TargetLoc, GetWorld()->GetGravityZ(), arcValue))
+	//	this, outVelocity, mStartPos, mTargetPos, GetWorld()->GetGravityZ(), mSwingArc))
 	//{
 	//	FPredictProjectilePathParams predictParams(20.0f, StartLoc, outVelocity, 15.0f);
 	//	predictParams.DrawDebugTime = 15.0f;
@@ -147,16 +161,60 @@ void ABall::SwingStraight()
 	//	UGameplayStatics::PredictProjectilePath(this, predictParams, result);
 	//}
 
-	mRoot->AddImpulse(outVelocity);
+	mRoot->AddImpulse(outVelocity * 1.5f);
+	//mRoot->AddImpulse(outVelocity * 2);
 }
 
 void ABall::SwingLeft()
 {
+	PrintViewport(1.f, FColor::Red, TEXT("SwingLeft"));
 
+	mProjectile->InitialSpeed = 5000.f;
+
+	mProjectile->bShouldBounce = true;
+	mProjectile->Bounciness = 0.6f;
+	mProjectile->Friction = 0.8f;
+	mSwingArc = 0.5f;
+
+	FVector StartLoc = GetActorLocation();
+	FVector TargetLoc = FVector(5000, 0, 0);
+	FVector outVelocity = FVector::ZeroVector;
+
+	mStartPos = GetActorLocation();
+
+	mIsSwingRight = false;
+	mIsSwingLeft = true;
+
+	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
+		this, outVelocity, mStartPos, mTargetPos, GetWorld()->GetGravityZ(), mSwingArc);
+
+	mRoot->AddImpulse(outVelocity);
 }
 
 void ABall::SwingRight()
 {
+	PrintViewport(1.f, FColor::Red, TEXT("SwingRight"));
+
+	mProjectile->InitialSpeed = 5000.f;
+
+	mProjectile->bShouldBounce = true;
+	mProjectile->Bounciness = 0.6f;
+	mProjectile->Friction = 0.8f;
+	mSwingArc = 0.5f;
+
+	FVector StartLoc = GetActorLocation();
+	FVector TargetLoc = FVector(5000, 0, 0);
+	FVector outVelocity = FVector::ZeroVector;
+
+	mStartPos = GetActorLocation();
+
+	mIsSwingRight = true;
+	mIsSwingLeft = false;
+
+	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
+		this, outVelocity, mStartPos, mTargetPos, GetWorld()->GetGravityZ(), mSwingArc);
+
+	mRoot->AddImpulse(outVelocity);
 }
 
 void ABall::Roll()
@@ -169,16 +227,49 @@ void ABall::Roll()
 	mSwingArc = 0.8f;
 
 	FVector StartLoc = GetActorLocation();
-	FVector TargetLoc = StartLoc + FVector(300, 0, 0);
+	FVector TargetLoc = StartLoc + FVector(1000, 0, 0);
 	FVector outVelocity = FVector::ZeroVector;
 
 	mStartPos = GetActorLocation();
-	mTargetPos = mStartPos + mStartToTarget;
+	//mTargetPos = mStartPos + mStartToTarget;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-		this, outVelocity, mStartPos, mTargetPos, GetWorld()->GetGravityZ(), mSwingArc);
+		this, outVelocity, mStartPos, TargetLoc, GetWorld()->GetGravityZ(), mSwingArc);
 
 	mRoot->AddImpulse(outVelocity);
+}
+
+void ABall::AddForceToLeft()
+{
+	// SpinForce 200
+	//mSpinForce = 200.f;
+
+	FVector AngularVelocityDelta = mRoot->GetPhysicsAngularVelocityInDegrees();
+	FVector CompVelocityDelta = mRoot->GetComponentVelocity();
+
+	AngularVelocityDelta.Normalize();
+	CompVelocityDelta.Normalize();
+
+	FVector TargetDir = mTargetPos - GetActorLocation();
+	TargetDir.Normalize();
+
+	FVector CrossPrdt = FVector::CrossProduct(AngularVelocityDelta, TargetDir.LeftVector);
+	mRoot->AddForce(CrossPrdt * mSpinForce);
+}
+
+void ABall::AddForceToRight()
+{
+	FVector AngularVelocityDelta = mRoot->GetPhysicsAngularVelocityInDegrees();
+	FVector CompVelocityDelta = mRoot->GetComponentVelocity();
+
+	AngularVelocityDelta.Normalize();
+	CompVelocityDelta.Normalize();
+
+	FVector TargetDir = mTargetPos - GetActorLocation();
+	TargetDir.Normalize();
+
+	FVector CrossPrdt = FVector::CrossProduct(AngularVelocityDelta, TargetDir.RightVector);
+	mRoot->AddForce(CrossPrdt * mSpinForce);
 }
 
 void ABall::SetStaticMesh(const FString& path)

@@ -26,8 +26,10 @@ private:
 	void SwingStraight();
 	void SwingLeft();
 	void SwingRight();
-
 	void Roll();
+
+	void AddForceToLeft();
+	void AddForceToRight();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
@@ -45,23 +47,23 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UProjectileMovementComponent* mProjectile;
 
-	// Physics
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	float		mInitialSpeed;
+	//// Physics
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	//float		mInitialSpeed;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	float		mGravityScale;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	//float		mGravityScale;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	bool		mIsBounce;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	//bool		mIsBounce;
 
-	// 각도 저항 영향받기
+	//// 각도 저항 영향받기
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	float		mBounciness;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	//float		mBounciness;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	float		mFriction;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	//float		mFriction;
 
 private:
 	FVector		mCameraOffset;
@@ -72,6 +74,10 @@ private:
 	FVector		mStartPos;
 	FVector		mTargetPos;
 	FVector		mStartToTarget;
+
+	bool		mIsSwingLeft;
+	bool		mIsSwingRight;
+	float		mSpinForce;
 
 public:
 	void SetStaticMesh(const FString& path);
