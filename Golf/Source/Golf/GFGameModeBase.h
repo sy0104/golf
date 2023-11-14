@@ -2,7 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include <Blueprint\UserWidget.h>
+
+#include "GameInfo.h"
 #include "GameFramework/GameModeBase.h"
 #include "GFGameModeBase.generated.h"
 
@@ -15,4 +17,10 @@ class GOLF_API AGFGameModeBase : public AGameModeBase
 public:
 	AGFGameModeBase();
 
+public:
+	virtual void BeginPlay() override;
+
+private:
+	TSubclassOf<UUserWidget>	mStartSceneUIClass;
+	class UStartSceneBase*		mStartSceneUI;
 };

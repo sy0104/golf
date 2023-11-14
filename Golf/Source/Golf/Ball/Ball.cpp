@@ -78,15 +78,6 @@ void ABall::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-
-	//PlayerController->PlayerCameraManager->ViewPitchMin = 0.f;
-	//PlayerController->PlayerCameraManager->ViewPitchMax = 0.f;
-	//PlayerController->PlayerCameraManager->ViewRollMin = 0.f;
-	//PlayerController->PlayerCameraManager->ViewRollMax = 0.f;
-	//PlayerController->PlayerCameraManager->ViewYawMin = 0.f;
-	//PlayerController->PlayerCameraManager->ViewYawMax = 0.f;
-
 }
 
 void ABall::Tick(float DeltaTime)
@@ -139,12 +130,10 @@ void ABall::SwingStraight()
 	mIsSwingLeft = false;
 	
 	FVector StartLoc = GetActorLocation();
-	// FVector TargetLoc = StartLoc + FVector(10000, 0, 0);
 	FVector TargetLoc = FVector(5000, 0, 0);
 	FVector outVelocity = FVector::ZeroVector;
 
 	mStartPos = GetActorLocation();
-	//mTargetPos = mStartPos + mStartToTarget;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 		this, outVelocity, mStartPos, mTargetPos, GetWorld()->GetGravityZ(), mSwingArc);
@@ -161,8 +150,7 @@ void ABall::SwingStraight()
 	//	UGameplayStatics::PredictProjectilePath(this, predictParams, result);
 	//}
 
-	mRoot->AddImpulse(outVelocity * 1.5f);
-	//mRoot->AddImpulse(outVelocity * 2);
+	mRoot->AddImpulse(outVelocity * 1.2f);
 }
 
 void ABall::SwingLeft()
@@ -244,6 +232,8 @@ void ABall::AddForceToLeft()
 	// SpinForce 200
 	//mSpinForce = 200.f;
 
+	PrintViewport(1.f, FColor::Red, TEXT("Left Spin"));
+
 	FVector AngularVelocityDelta = mRoot->GetPhysicsAngularVelocityInDegrees();
 	FVector CompVelocityDelta = mRoot->GetComponentVelocity();
 
@@ -259,6 +249,8 @@ void ABall::AddForceToLeft()
 
 void ABall::AddForceToRight()
 {
+	PrintViewport(1.f, FColor::Red, TEXT("Spin Right"));
+
 	FVector AngularVelocityDelta = mRoot->GetPhysicsAngularVelocityInDegrees();
 	FVector CompVelocityDelta = mRoot->GetComponentVelocity();
 
