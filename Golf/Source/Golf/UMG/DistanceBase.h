@@ -2,14 +2,15 @@
 
 #pragma once
 
-#include <Blueprint\UserWidget.h>
+#include <Components\TextBlock.h>
+
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
-#include "MainHUDBase.generated.h"
+#include "DistanceBase.generated.h"
 
 UCLASS()
-class GOLF_API UMainHUDBase : public UUserWidget
+class GOLF_API UDistanceBase : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -18,13 +19,8 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:
-	class UDistanceBase*	mDistanceBase;
-	
-public:
-	class UDistanceBase* GetDistanceBase()
-	{
-		return mDistanceBase;
-	}
+	UTextBlock*		mDistanceText;
 
+public:
 	void SetDistanceText(float dis);
 };

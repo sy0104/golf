@@ -1,4 +1,7 @@
 #include "Ball.h"
+#include "../GFGameModeBase.h"
+#include "../UMG/DistanceBase.h"
+#include "../UMG/MainHUDBase.h"
 
 ABall::ABall()
 {
@@ -78,6 +81,11 @@ void ABall::BeginPlay()
 {
 	Super::BeginPlay();
 
+	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (IsValid(GameMode))
+	{
+		mMainHUD = GameMode->GetMainHUD();
+	}
 }
 
 void ABall::Tick(float DeltaTime)
@@ -95,16 +103,25 @@ void ABall::Tick(float DeltaTime)
 		AddForceToLeft();
 	else if (mIsSwingRight)
 		AddForceToRight();
+	else
+		AddForceToStraight();
+
+	ShowDistance();
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	// 액션 매핑
 	PlayerInputComponent->BindAction<ABall>(TEXT("SwingStraight"), EInputEvent::IE_Pressed, this, &ABall::SwingStraight);
 	PlayerInputComponent->BindAction<ABall>(TEXT("SwingLeft"), EInputEvent::IE_Pressed, this, &ABall::SwingLeft);
 	PlayerInputComponent->BindAction<ABall>(TEXT("SwingRight"), EInputEvent::IE_Pressed, this, &ABall::SwingRight);
 	PlayerInputComponent->BindAction<ABall>(TEXT("Roll"), EInputEvent::IE_Pressed, this, &ABall::Roll);
+
+	//// 축 매핑
+	//PlayerInputComponent->BindAxis<ABall>(TEXT("MoveFront"), this, &ABall::MoveFront);
+	//PlayerInputComponent->BindAxis<ABall>(TEXT("MoveSide"), this, &ABall::MoveSide);
 }
 
 void ABall::SetCamera()
@@ -124,7 +141,12 @@ void ABall::SwingStraight()
 	mProjectile->bShouldBounce = true;
 	mProjectile->Bounciness = 0.6f;
 	mProjectile->Friction = 0.8f;
-	mSwingArc = 0.6f;
+	mSwingArc = 0.3f;
+
+	//mProjectile->bBounceAngleAffectsFriction = true;
+
+	mTargetDir = mTargetPos - GetActorLocation();
+	mTargetDir.Normalize();
 
 	mIsSwingRight = false;
 	mIsSwingLeft = false;
@@ -150,7 +172,7 @@ void ABall::SwingStraight()
 	//	UGameplayStatics::PredictProjectilePath(this, predictParams, result);
 	//}
 
-	mRoot->AddImpulse(outVelocity * 1.2f);
+	mRoot->AddImpulse(outVelocity * 1.5f);
 }
 
 void ABall::SwingLeft()
@@ -227,12 +249,15 @@ void ABall::Roll()
 	mRoot->AddImpulse(outVelocity);
 }
 
+void ABall::AddForceToStraight()
+{
+	mProjectile->ConstrainDirectionToPlane(GetActorForwardVector());
+}
+
 void ABall::AddForceToLeft()
 {
 	// SpinForce 200
 	//mSpinForce = 200.f;
-
-	PrintViewport(1.f, FColor::Red, TEXT("Left Spin"));
 
 	FVector AngularVelocityDelta = mRoot->GetPhysicsAngularVelocityInDegrees();
 	FVector CompVelocityDelta = mRoot->GetComponentVelocity();
@@ -249,8 +274,6 @@ void ABall::AddForceToLeft()
 
 void ABall::AddForceToRight()
 {
-	PrintViewport(1.f, FColor::Red, TEXT("Spin Right"));
-
 	FVector AngularVelocityDelta = mRoot->GetPhysicsAngularVelocityInDegrees();
 	FVector CompVelocityDelta = mRoot->GetComponentVelocity();
 
@@ -262,6 +285,45 @@ void ABall::AddForceToRight()
 
 	FVector CrossPrdt = FVector::CrossProduct(AngularVelocityDelta, TargetDir.RightVector);
 	mRoot->AddForce(CrossPrdt * mSpinForce);
+}
+
+void ABall::MoveFront(float scale)
+{
+	if (scale == 0.f)
+		return;
+
+	PrintViewport(1.f, FColor::Red, TEXT("MoveFront"));
+
+	AddMovementInput(GetActorForwardVector(), scale);
+}
+
+void ABall::MoveSide(float scale)
+{
+	if (scale == 0.f)
+		return;
+
+	PrintViewport(1.f, FColor::Red, TEXT("MoveSide"));
+
+	AddMovementInput(GetActorRightVector(), scale);
+}
+
+void ABall::ShowDistance()
+{
+	float dis = GetDistanceToTarget(GetActorLocation());
+
+	if (IsValid(mMainHUD))
+	{
+		mMainHUD->SetDistanceText(dis);
+	}
+
+	else
+	{
+		AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		if (IsValid(GameMode))
+			mMainHUD = GameMode->GetMainHUD();
+
+		mMainHUD->SetDistanceText(dis);
+	}
 }
 
 void ABall::SetStaticMesh(const FString& path)

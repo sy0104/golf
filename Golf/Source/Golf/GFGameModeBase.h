@@ -26,4 +26,10 @@ private:
 
 	TSubclassOf<UUserWidget>	mMainHUDClass;
 	class UMainHUDBase*			mMainHUD;
+
+public:
+	UMainHUDBase* GetMainHUD()
+	{
+		return mMainHUD;
+	}
 };

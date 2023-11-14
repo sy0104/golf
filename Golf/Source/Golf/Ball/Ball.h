@@ -28,8 +28,15 @@ private:
 	void SwingRight();
 	void Roll();
 
+	void AddForceToStraight();
 	void AddForceToLeft();
 	void AddForceToRight();
+
+	// ¿Ãµø
+	void MoveFront(float scale);
+	void MoveSide(float scale);
+
+	void ShowDistance();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
@@ -74,10 +81,13 @@ private:
 	FVector		mStartPos;
 	FVector		mTargetPos;
 	FVector		mStartToTarget;
+	FVector		mTargetDir;
 
 	bool		mIsSwingLeft;
 	bool		mIsSwingRight;
 	float		mSpinForce;
+
+	class UMainHUDBase*		mMainHUD;
 
 public:
 	void SetStaticMesh(const FString& path);
