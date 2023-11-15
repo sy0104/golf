@@ -19,6 +19,7 @@ DECLARE_LOG_CATEGORY_EXTERN(PF, Log, All);
 
 void PrintViewport(float Time, const FColor& Color, const FString& Text);
 
+
 USTRUCT(BlueprintType)
 struct FBallInfo
 {
@@ -26,7 +27,31 @@ struct FBallInfo
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	FName	name;
+	FVector		StartPos;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FVector		StartToTarget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FVector		TargetPos;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FVector		TargetDir;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float		SpinForce;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	double		BallPower;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	double		BallPowerMin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	double		BallPowerMax;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float		SwingArc;
 };
 
 UCLASS()

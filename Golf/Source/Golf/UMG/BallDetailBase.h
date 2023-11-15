@@ -2,14 +2,15 @@
 
 #pragma once
 
-#include <Blueprint\UserWidget.h>
+#include <Components\ProgressBar.h>
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
-#include "MainHUDBase.generated.h"
+#include "BallDetailBase.generated.h"
+
 
 UCLASS()
-class GOLF_API UMainHUDBase : public UUserWidget
+class GOLF_API UBallDetailBase : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -18,15 +19,8 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:
-	class UDistanceBase*	mDistanceBase;
-	class UBallDetailBase*	mBallDetailBase;
-	
-public:
-	class UDistanceBase* GetDistanceBase()
-	{
-		return mDistanceBase;
-	}
+	UProgressBar*	mBallPowerBar;
 
-	void SetDistanceText(float dis);
+public:
 	void SetBallPower(float ratio);
 };

@@ -29,14 +29,21 @@ private:
 	void Roll();
 
 	void AddForceToStraight();
-	void AddForceToLeft();
-	void AddForceToRight();
+	void AddForceToSide();
 
 	// 이동
 	void MoveFront(float scale);
 	void MoveSide(float scale);
 
+	void AddBallPower(float scale);
+
 	void ShowDistance();
+
+	UFUNCTION()
+	void BallBounced();
+	
+	UFUNCTION()
+	void BallStopped();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
@@ -52,40 +59,24 @@ protected:
 	UCameraComponent*			mCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UProjectileMovementComponent* mProjectile;
+	UProjectileMovementComponent*	mProjectile;
 
-	//// Physics
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	//float		mInitialSpeed;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	URotatingMovementComponent*		mRotating;
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	//float		mGravityScale;
-
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	//bool		mIsBounce;
-
-	//// 각도 저항 영향받기
-
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	//float		mBounciness;
-
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	//float		mFriction;
+	FBallInfo	mBallInfo;
 
 private:
 	FVector		mCameraOffset;
 	FRotator	mCameraRotation;
 
-	float		mSwingArc;
-
-	FVector		mStartPos;
-	FVector		mTargetPos;
-	FVector		mStartToTarget;
-	FVector		mTargetDir;
-
+	bool		mIsSwingStraight;
 	bool		mIsSwingLeft;
 	bool		mIsSwingRight;
-	float		mSpinForce;
+
+	bool		mIsPowerUp;
+
+	double		mAddPower;
 
 	class UMainHUDBase*		mMainHUD;
 
