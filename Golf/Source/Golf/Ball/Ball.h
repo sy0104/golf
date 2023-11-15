@@ -28,6 +28,7 @@ private:
 	void SwingRight();
 	void Roll();
 
+	// Spin
 	void AddForceToStraight();
 	void AddForceToSide();
 
@@ -76,6 +77,7 @@ private:
 
 	bool		mIsPowerUp;
 
+	double		mTempBallPower;
 	double		mAddPower;
 
 	class UMainHUDBase*		mMainHUD;
