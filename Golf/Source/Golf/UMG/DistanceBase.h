@@ -19,8 +19,10 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:
+	UTextBlock*		mLeftDistanceText;
 	UTextBlock*		mDistanceText;
 
 public:
+	void SetLeftDistanceText(float dis);
 	void SetDistanceText(float dis);
 };

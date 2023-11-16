@@ -28,6 +28,10 @@ public:
 		return mDistanceBase;
 	}
 
+	// Distance
+	void SetLeftDistanceText(float dis);
 	void SetDistanceText(float dis);
+
+	// Ball Detail
 	void SetBallPower(float ratio);
 };

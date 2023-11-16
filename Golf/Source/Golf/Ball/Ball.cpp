@@ -51,10 +51,8 @@ ABall::ABall()
 	mCameraRotation = FRotator(0.0, 0.0, 0.0);
 
 	// Ball Info
-	mBallInfo.StartPos = FVector(100.0, 0.0, 5.0);
-	// 
-	mBallInfo.StartToTarget = mBallInfo.StartPos + FVector(100000000000000000000000.0, 0.0, 0.0);
-	mBallInfo.TargetPos = mBallInfo.StartPos + mBallInfo.StartToTarget;
+	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
+	mBallInfo.TargetPos = FVector(43000.0, 0.0, 0.0);
 
 	mBallInfo.TargetDir = mBallInfo.TargetPos - mBallInfo.StartPos;
 	mBallInfo.TargetDir.Normalize();
@@ -120,6 +118,7 @@ void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction<ABall>(TEXT("SwingLeft"), EInputEvent::IE_Pressed, this, &ABall::SwingLeft);
 	PlayerInputComponent->BindAction<ABall>(TEXT("SwingRight"), EInputEvent::IE_Pressed, this, &ABall::SwingRight);
 	PlayerInputComponent->BindAction<ABall>(TEXT("Roll"), EInputEvent::IE_Pressed, this, &ABall::Roll);
+	PlayerInputComponent->BindAction<ABall>(TEXT("PrintPower"), EInputEvent::IE_Pressed, this, &ABall::PrintPower);
 
 	//// Ãà ¸ÅÇÎ
 	//PlayerInputComponent->BindAxis<ABall>(TEXT("MoveFront"), this, &ABall::MoveFront);
@@ -141,8 +140,8 @@ void ABall::SwingStraight()
 
 	// Projectile
 	mProjectile->bShouldBounce = true;
-	mProjectile->Bounciness = 0.5f;
-	mProjectile->Friction = 0.8f;
+	mProjectile->Bounciness = 0.1f;
+	mProjectile->Friction = 1.5f;
 
 	// Spin
 	mIsSwingStraight = true;
@@ -150,12 +149,8 @@ void ABall::SwingStraight()
 	mIsSwingLeft = false;
 
 	// Ball Info
-	//mBallInfo.BallPower = mTempBallPower;
-
-	mBallInfo.BallPower = 90.0;
+	mBallInfo.BallPower = mTempBallPower;
 	mBallInfo.SwingArc = 0.3f;
-
-	//mBallInfo.SwingArc = 0.5f;
 	mBallInfo.TargetDir = mBallInfo.TargetPos - GetActorLocation();
 	mBallInfo.TargetDir.Normalize();
 
@@ -251,7 +246,7 @@ void ABall::Roll()
 	mBallInfo.TargetDir.Normalize();
 
 	FVector StartPos = GetActorLocation();
-	FVector TargetPos = StartPos + FVector(1000, 0, 0);	// test
+	FVector TargetPos = StartPos + FVector(100, 0, 0);	// test
 	FVector outVelocity = FVector::ZeroVector;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
@@ -262,7 +257,7 @@ void ABall::Roll()
 
 void ABall::AddForceToStraight()
 {
-	mProjectile->ConstrainDirectionToPlane(GetActorForwardVector());
+	//mProjectile->ConstrainDirectionToPlane(GetActorForwardVector());
 }
 
 void ABall::AddForceToSide()
@@ -327,7 +322,7 @@ void ABall::AddBallPower(float scale)
 
 	if (mIsPowerUp)
 	{
-		mTempBallPower += 1.0;
+		mTempBallPower += 10.0;
 
 		if (mTempBallPower >= mBallInfo.BallMaxPower)
 			mIsPowerUp = false;
@@ -335,7 +330,7 @@ void ABall::AddBallPower(float scale)
 
 	else
 	{
-		mTempBallPower -= 1.0;
+		mTempBallPower -= 10.0;
 
 		if (mTempBallPower <= mBallInfo.BallMinPower)
 			mIsPowerUp = true;
@@ -352,21 +347,22 @@ void ABall::AddBallPower(float scale)
 
 void ABall::ShowDistance()
 {
-	float dis = GetDistanceToTarget(GetActorLocation());
+	float leftDis = GetDistanceToTarget(GetActorLocation());
+	float dis = GetActorLocation().X;
 
 	if (IsValid(mMainHUD))
 	{
-		mMainHUD->SetDistanceText(dis);
+		//leftDis = floor(leftDis * 1000);
+		//dis = floor(dis * 1000);
+
+		mMainHUD->SetLeftDistanceText(leftDis / 100.f);
+		mMainHUD->SetDistanceText(dis / 100.f);
 	}
+}
 
-	//else
-	//{
-	//	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	//	if (IsValid(GameMode))
-	//		mMainHUD = GameMode->GetMainHUD();
-
-	//	mMainHUD->SetDistanceText(dis);
-	//}
+void ABall::PrintPower()
+{
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("power: %f"), mBallInfo.BallPower));
 }
 
 void ABall::BallBounced()

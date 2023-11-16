@@ -39,6 +39,7 @@ private:
 	void AddBallPower(float scale);
 
 	void ShowDistance();
+	void PrintPower();
 
 	UFUNCTION()
 	void BallBounced();
