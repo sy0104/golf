@@ -24,7 +24,7 @@ ABall::ABall()
 
 	// Camera & Spring Arm
 	mCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	//mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	//mSpringArm->TargetArmLength = 100.f;
 	//mSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 8.0));
 	//mSpringArm->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
@@ -52,20 +52,17 @@ ABall::ABall()
 
 	// Ball Info
 	mBallInfo.StartPos = FVector(100.0, 0.0, 5.0);
-	mBallInfo.StartToTarget = mBallInfo.StartPos + FVector(10000.0, 0.0, 0.0);
+	// 
+	mBallInfo.StartToTarget = mBallInfo.StartPos + FVector(100000000000000000000000.0, 0.0, 0.0);
 	mBallInfo.TargetPos = mBallInfo.StartPos + mBallInfo.StartToTarget;
 
 	mBallInfo.TargetDir = mBallInfo.TargetPos - mBallInfo.StartPos;
 	mBallInfo.TargetDir.Normalize();
 	mBallInfo.SpinForce = 2000.f;
 
-	//mBallInfo.BallPower = 10000.0;
-	//mBallInfo.BallPowerMin = 5000.0;
-	//mBallInfo.BallPowerMax = 30000.0;
-
 	mBallInfo.BallPower = 0.0;
-	mBallInfo.BallPowerMin = 0.0;
-	mBallInfo.BallPowerMax = 190.0;
+	mBallInfo.BallMinPower = 0.0;
+	mBallInfo.BallMaxPower = 190.0;
 
 	mBallInfo.SwingArc = 0.3f;
 
@@ -153,8 +150,12 @@ void ABall::SwingStraight()
 	mIsSwingLeft = false;
 
 	// Ball Info
-	mBallInfo.BallPower = mTempBallPower;
-	mBallInfo.SwingArc = 0.5f;
+	//mBallInfo.BallPower = mTempBallPower;
+
+	mBallInfo.BallPower = 90.0;
+	mBallInfo.SwingArc = 0.3f;
+
+	//mBallInfo.SwingArc = 0.5f;
 	mBallInfo.TargetDir = mBallInfo.TargetPos - GetActorLocation();
 	mBallInfo.TargetDir.Normalize();
 
@@ -328,7 +329,7 @@ void ABall::AddBallPower(float scale)
 	{
 		mTempBallPower += 1.0;
 
-		if (mTempBallPower >= mBallInfo.BallPowerMax)
+		if (mTempBallPower >= mBallInfo.BallMaxPower)
 			mIsPowerUp = false;
 	}
 
@@ -336,13 +337,13 @@ void ABall::AddBallPower(float scale)
 	{
 		mTempBallPower -= 1.0;
 
-		if (mTempBallPower <= mBallInfo.BallPowerMin)
+		if (mTempBallPower <= mBallInfo.BallMinPower)
 			mIsPowerUp = true;
 	}
 
 	if (IsValid(mMainHUD))
 	{
-		float ratio = mTempBallPower / mBallInfo.BallPowerMax;
+		float ratio = mTempBallPower / mBallInfo.BallMaxPower;
 		mMainHUD->SetBallPower(ratio);
 	}
 

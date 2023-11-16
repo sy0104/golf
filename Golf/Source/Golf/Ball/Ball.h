@@ -84,6 +84,22 @@ private:
 
 public:
 	void SetStaticMesh(const FString& path);
+	void SetBallMinPower(double power)
+	{
+		mBallInfo.BallMinPower = power;
+		//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Min: %f"), mBallInfo.BallMinPower));
+	}
+
+	void SetBallMaxPower(double power)
+	{
+		mBallInfo.BallMaxPower = power;
+		//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Max: %f"), mBallInfo.BallMaxPower));
+	}
+
+	void SetSwingArc(float arc)
+	{
+		mBallInfo.SwingArc = arc;
+	}
 
 public:
 	float GetDistanceToTarget(FVector pos);

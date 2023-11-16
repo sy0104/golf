@@ -45,10 +45,10 @@ public:
 	double		BallPower;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		BallPowerMin;
+	double		BallMinPower;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		BallPowerMax;
+	double		BallMaxPower;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	float		SwingArc;

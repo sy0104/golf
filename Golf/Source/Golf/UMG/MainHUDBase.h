@@ -20,6 +20,7 @@ protected:
 private:
 	class UDistanceBase*	mDistanceBase;
 	class UBallDetailBase*	mBallDetailBase;
+	class UGolfClubBase*	mGolfClubBase;
 	
 public:
 	class UDistanceBase* GetDistanceBase()

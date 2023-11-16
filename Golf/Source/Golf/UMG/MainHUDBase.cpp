@@ -4,6 +4,7 @@
 #include "MainHUDBase.h"
 #include "DistanceBase.h"
 #include "BallDetailBase.h"
+#include "GolfClubBase.h"
 
 void UMainHUDBase::NativeConstruct()
 {
@@ -11,6 +12,7 @@ void UMainHUDBase::NativeConstruct()
 
 	mDistanceBase = Cast<UDistanceBase>(GetWidgetFromName(FName(TEXT("DistanceUI"))));
 	mBallDetailBase = Cast<UBallDetailBase>(GetWidgetFromName(FName(TEXT("BallDetailUI"))));
+	mGolfClubBase = Cast<UGolfClubBase>(GetWidgetFromName(FName(TEXT("GolfClubUI"))));
 }
 
 void UMainHUDBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
