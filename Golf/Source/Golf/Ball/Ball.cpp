@@ -24,18 +24,25 @@ ABall::ABall()
 
 	// Camera & Spring Arm
 	mCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	//mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	//mSpringArm->TargetArmLength = 100.f;
-	//mSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 8.0));
-	//mSpringArm->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
-	//
+	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	
 	//mSpringArm->SetupAttachment(mRoot);
 	//mCamera->SetupAttachment(mSpringArm);
+	//mCamera->SetupAttachment(mRoot);
+
+	//mSpringArm->TargetArmLength = 100.f;
+	//mSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 80.0));
+	//mSpringArm->SetRelativeRotation(FRotator(-15.0, 90.0, 0.0));
+
+	//mSpringArm->bUsePawnControlRotation = false;
+	//mSpringArm->bInheritPitch = false;
+	//mSpringArm->bInheritYaw = false;
+	//mSpringArm->bInheritRoll = false;
 
 	// Projectile
 	mProjectile = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile"));
 	mProjectile->SetUpdatedComponent(mRoot);
-	mProjectile->Friction = 0.8f;
+	mProjectile->Friction = 30.f;
 
 	//// Rotating Movement
 	//mRotating = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("Rotating"));
@@ -90,6 +97,10 @@ void ABall::BeginPlay()
 	{
 		mMainHUD = GameMode->GetMainHUD();
 	}
+
+	//mProjectile->OnProjectileStop.AddDynamic(this, &ABall::BallBounced);
+	mProjectile->OnProjectileBounce.AddDynamic(this, &ABall::BallBounced);
+	mProjectile->InitialSpeed = 100.f;
 }
 
 void ABall::Tick(float DeltaTime)
@@ -122,7 +133,7 @@ void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	//// Ãà ¸ÅÇÎ
 	//PlayerInputComponent->BindAxis<ABall>(TEXT("MoveFront"), this, &ABall::MoveFront);
-	//PlayerInputComponent->BindAxis<ABall>(TEXT("MoveSide"), this, &ABall::MoveSide);
+	PlayerInputComponent->BindAxis<ABall>(TEXT("SwingDir"), this, &ABall::SetSwingDir);
 	PlayerInputComponent->BindAxis<ABall>(TEXT("BallPower"), this, &ABall::AddBallPower);
 }
 
@@ -139,9 +150,11 @@ void ABall::SwingStraight()
 	//PrintViewport(1.f, FColor::Red, TEXT("SwingStraight"));
 
 	// Projectile
-	mProjectile->bShouldBounce = true;
-	mProjectile->Bounciness = 0.1f;
-	mProjectile->Friction = 1.5f;
+	mProjectile->bShouldBounce = false;
+	mProjectile->Bounciness = 0.0f;
+	mProjectile->Friction = 300.f;
+
+	mProjectile->bBounceAngleAffectsFriction = true;
 
 	// Spin
 	mIsSwingStraight = true;
@@ -149,15 +162,18 @@ void ABall::SwingStraight()
 	mIsSwingLeft = false;
 
 	// Ball Info
-	mBallInfo.BallPower = mTempBallPower;
+	//mBallInfo.BallPower = mTempBallPower;
 	mBallInfo.SwingArc = 0.3f;
 	mBallInfo.TargetDir = mBallInfo.TargetPos - GetActorLocation();
 	mBallInfo.TargetDir.Normalize();
 
-
 	FVector StartPos = GetActorLocation();
-	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower + mAddPower, 0.0, 0.0);
+	//FVector TargetPos = StartPos + FVector(mBallInfo.BallPower + mAddPower, 0.0, 0.0);
 	FVector outVelocity = FVector::ZeroVector;
+
+	// 
+	mBallInfo.BallPower = 890.0;
+	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower, 0.0, 0.0);
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
@@ -253,6 +269,22 @@ void ABall::Roll()
 		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
 
 	mRoot->AddImpulse(outVelocity / 4);
+}
+
+void ABall::SetSwingDir(float scale)
+{
+	if (scale == 0.f)
+		return;
+
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("scale: %f"), scale));
+
+	FRotator rot = GetActorRotation();
+
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("roll: %f"), rot.Roll));
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("pitch: %f"), rot.Pitch));
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("yaw: %f"), rot.Yaw));
+
+	SetActorRelativeRotation(FRotator(rot.Roll + scale, 0.0, 0.0));
 }
 
 void ABall::AddForceToStraight()
@@ -365,7 +397,7 @@ void ABall::PrintPower()
 	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("power: %f"), mBallInfo.BallPower));
 }
 
-void ABall::BallBounced()
+void ABall::BallBounced(const FHitResult& Hit, const FVector& ImpactVelocity)
 {
 	PrintViewport(1.f, FColor::Red, TEXT("Bounced"));
 }

@@ -18,7 +18,6 @@ void UDistanceBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 void UDistanceBase::SetLeftDistanceText(float dis)
 {
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Dis: %f"), dis));
 	mLeftDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%f"), dis)));
 }
 

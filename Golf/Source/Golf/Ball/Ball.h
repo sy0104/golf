@@ -28,6 +28,9 @@ private:
 	void SwingRight();
 	void Roll();
 
+	// Dir
+	void SetSwingDir(float scale);
+
 	// Spin
 	void AddForceToStraight();
 	void AddForceToSide();
@@ -41,8 +44,9 @@ private:
 	void ShowDistance();
 	void PrintPower();
 
+public:
 	UFUNCTION()
-	void BallBounced();
+	void BallBounced(const FHitResult& Hit, const FVector& ImpactVelocity);
 	
 	UFUNCTION()
 	void BallStopped();
@@ -54,10 +58,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UStaticMeshComponent*		mStaticMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
 	USpringArmComponent*		mSpringArm;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
 	UCameraComponent*			mCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
