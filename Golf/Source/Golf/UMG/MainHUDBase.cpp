@@ -34,3 +34,8 @@ void UMainHUDBase::SetBallPower(float ratio)
 {
 	mBallDetailBase->SetBallPower(ratio);
 }
+
+void UMainHUDBase::SetBallDir(float ratio)
+{
+	mBallDetailBase->SetBallDir(ratio);
+}

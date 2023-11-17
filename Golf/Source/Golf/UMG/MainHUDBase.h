@@ -34,4 +34,5 @@ public:
 
 	// Ball Detail
 	void SetBallPower(float ratio);
+	void SetBallDir(float ratio);
 };

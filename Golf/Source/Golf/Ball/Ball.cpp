@@ -70,6 +70,7 @@ ABall::ABall()
 	mBallInfo.BallPower = 0.0;
 	mBallInfo.BallMinPower = 0.0;
 	mBallInfo.BallMaxPower = 190.0;
+	mBallInfo.BallDir = 0.0;
 
 	mBallInfo.SwingArc = 0.3f;
 
@@ -176,9 +177,9 @@ void ABall::SwingStraight()
 	// 
 	//mBallInfo.BallPower = 890.0;
 	// FVector TargetPos = StartPos + FVector(mBallInfo.BallPower, 0.0, 0.0);
-	FVector TargetPos =  GetActorLocation() + FVector(100.0, mBallInfo.FireDir, 0.0);
+	FVector TargetPos =  GetActorLocation() + FVector(100.0, mBallInfo.BallDir - 180.0, 0.0);
 	//FVector TargetPos = GetActorLocation() + FVector(100.0, -180.0, 0.0);
-	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Dir: %f"), mBallInfo.FireDir));
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Dir: %f"), mBallInfo.BallDir));
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
@@ -281,26 +282,25 @@ void ABall::SetSwingDir(float scale)
 	if (scale == 0.f)
 		return;
 
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("scale: %f"), scale));
-
-	FRotator rot = GetActorRotation();
-
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("roll: %f"), rot.Roll));
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("pitch: %f"), rot.Pitch));
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("yaw: %f"), rot.Yaw));
-
 	if (scale == -1.f)
 	{
-		if (mBallInfo.FireDir > -180.0)
-			mBallInfo.FireDir -= 10.0;
-		PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Dir: %f"), mBallInfo.FireDir));
+		if (mBallInfo.BallDir > 0)
+			mBallInfo.BallDir -= 10.0;
+
+		PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Dir: %f"), mBallInfo.BallDir));
 	}
 
 	else
 	{
-		if (mBallInfo.FireDir < 180.0)
-			mBallInfo.FireDir += 10.0;
-		PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Dir: %f"), mBallInfo.FireDir));
+		if (mBallInfo.BallDir < 360.0)
+			mBallInfo.BallDir += 10.0;
+		PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Dir: %f"), mBallInfo.BallDir));
+	}
+
+	if (IsValid(mMainHUD))
+	{
+		float ratio = mBallInfo.BallDir / 360.f;
+		mMainHUD->SetBallDir(ratio);
 	}
 }
 
@@ -329,7 +329,7 @@ void ABall::AddForceToSide()
 		FVector ForwardVector = TargetDir.ForwardVector;
 		FVector LeftVec = TargetDir.LeftVector;
 		//CrossPrdt = FVector::CrossProduct(mBallInfo.TargetDir, LeftVec);
-		CrossPrdt = FVector::CrossProduct(AngularVelocityDelta, CompVelocityDelta);
+		CrossPrdt = FVector::CrossProduct(AngularVelocityDelta, CompVelocityDelta); 
 	}
 
 	else if (mIsSwingRight)

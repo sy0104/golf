@@ -36,7 +36,7 @@ public:
 	FVector		TargetDir;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		FireDir;
+	double		BallDir;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	float		SpinForce;
