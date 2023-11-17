@@ -11,6 +11,14 @@ AGFGameModeBase::AGFGameModeBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	//ConstructorHelpers::FClassFinder<ABall> BallFinder(
+	//	TEXT("/Script/Engine.Blueprint'/Game/Ball/BPC_Ball.BPC_Ball_C'"));
+
+	//if (BallFinder.Succeeded())
+	//	DefaultPawnClass = BallFinder.Class;
+	//else
+	//	DefaultPawnClass = ABall::StaticClass();
+
 	DefaultPawnClass = ABall::StaticClass();
 	PlayerControllerClass = ABallController::StaticClass();
 

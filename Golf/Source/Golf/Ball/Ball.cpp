@@ -164,7 +164,7 @@ void ABall::SwingStraight()
 	mIsSwingLeft = false;
 
 	// Ball Info
-	//mBallInfo.BallPower = mTempBallPower;
+	mBallInfo.BallPower = mTempBallPower;
 	mBallInfo.SwingArc = 0.3f;
 	mBallInfo.TargetDir = mBallInfo.TargetPos - GetActorLocation();
 	mBallInfo.TargetDir.Normalize();
@@ -174,8 +174,11 @@ void ABall::SwingStraight()
 	FVector outVelocity = FVector::ZeroVector;
 
 	// 
-	mBallInfo.BallPower = 890.0;
-	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower, 0.0, 0.0);
+	//mBallInfo.BallPower = 890.0;
+	// FVector TargetPos = StartPos + FVector(mBallInfo.BallPower, 0.0, 0.0);
+	FVector TargetPos =  GetActorLocation() + FVector(100.0, mBallInfo.FireDir, 0.0);
+	//FVector TargetPos = GetActorLocation() + FVector(100.0, -180.0, 0.0);
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Dir: %f"), mBallInfo.FireDir));
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
@@ -282,11 +285,23 @@ void ABall::SetSwingDir(float scale)
 
 	FRotator rot = GetActorRotation();
 
-	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("roll: %f"), rot.Roll));
-	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("pitch: %f"), rot.Pitch));
-	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("yaw: %f"), rot.Yaw));
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("roll: %f"), rot.Roll));
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("pitch: %f"), rot.Pitch));
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("yaw: %f"), rot.Yaw));
 
-	SetActorRelativeRotation(FRotator(rot.Roll + scale, 0.0, 0.0));
+	if (scale == -1.f)
+	{
+		if (mBallInfo.FireDir > -180.0)
+			mBallInfo.FireDir -= 10.0;
+		PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Dir: %f"), mBallInfo.FireDir));
+	}
+
+	else
+	{
+		if (mBallInfo.FireDir < 180.0)
+			mBallInfo.FireDir += 10.0;
+		PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Dir: %f"), mBallInfo.FireDir));
+	}
 }
 
 void ABall::AddForceToStraight()
