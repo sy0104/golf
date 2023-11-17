@@ -26,18 +26,20 @@ ABall::ABall()
 	mCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	
-	//mSpringArm->SetupAttachment(mRoot);
-	//mCamera->SetupAttachment(mSpringArm);
+	mSpringArm->SetupAttachment(mStaticMesh);
+	mCamera->SetupAttachment(mSpringArm);
 	//mCamera->SetupAttachment(mRoot);
 
-	//mSpringArm->TargetArmLength = 100.f;
-	//mSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 80.0));
-	//mSpringArm->SetRelativeRotation(FRotator(-15.0, 90.0, 0.0));
+	mSpringArm->TargetArmLength = 50.f;
+	mCamera->SetRelativeLocation(FVector(-230.0, 0.0, 85.0));
+	//mSpringArm->SetRelativeLocation(FVector(0.0, 80.0, 0.0));
+	//mSpringArm->SetRelativeRotation(FRotator(0.0, 90.0, 0.0));
 
-	//mSpringArm->bUsePawnControlRotation = false;
-	//mSpringArm->bInheritPitch = false;
-	//mSpringArm->bInheritYaw = false;
-	//mSpringArm->bInheritRoll = false;
+
+	mSpringArm->bUsePawnControlRotation = false;
+	mSpringArm->bInheritPitch = false;
+	mSpringArm->bInheritYaw = false;
+	mSpringArm->bInheritRoll = false;
 
 	// Projectile
 	mProjectile = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile"));
@@ -107,7 +109,7 @@ void ABall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	SetCamera();
+	//SetCamera();
 
 	//float dis = GetDistanceToTarget(GetActorLocation());
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Dis: %f"), dis));
