@@ -44,6 +44,9 @@ private:
 	void ShowDistance();
 	void PrintPower();
 
+	// Ãæµ¹
+	void CheckMaterialCollision();
+
 public:
 	UFUNCTION()
 	void BallBounced(const FHitResult& Hit, const FVector& ImpactVelocity);

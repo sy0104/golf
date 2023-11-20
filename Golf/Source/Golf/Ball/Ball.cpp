@@ -70,7 +70,7 @@ ABall::ABall()
 	mBallInfo.BallPower = 0.0;
 	mBallInfo.BallMinPower = 0.0;
 	mBallInfo.BallMaxPower = 190.0;
-	mBallInfo.BallDir = 0.0;
+	mBallInfo.BallDir = 180.0;
 
 	mBallInfo.SwingArc = 0.3f;
 
@@ -121,6 +121,8 @@ void ABall::Tick(float DeltaTime)
 		AddForceToStraight();
 
 	ShowDistance();
+
+	CheckMaterialCollision();
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -268,7 +270,7 @@ void ABall::Roll()
 	mBallInfo.TargetDir.Normalize();
 
 	FVector StartPos = GetActorLocation();
-	FVector TargetPos = StartPos + FVector(100, 0, 0);	// test
+	FVector TargetPos = StartPos + FVector(50, 0, 0);	// test
 	FVector outVelocity = FVector::ZeroVector;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
@@ -412,6 +414,29 @@ void ABall::ShowDistance()
 void ABall::PrintPower()
 {
 	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("power: %f"), mBallInfo.BallPower));
+}
+
+void ABall::CheckMaterialCollision()
+{
+	FVector startPos = GetActorLocation();
+	FVector endPos = startPos + GetActorForwardVector() * 50.f;
+
+	FHitResult hitResult;
+	FCollisionQueryParams collisionParams(NAME_None, false, this);
+	collisionParams.bReturnPhysicalMaterial = true;
+
+	bool hit = GetWorld()->LineTraceSingleByChannel(hitResult, startPos, endPos, ECC_GameTraceChannel12, collisionParams);
+	DrawDebugLine(GetWorld(), startPos, endPos, FColor::Red, false, 1.0f);
+
+	if (hit)
+	{
+		UObject* material = Cast<UObject>(hitResult.PhysMaterial.Get());
+		if (IsValid(material))
+		{
+			FString name = material->GetName();
+			PrintViewport(1.f, FColor::Red, name);
+		}
+	}
 }
 
 void ABall::BallBounced(const FHitResult& Hit, const FVector& ImpactVelocity)

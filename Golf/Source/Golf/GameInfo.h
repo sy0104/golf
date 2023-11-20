@@ -6,6 +6,7 @@
 #include "DrawDebugHelpers.h"	// 디버깅용 도형 출력기능.
 #include "EngineGlobals.h"
 #include "Engine.h"
+#include "LandscapeInfo.h"
 
 #include "UObject/NoExportTypes.h"
 #include "GameInfo.generated.h"
