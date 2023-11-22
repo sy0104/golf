@@ -18,10 +18,10 @@ void UDistanceBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 void UDistanceBase::SetLeftDistanceText(float dis)
 {
-	mLeftDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%f"), dis)));
+	mLeftDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), dis) + TEXT("m")));
 }
 
 void UDistanceBase::SetDistanceText(float dis)
 {
-	mDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%f"), dis)));
+	mDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), dis) + TEXT("m")));
 }

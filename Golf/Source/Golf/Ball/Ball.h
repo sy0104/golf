@@ -30,10 +30,13 @@ private:
 
 	// Dir
 	void SetSwingDir(float scale);
+	void SetBallDirLeft();
+	void SetBallDirRight();
 
 	// Spin
 	void AddForceToStraight();
 	void AddForceToSide();
+	void LimitRotation(float DeltaTime);
 
 	// 이동
 	void MoveFront(float scale);
@@ -46,13 +49,20 @@ private:
 
 	// 충돌
 	void CheckMaterialCollision();
+	void CheckLandscapeCollision();
+	void SetBallDetail();
 
 public:
 	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
+		FVector NormalImpulse, const FHitResult& Hit);
+
+public:
+	UFUNCTION(BlueprintCallable)
 	void BallBounced(const FHitResult& Hit, const FVector& ImpactVelocity);
 	
-	UFUNCTION()
-	void BallStopped();
+	UFUNCTION(BlueprintCallable)
+	void BallStopped(const FHitResult& ImpactResult);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
@@ -70,7 +80,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UProjectileMovementComponent*	mProjectile;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	URotatingMovementComponent*		mRotating;
 
 	FBallInfo	mBallInfo;
@@ -79,14 +89,20 @@ private:
 	FVector		mCameraOffset;
 	FRotator	mCameraRotation;
 
+	double		mMinRotation;
+	double		mMaxRotation;
+
 	bool		mIsSwingStraight;
 	bool		mIsSwingLeft;
 	bool		mIsSwingRight;
 
 	bool		mIsPowerUp;
+	bool		mIsGround;
 
 	double		mTempBallPower;
 	double		mAddPower;
+
+	FString		mHitMaterialName;
 
 	class UMainHUDBase*		mMainHUD;
 
