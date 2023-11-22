@@ -22,7 +22,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-	void SetCamera();
 	void SwingStraight();
 	void SwingLeft();
 	void SwingRight();
@@ -30,17 +29,10 @@ private:
 
 	// Dir
 	void SetSwingDir(float scale);
-	void SetBallDirLeft();
-	void SetBallDirRight();
 
 	// Spin
 	void AddForceToStraight();
 	void AddForceToSide();
-	void LimitRotation(float DeltaTime);
-
-	// ¿Ãµø
-	void MoveFront(float scale);
-	void MoveSide(float scale);
 
 	void AddBallPower(float scale);
 
@@ -86,12 +78,6 @@ protected:
 	FBallInfo	mBallInfo;
 
 private:
-	FVector		mCameraOffset;
-	FRotator	mCameraRotation;
-
-	double		mMinRotation;
-	double		mMaxRotation;
-
 	bool		mIsSwingStraight;
 	bool		mIsSwingLeft;
 	bool		mIsSwingRight;
@@ -126,5 +112,5 @@ public:
 	}
 
 public:
-	float GetDistanceToTarget(FVector pos);
+	float GetDistanceToTarget(FVector src, FVector dst);
 };
