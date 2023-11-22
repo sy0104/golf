@@ -119,7 +119,7 @@ void ABall::Tick(float DeltaTime)
 	CheckMaterialCollision();
 	CheckLandscapeCollision();
 
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("dir: %f"), mBallInfo.BallDir));
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("dir: %f"), mBallInfo.BallDir));
 
 }
 
@@ -163,7 +163,14 @@ void ABall::SwingStraight()
 	mBallInfo.TargetDir.Normalize();
 
 	FVector StartPos = GetActorLocation();
-	FVector TargetPos = GetActorLocation() + FVector(mBallInfo.BallPower + mAddPower, mBallInfo.BallDir, 0.0);
+	FVector TargetPos;
+
+	if (mBallInfo.BallDir <= 90.f)
+		TargetPos = GetActorLocation() + FVector(mBallInfo.BallPower + mAddPower, mBallInfo.BallDir, 0.0);
+	else if (mBallInfo.BallDir > 90.f)
+		TargetPos = GetActorLocation() - FVector(mBallInfo.BallPower + mAddPower, mBallInfo.BallDir, 0.0);
+
+	// FVector TargetPos = GetActorLocation() + FVector(mBallInfo.BallPower + mAddPower, mBallInfo.BallDir, 0.0);
 	//FVector TargetPos = GetActorLocation() + FVector(50.0, 0.0, 0.0);
 	FVector outVelocity = FVector::ZeroVector;
 
@@ -408,7 +415,7 @@ void ABall::CheckLandscapeCollision()
 
 void ABall::SetBallDetail()
 {
-	PrintViewport(1.f, FColor::Red, mHitMaterialName);
+	// PrintViewport(1.f, FColor::Red, mHitMaterialName);
 
 	if (mHitMaterialName == L"PM_LandscapeBase")
 	{
