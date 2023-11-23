@@ -27,28 +27,29 @@ ABall::ABall()
 	// Camera & Spring Arm
 	mCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-
-	mSubCamera = CreateDefaultSubobject<ACameraActor>(TEXT("SubCamera"));
-	// mSubCamera->SetupAttachment(mSpringArm);
 	
 	mSpringArm->SetupAttachment(mStaticMesh);
 	mCamera->SetupAttachment(mSpringArm);
 
-	mSpringArm->TargetArmLength = 50.f;
-	mCamera->SetRelativeLocation(FVector(-230.0, 0.0, 85.0));
-	mCamera->bConstrainAspectRatio = true;
-	//mSpringArm->SetRelativeLocation(FVector(0.0, 80.0, 0.0));
-	//mSpringArm->SetRelativeRotation(FRotator(0.0, 90.0, 0.0));
+	mSpringArm->TargetArmLength = 200.f;
+	mCamera->SetRelativeLocation(FVector(-60.0, 0.0, 100.0));
+	
+	//mCamera->bConstrainAspectRatio = true;
+	mSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 0.0));
+	mSpringArm->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
 
 	mSpringArm->bUsePawnControlRotation = false;
 	mSpringArm->bInheritPitch = false;
 	mSpringArm->bInheritYaw = false;
 	mSpringArm->bInheritRoll = false;
 
+	mSpringArm->bDoCollisionTest = false;
+
 	// Projectile
 	mProjectile = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile"));
 	mProjectile->SetUpdatedComponent(mRoot);
 	mProjectile->Friction = 30.f;
+
 	mProjectile->OnProjectileBounce.AddDynamic(this, &ABall::BallBounced);
 	mProjectile->OnProjectileStop.AddDynamic(this, &ABall::BallStopped);
 
@@ -125,6 +126,10 @@ void ABall::Tick(float DeltaTime)
 	CheckLandscapeCollision();
 
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("dir: %f"), mBallInfo.BallDir));
+
+	//FVector CameraOffset = FVector(-150.0, 0.0, 30.0);
+	//FVector loc = GetActorLocation() + CameraOffset;
+	//mCamera->SetRelativeLocation(loc);
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -152,7 +157,6 @@ void ABall::SwingStraight()
 	mProjectile->bShouldBounce = false;
 	mProjectile->Bounciness = 0.0f;
 	mProjectile->Friction = 300.f;
-
 	mProjectile->bBounceAngleAffectsFriction = true;
 
 	// Spin
@@ -161,7 +165,7 @@ void ABall::SwingStraight()
 	mIsSwingLeft = false;
 
 	// Ball Info
-	mBallInfo.StartPos = GetActorLocation();
+	//mBallInfo.StartPos = GetActorLocation();
 	mBallInfo.BallPower = mTempBallPower;
 	mBallInfo.SwingArc = 0.3f;
 	mBallInfo.TargetDir = mBallInfo.TargetPos - GetActorLocation();
@@ -171,15 +175,20 @@ void ABall::SwingStraight()
 	FVector TargetPos;
 
 	if (mBallInfo.BallDir <= 90.f)
+	{
+		PrintViewport(1.f, FColor::Red, TEXT("Forward"));
 		TargetPos = GetActorLocation() + FVector(mBallInfo.BallPower + mAddPower, mBallInfo.BallDir, 0.0);
+	}
+
 	else if (mBallInfo.BallDir > 90.f)
+	{
+		PrintViewport(1.f, FColor::Red, TEXT("Back"));
 		TargetPos = GetActorLocation() - FVector(mBallInfo.BallPower + mAddPower, mBallInfo.BallDir, 0.0);
+	}
 
 	// FVector TargetPos = GetActorLocation() + FVector(mBallInfo.BallPower + mAddPower, mBallInfo.BallDir, 0.0);
 	//FVector TargetPos = GetActorLocation() + FVector(50.0, 0.0, 0.0);
 	FVector outVelocity = FVector::ZeroVector;
-
-	//mBallInfo.TargetPos = TargetPos;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
@@ -209,8 +218,6 @@ void ABall::SwingLeft()
 	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower + mAddPower, 0.0, 0.0);
 	FVector outVelocity = FVector::ZeroVector;
 
-	//mBallInfo.TargetPos = TargetPos;
-
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
 
@@ -238,8 +245,6 @@ void ABall::SwingRight()
 	FVector StartPos = GetActorLocation();
 	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower + mAddPower, 0.0, 0.0);
 	FVector outVelocity = FVector::ZeroVector;
-
-	//mBallInfo.TargetPos = TargetPos;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
@@ -378,7 +383,7 @@ void ABall::CheckMaterialCollision()
 	collisionParams.bReturnPhysicalMaterial = true;
 
 	bool hit = GetWorld()->LineTraceSingleByChannel(hitResult, startPos, endPos, ECC_GameTraceChannel12, collisionParams);
-	//DrawDebugLine(GetWorld(), startPos, endPos, FColor::Red, false, 1.0f);
+	DrawDebugLine(GetWorld(), startPos, endPos, FColor::Red, false, 1.0f);
 
 	if (hit)
 	{
@@ -458,12 +463,12 @@ void ABall::ChangeCamera()
 {
 	// APlayerController::SetViewTargetWithBlend(mSubCamera, 2.f);
 
-	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (IsValid(BallController))
-	{
-		PrintViewport(1.f, FColor::Red, TEXT("ChangeCamera"));
-		BallController->SetViewTargetWithBlend(mSubCamera, 2.f);
-	}
+	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	//if (IsValid(BallController))
+	//{
+	//	PrintViewport(1.f, FColor::Red, TEXT("ChangeCamera"));
+	//	//BallController->SetViewTargetWithBlend(mSubCamera, 2.f);
+	//}
 }
 
 void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
