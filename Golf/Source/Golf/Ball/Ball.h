@@ -44,6 +44,9 @@ private:
 	void CheckLandscapeCollision();
 	void SetBallDetail();
 
+	// camera
+	void ChangeCamera();
+
 public:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
@@ -68,6 +71,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
 	UCameraComponent*			mCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	ACameraActor*				mSubCamera;
+
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	//UCameraComponent*			mSubCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UProjectileMovementComponent*	mProjectile;

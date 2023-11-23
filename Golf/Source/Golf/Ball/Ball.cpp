@@ -2,6 +2,7 @@
 #include "../GFGameModeBase.h"
 #include "../UMG/DistanceBase.h"
 #include "../UMG/MainHUDBase.h"
+#include "BallController.h"
 
 ABall::ABall()
 {
@@ -26,12 +27,16 @@ ABall::ABall()
 	// Camera & Spring Arm
 	mCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+
+	mSubCamera = CreateDefaultSubobject<ACameraActor>(TEXT("SubCamera"));
+	// mSubCamera->SetupAttachment(mSpringArm);
 	
 	mSpringArm->SetupAttachment(mStaticMesh);
 	mCamera->SetupAttachment(mSpringArm);
 
 	mSpringArm->TargetArmLength = 50.f;
 	mCamera->SetRelativeLocation(FVector(-230.0, 0.0, 85.0));
+	mCamera->bConstrainAspectRatio = true;
 	//mSpringArm->SetRelativeLocation(FVector(0.0, 80.0, 0.0));
 	//mSpringArm->SetRelativeRotation(FRotator(0.0, 90.0, 0.0));
 
@@ -119,8 +124,7 @@ void ABall::Tick(float DeltaTime)
 	CheckMaterialCollision();
 	CheckLandscapeCollision();
 
-	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("dir: %f"), mBallInfo.BallDir));
-
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("dir: %f"), mBallInfo.BallDir));
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -133,6 +137,7 @@ void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction<ABall>(TEXT("SwingRight"), EInputEvent::IE_Pressed, this, &ABall::SwingRight);
 	PlayerInputComponent->BindAction<ABall>(TEXT("Roll"), EInputEvent::IE_Pressed, this, &ABall::Roll);
 	PlayerInputComponent->BindAction<ABall>(TEXT("PrintPower"), EInputEvent::IE_Pressed, this, &ABall::PrintPower);
+	PlayerInputComponent->BindAction<ABall>(TEXT("ChangeCamera"), EInputEvent::IE_Pressed, this, &ABall::ChangeCamera);
 
 	// Ãà ¸ÅÇÎ
 	PlayerInputComponent->BindAxis<ABall>(TEXT("SwingDir"), this, &ABall::SetSwingDir);
@@ -174,7 +179,7 @@ void ABall::SwingStraight()
 	//FVector TargetPos = GetActorLocation() + FVector(50.0, 0.0, 0.0);
 	FVector outVelocity = FVector::ZeroVector;
 
-	mBallInfo.TargetPos = TargetPos;
+	//mBallInfo.TargetPos = TargetPos;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
@@ -204,7 +209,7 @@ void ABall::SwingLeft()
 	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower + mAddPower, 0.0, 0.0);
 	FVector outVelocity = FVector::ZeroVector;
 
-	mBallInfo.TargetPos = TargetPos;
+	//mBallInfo.TargetPos = TargetPos;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
@@ -234,7 +239,7 @@ void ABall::SwingRight()
 	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower + mAddPower, 0.0, 0.0);
 	FVector outVelocity = FVector::ZeroVector;
 
-	mBallInfo.TargetPos = TargetPos;
+	//mBallInfo.TargetPos = TargetPos;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
@@ -256,6 +261,7 @@ void ABall::Roll()
 	mIsSwingLeft = false;
 
 	// Ball Info
+	mBallInfo.StartPos = GetActorLocation();
 	mBallInfo.SwingArc = 0.9f;
 	mBallInfo.TargetDir = mBallInfo.TargetPos - GetActorLocation();
 	mBallInfo.TargetDir.Normalize();
@@ -415,7 +421,7 @@ void ABall::CheckLandscapeCollision()
 
 void ABall::SetBallDetail()
 {
-	// PrintViewport(1.f, FColor::Red, mHitMaterialName);
+	//PrintViewport(1.f, FColor::Red, mHitMaterialName);
 
 	if (mHitMaterialName == L"PM_LandscapeBase")
 	{
@@ -445,6 +451,18 @@ void ABall::SetBallDetail()
 	else if (mHitMaterialName == L"PM_LandscapeLine")
 	{
 
+	}
+}
+
+void ABall::ChangeCamera()
+{
+	// APlayerController::SetViewTargetWithBlend(mSubCamera, 2.f);
+
+	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (IsValid(BallController))
+	{
+		PrintViewport(1.f, FColor::Red, TEXT("ChangeCamera"));
+		BallController->SetViewTargetWithBlend(mSubCamera, 2.f);
 	}
 }
 
