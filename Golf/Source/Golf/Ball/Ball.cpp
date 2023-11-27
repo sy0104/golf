@@ -16,7 +16,7 @@ ABall::ABall()
 	// Static Mesh
 	mStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	mStaticMesh->SetupAttachment(mRoot);
-
+	
 	const FString& path = TEXT("/Script/Engine.StaticMesh'/Game/Assets/GolfPack/Meshes/SM_Golfball.SM_Golfball'");
 	//const FString& path = TEXT("/Script/Engine.StaticMesh'/Game/Assets/GolfPack/Meshes/SM_GolfTee.SM_GolfTee'");
 	UStaticMesh* mesh = LoadObject<UStaticMesh>(nullptr, *path);
@@ -33,8 +33,11 @@ ABall::ABall()
 
 	mSpringArm->TargetArmLength = 200.f;
 	mCamera->SetRelativeLocation(FVector(-60.0, 0.0, 100.0));
-	
 	//mCamera->bConstrainAspectRatio = true;
+
+	mSubCamera = CreateDefaultSubobject<ACameraActor>(TEXT("SubCamera"));
+	//mSubCamera->GetCameraComponent()->SetupAttachment(mSpringArm);
+	
 	mSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 0.0));
 	mSpringArm->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
 
@@ -44,6 +47,7 @@ ABall::ABall()
 	mSpringArm->bInheritRoll = false;
 
 	mSpringArm->bDoCollisionTest = false;
+
 
 	// Projectile
 	mProjectile = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile"));
@@ -62,9 +66,10 @@ ABall::ABall()
 	mRoot->SetCollisionProfileName(TEXT("Ball"));
 	mRoot->SetSimulatePhysics(true);
 	mRoot->SetLinearDamping(0.0f);
+	mRoot->SetUseCCD(true);
 
 	// Ball Info
-	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
+	mBallInfo.StartPos = FVector(500.0, 0.0, 0.0);
 	mBallInfo.TargetPos = FVector(43000.0, 0.0, 0.0);
 
 	mBallInfo.TargetDir = mBallInfo.TargetPos - mBallInfo.StartPos;
@@ -89,6 +94,9 @@ ABall::ABall()
 	mTempBallPower = mBallInfo.BallPower;
 
 	mIsGround = true;
+
+	mFlyingTime = 0.f;
+	mIsSubCamera = false;
 
 	// Init
 	SetActorLocation(mBallInfo.StartPos);
@@ -125,6 +133,8 @@ void ABall::Tick(float DeltaTime)
 	CheckMaterialCollision();
 	CheckLandscapeCollision();
 
+	CheckCameraChange(DeltaTime);
+
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("dir: %f"), mBallInfo.BallDir));
 
 	//FVector CameraOffset = FVector(-150.0, 0.0, 30.0);
@@ -154,10 +164,13 @@ void ABall::SwingStraight()
 	//PrintViewport(1.f, FColor::Red, TEXT("SwingStraight"));
 
 	// Projectile
-	mProjectile->bShouldBounce = false;
-	mProjectile->Bounciness = 0.0f;
-	mProjectile->Friction = 300.f;
-	mProjectile->bBounceAngleAffectsFriction = true;
+	//mProjectile->bShouldBounce = false;
+	//mProjectile->Bounciness = 0.0f;
+	//mProjectile->Friction = 300.f;
+	//mProjectile->bBounceAngleAffectsFriction = true;
+
+	mRoot->SetSimulatePhysics(true);
+	mIsGround = false;
 
 	// Spin
 	mIsSwingStraight = true;
@@ -165,7 +178,7 @@ void ABall::SwingStraight()
 	mIsSwingLeft = false;
 
 	// Ball Info
-	//mBallInfo.StartPos = GetActorLocation();
+	mBallInfo.StartPos = GetActorLocation();
 	mBallInfo.BallPower = mTempBallPower;
 	mBallInfo.SwingArc = 0.3f;
 	mBallInfo.TargetDir = mBallInfo.TargetPos - GetActorLocation();
@@ -187,13 +200,17 @@ void ABall::SwingStraight()
 	}
 
 	// FVector TargetPos = GetActorLocation() + FVector(mBallInfo.BallPower + mAddPower, mBallInfo.BallDir, 0.0);
-	//FVector TargetPos = GetActorLocation() + FVector(50.0, 0.0, 0.0);
+	//TargetPos = GetActorLocation() + FVector(50000.0, 0.0, 0.0);
 	FVector outVelocity = FVector::ZeroVector;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
 
-	mRoot->AddImpulse(outVelocity);
+	if (mHitMaterialName == L"PM_LandscapeBunker")
+		mRoot->AddImpulse(outVelocity / 2.0);
+
+	else
+		mRoot->AddImpulse(outVelocity);
 }
 
 void ABall::SwingLeft()
@@ -399,10 +416,10 @@ void ABall::CheckMaterialCollision()
 		}
 
 		FVector playerPos = GetActorLocation();
-		if (playerPos.Z < 3.0)
+		if (playerPos.Z < 2.5)
 		{
 			mIsGround = true;
-			// PrintViewport(1.f, FColor::Red, TEXT("Ground"));
+			PrintViewport(1.f, FColor::Red, TEXT("Ground"));
 		}
 
 		else
@@ -445,12 +462,20 @@ void ABall::SetBallDetail()
 
 	else if (mHitMaterialName == L"PM_LandscapeWater")
 	{
-
+		if (mIsGround)
+		{
+			mRoot->SetSimulatePhysics(false);
+		}
 	}
 
 	else if (mHitMaterialName == L"PM_LandscapeBunker")
 	{
-
+		if (mIsGround)
+		{
+			mRoot->SetSimulatePhysics(false);
+			mProjectile->Bounciness = 0.f;
+			mProjectile->StopMovementImmediately();
+		}
 	}
 
 	else if (mHitMaterialName == L"PM_LandscapeLine")
@@ -463,12 +488,22 @@ void ABall::ChangeCamera()
 {
 	// APlayerController::SetViewTargetWithBlend(mSubCamera, 2.f);
 
-	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	//if (IsValid(BallController))
-	//{
-	//	PrintViewport(1.f, FColor::Red, TEXT("ChangeCamera"));
-	//	//BallController->SetViewTargetWithBlend(mSubCamera, 2.f);
-	//}
+	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (IsValid(BallController))
+	{
+		PrintViewport(1.f, FColor::Red, TEXT("ChangeCamera"));
+		BallController->SetViewTargetWithBlend(mSubCamera, 2.f);
+	}
+}
+
+void ABall::CheckCameraChange(float DeltaTime)
+{
+	mFlyingTime += DeltaTime;
+
+	if (mFlyingTime >= 4.f)
+	{
+
+	}
 }
 
 void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
@@ -485,6 +520,12 @@ void ABall::BallBounced(const FHitResult& Hit, const FVector& ImpactVelocity)
 void ABall::BallStopped(const FHitResult& ImpactResult)
 {
 	PrintViewport(1.f, FColor::Blue, TEXT("Stopped"));
+
+	if (mHitMaterialName == L"PM_LandscapeWater")
+	{
+		PrintViewport(1.f, FColor::Blue, TEXT("Water"));
+		// 위치 옮김 추가
+	}
 }
 
 void ABall::SetStaticMesh(const FString& path)

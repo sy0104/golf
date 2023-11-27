@@ -46,6 +46,7 @@ private:
 
 	// camera
 	void ChangeCamera();
+	void CheckCameraChange(float DeltaTime);
 
 public:
 	UFUNCTION()
@@ -72,8 +73,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
 	UCameraComponent*			mCamera;
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	//ACameraActor*				mSubCamera;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	ACameraActor*				mSubCamera;
 
 	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
 	//UCameraComponent*			mSubCamera;
@@ -96,6 +97,9 @@ private:
 
 	double		mTempBallPower;
 	double		mAddPower;
+
+	float		mFlyingTime;
+	bool		mIsSubCamera;
 
 	FString		mHitMaterialName;
 
