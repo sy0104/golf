@@ -21,6 +21,7 @@ private:
 	class UDistanceBase*	mDistanceBase;
 	class UBallDetailBase*	mBallDetailBase;
 	class UGolfClubBase*	mGolfClubBase;
+	class UScoreBase*		mScoreBase;
 	
 public:
 	class UDistanceBase* GetDistanceBase()
@@ -34,4 +35,7 @@ public:
 
 	// Ball Detail
 	void SetBallPower(float ratio);
+
+	// Score UI
+	void SetScoreText(FString ScoreText);
 };

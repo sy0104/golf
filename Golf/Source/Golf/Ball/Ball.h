@@ -29,6 +29,7 @@ private:
 
 	// Dir
 	void SetSwingDir(float scale);
+	void StopRotate();
 
 	// Spin
 	void AddForceToStraight();

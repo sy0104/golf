@@ -6,10 +6,10 @@
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
-#include "DistanceBase.generated.h"
+#include "ScoreBase.generated.h"
 
 UCLASS()
-class GOLF_API UDistanceBase : public UUserWidget
+class GOLF_API UScoreBase : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -18,10 +18,8 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:
-	UTextBlock*		mLeftDistanceText;
-	UTextBlock*		mDistanceText;
+	UTextBlock* mScoreText;
 
 public:
-	void SetLeftDistanceText(float dis);
-	void SetDistanceText(float dis);
+	void SetScoreText(FString ScoreText);
 };

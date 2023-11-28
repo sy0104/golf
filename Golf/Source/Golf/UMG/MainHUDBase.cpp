@@ -5,6 +5,7 @@
 #include "DistanceBase.h"
 #include "BallDetailBase.h"
 #include "GolfClubBase.h"
+#include "ScoreBase.h"
 
 void UMainHUDBase::NativeConstruct()
 {
@@ -13,6 +14,7 @@ void UMainHUDBase::NativeConstruct()
 	mDistanceBase = Cast<UDistanceBase>(GetWidgetFromName(FName(TEXT("DistanceUI"))));
 	mBallDetailBase = Cast<UBallDetailBase>(GetWidgetFromName(FName(TEXT("BallDetailUI"))));
 	mGolfClubBase = Cast<UGolfClubBase>(GetWidgetFromName(FName(TEXT("GolfClubUI"))));
+	mScoreBase = Cast<UScoreBase>(GetWidgetFromName(FName(TEXT("ScoreUI"))));
 }
 
 void UMainHUDBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -33,4 +35,10 @@ void UMainHUDBase::SetDistanceText(float dis)
 void UMainHUDBase::SetBallPower(float ratio)
 {
 	mBallDetailBase->SetBallPower(ratio);
+}
+
+void UMainHUDBase::SetScoreText(FString ScoreText)
+{
+	mScoreBase->SetVisibility(ESlateVisibility::Visible);
+	mScoreBase->SetScoreText(ScoreText);
 }
