@@ -91,10 +91,7 @@ ABall::ABall()
 
 	// power
 	mIsPowerUp = true;
-	mAddPower = 10.0;
 	mTempBallPower = mBallInfo.BallPower;
-
-	mIsGround = true;
 
 	mFlyingTime = 0.f;
 	mIsSubCamera = false;
@@ -134,7 +131,6 @@ void ABall::Tick(float DeltaTime)
 	ShowDistance();
 
 	CheckMaterialCollision();
-	CheckLandscapeCollision();
 
 	CheckCameraChange(DeltaTime);
 
@@ -190,7 +186,6 @@ void ABall::SwingStraight()
 	//mProjectile->bBounceAngleAffectsFriction = true;
 
 	mRoot->SetSimulatePhysics(true);
-	mIsGround = false;
 
 	// Spin
 	mIsSwingStraight = true;
@@ -204,36 +199,54 @@ void ABall::SwingStraight()
 	mBallInfo.TargetDir = mBallInfo.TargetPos - GetActorLocation();
 	mBallInfo.TargetDir.Normalize();
 
+	// landscape
 	if (mHitMaterialName == L"PM_LandscapeBunker")
 		mBallInfo.SwingArc *= 2.f;
 
 	FVector StartPos = GetActorLocation();
 	FVector TargetPos;
 
+	// dir
 	if (mBallInfo.BallDir <= 90.f)
 	{
-		PrintViewport(1.f, FColor::Red, TEXT("Forward"));
+		//PrintViewport(1.f, FColor::Red, TEXT("Forward"));
 		TargetPos = GetActorLocation() + FVector(mBallInfo.BallPower, mBallInfo.BallDir, 0.0);
 	}
 
 	else if (mBallInfo.BallDir > 90.f)
 	{
-		PrintViewport(1.f, FColor::Red, TEXT("Back"));
+		//PrintViewport(1.f, FColor::Red, TEXT("Back"));
 		TargetPos = GetActorLocation() - FVector(mBallInfo.BallPower, mBallInfo.BallDir, 0.0);
 	}
 
-	//FVector TargetPos = GetActorLocation() + FVector(mBallInfo.BallPower + mAddPower, mBallInfo.BallDir, 0.0);
-	TargetPos = GetActorLocation() + FVector(600.0, 0.0, 0.0);
-	FVector outVelocity = FVector::ZeroVector;
+	//FVector TargetPos = GetActorLocation() + FVector(mBallInfo.BallPower, mBallInfo.BallDir, 0.0);
+	//TargetPos = GetActorLocation() + FVector(600.0, 0.0, 0.0);
 
+	// club
+	switch (mGolfClubType)
+	{
+	case EGolfClub::Club1:
+
+		break;
+	case EGolfClub::Club2:
+
+		break;
+	case EGolfClub::Club3:
+		mBallInfo.SwingArc /= 1.5f;
+		break;
+	}
+
+
+	FVector outVelocity = FVector::ZeroVector;
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
 
 	if (mHitMaterialName == L"PM_LandscapeBunker")
-		mRoot->AddImpulse(outVelocity / 2.0);
+		outVelocity /= 2.0;
 
-	else
-		mRoot->AddImpulse(outVelocity);
+
+
+	mRoot->AddImpulse(outVelocity);
 }
 
 void ABall::SwingLeft()
@@ -257,7 +270,7 @@ void ABall::SwingLeft()
 	mBallInfo.SwingArc = 0.3f;
 
 	FVector StartPos = GetActorLocation();
-	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower + mAddPower, 0.0, 0.0);
+	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower, 0.0, 0.0);
 	FVector outVelocity = FVector::ZeroVector;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
@@ -287,7 +300,7 @@ void ABall::SwingRight()
 	mBallInfo.SwingArc = 0.3f;
 
 	FVector StartPos = GetActorLocation();
-	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower + mAddPower, 0.0, 0.0);
+	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower, 0.0, 0.0);
 	FVector outVelocity = FVector::ZeroVector;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
@@ -453,32 +466,10 @@ void ABall::CheckMaterialCollision()
 			mHitMaterialName = material->GetName();
 			SetBallDetail();
 		}
-
-		FVector playerPos = GetActorLocation();
-		if (playerPos.Z < 2.5)
-		{
-			//mIsGround = true;
-			//PrintViewport(1.f, FColor::Red, TEXT("Ground"));
-		}
-
-		else
-		{
-			mIsGround = false;
-		}
 	}
 }
 
-void ABall::CheckLandscapeCollision()
-{
-	if (!mIsGround)
-		return;
 
-	//mIsSwingStraight = false;
-	//mIsSwingLeft = false;
-	//mIsSwingRight = false;
-
-	//mProjectile->StopMovementImmediately();
-}
 
 void ABall::SetBallDetail()
 {
@@ -503,21 +494,12 @@ void ABall::SetBallDetail()
 
 	else if (mHitMaterialName == L"PM_LandscapeWater")
 	{
-		if (mIsGround)
-		{
-			mRoot->SetSimulatePhysics(false);
 
-		}
 	}
 
 	else if (mHitMaterialName == L"PM_LandscapeBunker")
 	{
-		if (mIsGround)
-		{
-			mRoot->SetSimulatePhysics(false);
-			mProjectile->Bounciness = 0.f;
-			mProjectile->StopMovementImmediately();
-		}
+
 	}
 
 	else if (mHitMaterialName == L"PM_LandscapeLine")

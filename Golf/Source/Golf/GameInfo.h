@@ -55,6 +55,14 @@ public:
 	float		SwingArc;
 };
 
+UENUM(BlueprintType)
+enum class EGolfClub : uint8
+{
+	Club1,
+	Club2,
+	Club3
+};
+
 UCLASS()
 class GOLF_API UGameInfo : public UObject
 {

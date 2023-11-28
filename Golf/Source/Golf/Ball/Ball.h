@@ -41,7 +41,6 @@ private:
 
 	// Ãæµ¹
 	void CheckMaterialCollision();
-	void CheckLandscapeCollision();
 	void SetBallDetail();
 	void ResetBallPos(float DeltaTime);
 
@@ -86,6 +85,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	URotatingMovementComponent*		mRotating;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EGolfClub	mGolfClubType;
+
 	FBallInfo	mBallInfo;
 
 private:
@@ -94,10 +96,8 @@ private:
 	bool		mIsSwingRight;
 
 	bool		mIsPowerUp;
-	bool		mIsGround;
 
 	double		mTempBallPower;
-	double		mAddPower;
 
 	float		mFlyingTime;
 	bool		mIsSubCamera;
@@ -126,6 +126,11 @@ public:
 	void SetSwingArc(float arc)
 	{
 		mBallInfo.SwingArc = arc;
+	}
+
+	void SetGolfClubType(EGolfClub GolfClub)
+	{
+		mGolfClubType = GolfClub;
 	}
 
 public:

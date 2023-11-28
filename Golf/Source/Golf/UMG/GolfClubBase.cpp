@@ -28,15 +28,14 @@ void UGolfClubBase::OnClub1ButtonClicked()
 {
 	PrintViewport(1.f, FColor::Red, TEXT("1"));
 
-	// max 200m
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode))
 	{
 		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 		if (IsValid(Ball))
 		{
-			//Ball->SetBallMinPower(290.0);
-			Ball->SetBallMaxPower(990.0);
+			Ball->SetBallMaxPower(1200.0);	// 260m ~ 280m
+			Ball->SetGolfClubType(EGolfClub::Club1);
 		}
 	}
 }
@@ -52,7 +51,8 @@ void UGolfClubBase::OnClub2ButtonClicked()
 		if (IsValid(Ball))
 		{
 			//Ball->SetBallMinPower(190.0);
-			Ball->SetBallMaxPower(790.0);
+			Ball->SetBallMaxPower(800.0);	// 170m
+			Ball->SetGolfClubType(EGolfClub::Club2);
 		}
 	}
 }
@@ -68,7 +68,8 @@ void UGolfClubBase::OnClub3ButtonClicked()
 		if (IsValid(Ball))
 		{
 			//Ball->SetBallMinPower(90.0);
-			Ball->SetBallMaxPower(590.0);
+			Ball->SetBallMaxPower(600.0);	// 600m
+			Ball->SetGolfClubType(EGolfClub::Club3);
 		}
 	}
 }
