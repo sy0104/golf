@@ -43,6 +43,7 @@ private:
 	void CheckMaterialCollision();
 	void CheckLandscapeCollision();
 	void SetBallDetail();
+	void ResetBallPos(float DeltaTime);
 
 	// camera
 	void ChangeCamera();
@@ -101,6 +102,9 @@ private:
 	float		mFlyingTime;
 	bool		mIsSubCamera;
 
+	float		mResetTime;
+	bool		mIsResetPos;
+
 	FString		mHitMaterialName;
 
 	class UMainHUDBase*		mMainHUD;
@@ -126,4 +130,5 @@ public:
 
 public:
 	float GetDistanceToTarget(FVector src, FVector dst);
+	bool IsBallStopped();
 };
