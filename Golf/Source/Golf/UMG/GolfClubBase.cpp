@@ -34,7 +34,7 @@ void UGolfClubBase::OnClub1ButtonClicked()
 		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 		if (IsValid(Ball))
 		{
-			Ball->SetBallMaxPower(1200.0);	// 260m ~ 280m
+			Ball->SetBallMaxPower(1200.0);	// 250m
 			Ball->SetGolfClubType(EGolfClub::Club1);
 		}
 	}
@@ -68,7 +68,7 @@ void UGolfClubBase::OnClub3ButtonClicked()
 		if (IsValid(Ball))
 		{
 			//Ball->SetBallMinPower(90.0);
-			Ball->SetBallMaxPower(600.0);	// 600m
+			Ball->SetBallMaxPower(600.0);	// 130m
 			Ball->SetGolfClubType(EGolfClub::Club3);
 		}
 	}

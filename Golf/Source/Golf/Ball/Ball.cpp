@@ -36,10 +36,7 @@ ABall::ABall()
 	mSpringArm->TargetArmLength = 200.f;
 	mCamera->SetRelativeLocation(FVector(-60.0, 0.0, 100.0));
 	//mCamera->bConstrainAspectRatio = true;
-
-	mSubCamera = CreateDefaultSubobject<ACameraActor>(TEXT("SubCamera"));
-	//mSubCamera->GetCameraComponent()->SetupAttachment(mSpringArm);
-	
+		
 	mSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 0.0));
 	mSpringArm->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
 
@@ -69,9 +66,11 @@ ABall::ABall()
 	mRoot->SetLinearDamping(0.0f);
 	mRoot->SetUseCCD(true);
 
+	mRoot->SetAngularDamping(0.1f);
+
 	// Ball Info
-	mBallInfo.StartPos = FVector(500.0, 0.0, 0.0);
-	mBallInfo.TargetPos = FVector(43000.0, 0.0, 0.0);
+	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
+	mBallInfo.DestPos = FVector(43000.0, 0.0, 0.0);
 
 	mBallInfo.TargetDir = mBallInfo.TargetPos - mBallInfo.StartPos;
 	mBallInfo.TargetDir.Normalize();
@@ -95,16 +94,12 @@ ABall::ABall()
 	mIsPowerUp = true;
 	mTempBallPower = mBallInfo.BallPower;
 
-	mFlyingTime = 0.f;
-	mIsSubCamera = false;
-
 	mResetTime = 0.f;
 	mIsResetPos = false;
 
 	// Init
 	SetActorLocation(mBallInfo.StartPos);
 	SetActorScale3D(FVector(1.0, 1.0, 1.0));
-
 }
 
 void ABall::BeginPlay()
@@ -115,6 +110,7 @@ void ABall::BeginPlay()
 	if (IsValid(GameMode))
 	{
 		mMainHUD = GameMode->GetMainHUD();
+		mMainHUD->SetDistanceText(0.f);
 	}
 
 	mRoot->OnComponentHit.AddDynamic(this, &ABall::OnHit);
@@ -153,6 +149,13 @@ void ABall::Tick(float DeltaTime)
 	//FVector CameraOffset = FVector(-150.0, 0.0, 30.0);
 	//FVector loc = GetActorLocation() + CameraOffset;
 	//mCamera->SetRelativeLocation(loc);
+
+	FVector vel = mRoot->GetPhysicsLinearVelocity().GetSafeNormal();
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel X: %f"), vel.X));
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Y: %f"), vel.Y));
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Z: %f"), vel.Z));
+
+	
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -201,22 +204,20 @@ void ABall::SwingStraight()
 	if (mHitMaterialName == L"PM_LandscapeBunker")
 		mBallInfo.SwingArc *= 2.f;
 
-	FVector StartPos = GetActorLocation();
+	//FVector StartPos = GetActorLocation();
 	FVector TargetPos;
 
-
-
-	//FVector TargetPos = GetActorLocation() + FVector(mBallInfo.BallPower, mBallInfo.BallDir, 0.0);
+	////FVector TargetPos = GetActorLocation() + FVector(mBallInfo.BallPower, mBallInfo.BallDir, 0.0);
 	//FVector TargetPos = GetActorLocation() + FVector(mBallInfo.BallPower, 0.0, 0.0);
 
-	double radian = mBallInfo.BallSpinDir * (float)(3.141592 / 180);
-	////double x2 = cos(radian) * TargetPos.X - sin(radian) * TargetPos.Y;
-	////double y2 = sin(radian) * TargetPos.X + cos(radian) * TargetPos.Y;
+	//double radian = mBallInfo.BallSpinDir * (float)(3.141592 / 180);
+	//////double x2 = cos(radian) * TargetPos.X - sin(radian) * TargetPos.Y;
+	//////double y2 = sin(radian) * TargetPos.X + cos(radian) * TargetPos.Y;
 
-	double x2 = (cos(radian) * TargetPos.X);
-	double y2 = (sin(radian) * TargetPos.X) + (cos(radian) * TargetPos.Y);
-	double z2 = (sin(radian) * TargetPos.X);
-	FVector RotVec = FVector(x2, 0, z2);
+	//double x2 = (cos(radian) * TargetPos.X);
+	//double y2 = (sin(radian) * TargetPos.X) + (cos(radian) * TargetPos.Y);
+	//double z2 = (sin(radian) * TargetPos.X);
+	//FVector RotVec = FVector(x2, 0, z2);
 
 	// dir
 	if (abs(mBallInfo.BallSpinDir) <= 90.f)
@@ -231,10 +232,10 @@ void ABall::SwingStraight()
 		TargetPos = GetActorLocation() - FVector(mBallInfo.BallPower, 0.0, 0.0);
 	}
 
-	if (mBallInfo.BallSpinDir < 0.0)
-		RotVec.X *= -1.0;
+	//if (mBallInfo.BallSpinDir < 0.0)
+	//	RotVec.X *= -1.0;
 
-	mBallInfo.TargetPos = RotVec;
+	//mBallInfo.TargetPos = RotVec;
 
 	//PrintViewport(10.f, FColor::Blue, FString::Printf(TEXT("SpinDir: %f"), mBallInfo.BallSpinDir));
 	//PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("X1: %f"), TargetPos.X));
@@ -267,7 +268,6 @@ void ABall::SwingStraight()
 	if (mHitMaterialName == L"PM_LandscapeBunker")
 		outVelocity /= 2.0;
 
-	
 	mRoot->AddImpulse(outVelocity);
 	mBallInfo.Score++;
 }
@@ -353,7 +353,7 @@ void ABall::Roll()
 	mBallInfo.TargetDir.Normalize();
 
 	FVector StartPos = GetActorLocation();
-	FVector TargetPos = StartPos + FVector(500, 0, 0);	// test
+	FVector TargetPos = StartPos + FVector(10, 0, 0);	// test
 	FVector outVelocity = FVector::ZeroVector;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
@@ -374,36 +374,55 @@ void ABall::SetSwingDir(float scale)
 	if (scale == -1.f/* && mBallInfo.BallDir > -90.0*/)
 	{
 		mBallInfo.BallSpinDir -= 1.0;
+		rot.Pitch -= 1.0;
 
-		//rot.Pitch -= 1.0;
-		rot.Pitch = mBallInfo.BallSpinDir;
-		SetActorRelativeRotation(rot);
+		//rot.Pitch = mBallInfo.BallSpinDir;
+		//SetActorRelativeRotation(rot);
 	}
 
 	else if (scale == 1.f/* && mBallInfo.BallDir < 90.0*/)
 	{
 		mBallInfo.BallSpinDir += 1.0;
+		rot.Pitch += 1.0;
 
-		//rot.Pitch += 1.0;
-		rot.Pitch = mBallInfo.BallSpinDir;
-		SetActorRelativeRotation(rot);
+		//rot.Pitch = mBallInfo.BallSpinDir;
 	}
+
+	SetActorRelativeRotation(rot);
+	mSpringArm->SetRelativeRotation(FRotator(0.0, rot.Pitch, 0.0));
+
+	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Pitch: %f"), rot.Pitch));
 
 	//FRotator springArmRot = FRotator(0.0, rot.Pitch, 0.0);
 	//mSpringArm->SetRelativeRotation(springArmRot);
 	//SetActorRelativeRotation(springArmRot);
+
+	//FVector vec = FVector(0.0, 0.0, 0.0);
+	//FVector StartPos = GetActorLocation();
+	//FVector TargetPos = vec + FVector(mBallInfo.BallPower, 0.0, 0.0);
+
+	//double radian = mBallInfo.BallSpinDir * (float)(3.141592 / 180);
+
+	//double x2 = (cos(radian) * TargetPos.X);
+	//double y2 = (sin(radian) * TargetPos.X) + (cos(radian) * TargetPos.Y);
+	//double z2 = (sin(radian) * TargetPos.X);
+	//FVector RotVec = FVector(x2, 0.0, z2);
+
+	//if (mBallInfo.BallSpinDir < 0.0)
+	//	RotVec.X *= -1.0;
+
+	//mBallInfo.TargetPos = RotVec;
+	//DrawDebugLine(GetWorld(), mBallInfo.StartPos, mBallInfo.TargetPos, FColor::Red, false, 1.0f);
 }
 
 void ABall::StopRotate()
 {
 	mSpringArm->bInheritYaw = false;
-	PrintViewport(1.f, FColor::Red, TEXT("Stop Rotate"));
 }
 
 void ABall::AddForceToStraight()
 {
 	//mProjectile->ConstrainDirectionToPlane(GetActorForwardVector());
-
 }
 
 void ABall::AddForceToSide()
@@ -456,7 +475,7 @@ void ABall::AddBallPower(float scale)
 
 void ABall::ShowDistance()
 {
-	float leftDis = GetDistanceToTarget(GetActorLocation(), mBallInfo.TargetPos);
+	float leftDis = GetDistanceToTarget(GetActorLocation(), mBallInfo.DestPos);
 	// float dis = GetActorLocation().X;
 
 	float dis = GetDistanceToTarget(mBallInfo.StartPos, GetActorLocation());
@@ -554,6 +573,7 @@ void ABall::ResetBallPos(float DeltaTime)
 	mResetTime += DeltaTime;
 	if (mResetTime > 2.f)
 	{
+		// 지정된 위치로 공 위치 재설정
 		SetActorLocation(mBallInfo.StartPos);
 		mResetTime = 0.f;
 		mIsResetPos = false;
@@ -564,21 +584,21 @@ void ABall::ChangeCamera()
 {
 	// APlayerController::SetViewTargetWithBlend(mSubCamera, 2.f);
 
+	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	//if (IsValid(BallController))
+	//{
+	//	PrintViewport(1.f, FColor::Red, TEXT("ChangeCamera"));
+	//	BallController->SetViewTargetWithBlend(mSubCamera, 2.f);
+	//}
+
 	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (IsValid(BallController))
 	{
-		PrintViewport(1.f, FColor::Red, TEXT("ChangeCamera"));
-		BallController->SetViewTargetWithBlend(mSubCamera, 2.f);
-	}
-}
+		FRotator Rot = BallController->GetControlRotation();
 
-void ABall::CheckCameraChange(float DeltaTime)
-{
-	mFlyingTime += DeltaTime;
-
-	if (mFlyingTime >= 4.f)
-	{
-
+		PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Roll: %f"), Rot.Roll));
+		PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Pitch: %f"), Rot.Pitch));
+		PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Yaw: %f"), Rot.Yaw));
 	}
 }
 
@@ -625,7 +645,7 @@ void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 
 	if (IsBallStopped())
 	{
-		if (mIsSwingStraight)
+		if (mIsSwingStraight)	// 추가
 		{
 			SetActorRelativeRotation(FRotator(0.0, 0.0, 0.0));
 			mSpringArm->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
@@ -635,6 +655,8 @@ void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 		mIsSwingStraight = false;
 		mIsSwingLeft = false;
 		mIsSwingRight = false;
+
+		mMainHUD->SetDistanceText(0.f);
 	}
 }
 
