@@ -86,6 +86,7 @@ ABall::ABall()
 	mBallInfo.Score = -4;
 
 	// spin
+	mIsSwing = false;
 	mIsSwingStraight = true;
 	mIsSwingLeft = false;
 	mIsSwingRight = false;
@@ -96,6 +97,7 @@ ABall::ABall()
 
 	mResetTime = 0.f;
 	mIsResetPos = false;
+	mIsFindResetPos = false;
 
 	// Init
 	SetActorLocation(mBallInfo.StartPos);
@@ -133,6 +135,7 @@ void ABall::Tick(float DeltaTime)
 	//CheckCameraChange(DeltaTime);
 
 	ResetBallPos(DeltaTime);
+	//FindResetPos();
 
 	//FVector vel = mRoot->GetComponentVelocity();
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel X: %f"), vel.X));
@@ -150,12 +153,14 @@ void ABall::Tick(float DeltaTime)
 	//FVector loc = GetActorLocation() + CameraOffset;
 	//mCamera->SetRelativeLocation(loc);
 
-	FVector vel = mRoot->GetPhysicsLinearVelocity().GetSafeNormal();
-	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel X: %f"), vel.X));
-	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Y: %f"), vel.Y));
-	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Z: %f"), vel.Z));
+	//FVector vel = mRoot->GetPhysicsLinearVelocity().GetSafeNormal();
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel X: %f"), vel.X));
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Y: %f"), vel.Y));
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Z: %f"), vel.Z));
 
-	
+	//FVector loc = GetActorLocation();
+	//loc.Y++;
+	//SetActorLocation(loc);
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -187,6 +192,7 @@ void ABall::SwingStraight()
 	//mProjectile->bBounceAngleAffectsFriction = true;
 
 	mRoot->SetSimulatePhysics(true);
+	mIsSwing = true;
 
 	// Spin
 	mIsSwingStraight = true;
@@ -525,10 +531,8 @@ void ABall::CheckMaterialCollision()
 
 void ABall::SetBallDetail()
 {
-	//PrintViewport(1.f, FColor::Red, mHitMaterialName);
+	PrintViewport(1.f, FColor::Red, mHitMaterialName);
 	
-
-
 	if (mHitMaterialName == L"PM_LandscapeBase")
 	{
 
@@ -573,9 +577,27 @@ void ABall::ResetBallPos(float DeltaTime)
 	mResetTime += DeltaTime;
 	if (mResetTime > 2.f)
 	{
-		// 지정된 위치로 공 위치 재설정
-		SetActorLocation(mBallInfo.StartPos);
+		SetActorLocation(mResetPos);
 		mResetTime = 0.f;
+		mIsResetPos = false;
+	}
+}
+
+void ABall::FindResetPos()
+{
+	if (!mIsFindResetPos)
+		return;
+
+	if (mResetPos.Y < 0)
+		mResetPos.Y += 10.0;
+	else
+		mResetPos.Y -= 10.0;
+
+	SetActorLocation(mResetPos);
+
+	if (mHitMaterialName == L"PM_LandscapeBase")
+	{
+		mIsFindResetPos = false;
 		mIsResetPos = false;
 	}
 }
@@ -615,6 +637,18 @@ void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 		if (IsBallStopped())
 		{
 			mIsResetPos = true;
+
+			if (mHitMaterialName == L"PM_LandscapeWater")
+			{
+				mResetPos = FVector(28280.0, 820.0, -230.0);
+			}
+
+			else if (mHitMaterialName == L"PM_LandscapeRough")
+			{
+				FVector curPos = GetActorLocation();
+				curPos.Y = 0.0;
+				mResetPos = FVector(curPos.X, curPos.Y, curPos.Z);
+			}
 		}
 	}
 

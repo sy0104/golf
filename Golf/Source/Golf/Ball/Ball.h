@@ -43,7 +43,9 @@ private:
 	// Ãæµ¹
 	void CheckMaterialCollision();
 	void SetBallDetail();
+
 	void ResetBallPos(float DeltaTime);
+	void FindResetPos();
 
 	// camera
 	void ChangeCamera();
@@ -85,6 +87,7 @@ protected:
 	FBallInfo	mBallInfo;
 
 private:
+	bool		mIsSwing;
 	bool		mIsSwingStraight;
 	bool		mIsSwingLeft;
 	bool		mIsSwingRight;
@@ -95,6 +98,8 @@ private:
 
 	float		mResetTime;
 	bool		mIsResetPos;
+	bool		mIsFindResetPos;
+	FVector		mResetPos;
 
 	FString		mHitMaterialName;
 
