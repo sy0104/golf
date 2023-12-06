@@ -33,8 +33,8 @@ ABall::ABall()
 	mSpringArm->SetupAttachment(mStaticMesh);
 	mCamera->SetupAttachment(mSpringArm);
 
-	mSpringArm->TargetArmLength = 200.f;
-	mCamera->SetRelativeLocation(FVector(-60.0, 0.0, 100.0));
+	mSpringArm->TargetArmLength = 400.f;
+	mCamera->SetRelativeLocation(FVector(-150.0, 0.0, 70.0));
 	//mCamera->bConstrainAspectRatio = true;
 		
 	mSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 0.0));
@@ -63,10 +63,9 @@ ABall::ABall()
 	mRoot->SetCollisionProfileName(TEXT("Ball"));
 	mRoot->SetSimulatePhysics(false);
 	mRoot->SetNotifyRigidBodyCollision(true);
-	mRoot->SetLinearDamping(0.0f);
 	mRoot->SetUseCCD(true);
-
-	mRoot->SetAngularDamping(0.1f);
+	//mRoot->SetLinearDamping(0.05f);
+	//mProjectile->ProjectileGravityScale = 20.f;
 
 	// Ball Info
 	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
@@ -77,22 +76,28 @@ ABall::ABall()
 	mBallInfo.SpinForce = 1000.f;
 
 	mBallInfo.BallPower = 0.0;
-	//mBallInfo.BallMinPower = 0.0;
-	mBallInfo.BallMaxPower = 190.0;
+	mBallInfo.BallMinPower = 0.0;
+	mBallInfo.BallMaxPower = 1500.0;
+
+	mBallInfo.BallHeight = 0.0;
+	mBallInfo.BallMinHeight = 0.0;
+	mBallInfo.BallMaxHeight = 1500.0;
+
 	mBallInfo.BallDir = 0.0;
 	mBallInfo.BallSpinDir = 0.0;
 
-	mBallInfo.SwingArc = 0.3f;
 	mBallInfo.Score = -4;
 
 	// spin
-	mIsSwing = false;
+	mIsEnableSwing = true;
 	mIsSwingStraight = true;
 	mIsSwingLeft = false;
 	mIsSwingRight = false;
 
 	// power
 	mIsPowerUp = true;
+	mIsHeightUp = true;
+	mIsPowerTurn = true;
 	mTempBallPower = mBallInfo.BallPower;
 
 	mResetTime = 0.f;
@@ -101,7 +106,7 @@ ABall::ABall()
 
 	// Init
 	SetActorLocation(mBallInfo.StartPos);
-	SetActorScale3D(FVector(1.0, 1.0, 1.0));
+	SetActorScale3D(FVector(12.0, 12.0, 12.0));
 }
 
 void ABall::BeginPlay()
@@ -116,7 +121,6 @@ void ABall::BeginPlay()
 	}
 
 	mRoot->OnComponentHit.AddDynamic(this, &ABall::OnHit);
-	mProjectile->InitialSpeed = 100.f;
 }
 
 void ABall::Tick(float DeltaTime)
@@ -137,30 +141,40 @@ void ABall::Tick(float DeltaTime)
 	ResetBallPos(DeltaTime);
 	//FindResetPos();
 
-	//FVector vel = mRoot->GetComponentVelocity();
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel X: %f"), vel.X));
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Y: %f"), vel.Y));
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Z: %f"), vel.Z));
-
-
-	//FRotator rot = GetActorRotation();
-	//rot.Pitch -= 1.0;
-	//SetActorRelativeRotation(rot);
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("pitch: %f"), rot.Pitch));
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("dir: %f"), mBallInfo.BallDir));
-
-	//FVector CameraOffset = FVector(-150.0, 0.0, 30.0);
-	//FVector loc = GetActorLocation() + CameraOffset;
-	//mCamera->SetRelativeLocation(loc);
-
-	//FVector vel = mRoot->GetPhysicsLinearVelocity().GetSafeNormal();
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel X: %f"), vel.X));
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Y: %f"), vel.Y));
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Z: %f"), vel.Z));
+	//FVector target = mSpringArm->GetForwardVector();
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel X: %f"), target.X));
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Y: %f"), target.Y));
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Z: %f"), target.Z));
 
 	//FVector loc = GetActorLocation();
 	//loc.Y++;
 	//SetActorLocation(loc);
+
+	//if (mIsSwingStraight)
+	//{
+	//	static float power = 100.f;
+	//	FVector resistance = -mRoot->GetPhysicsLinearVelocity().GetSafeNormal();
+	//	mRoot->AddForce(resistance * power);
+	//	power += 0.1f;
+	//}
+
+	//FVector upVec = mRoot->GetUpVector();
+	//FVector forwardVec = mRoot->GetForwardVector();
+
+	//FVector vel = mProjectile->Velocity;
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel X: %f"), forwardVec.X));
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel Y: %f"), forwardVec.Y));
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel Z: %f"), forwardVec.Z));
+
+	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	//if (IsValid(BallController))
+	//{
+	//	FVector vec = BallController->GetControlRotation().Vector();
+
+	//	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Controller X: %f"), vec.X));
+	//	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Controller Y: %f"), vec.Y));
+	//	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Controller Z: %f"), vec.Z));
+	//}
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -175,14 +189,19 @@ void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction<ABall>(TEXT("PrintPower"), EInputEvent::IE_Pressed, this, &ABall::PrintPower);
 	PlayerInputComponent->BindAction<ABall>(TEXT("ChangeCamera"), EInputEvent::IE_Pressed, this, &ABall::ChangeCamera);
 	PlayerInputComponent->BindAction<ABall>(TEXT("StopRotate"), EInputEvent::IE_Released, this, &ABall::StopRotate);
+	//PlayerInputComponent->BindAction<ABall>(TEXT("BallDetail"), EInputEvent::IE_Pressed, this, &ABall::);
 
 	// 축 매핑
 	PlayerInputComponent->BindAxis<ABall>(TEXT("SwingDir"), this, &ABall::SetSwingDir);
-	PlayerInputComponent->BindAxis<ABall>(TEXT("BallPower"), this, &ABall::AddBallPower);
+	PlayerInputComponent->BindAxis<ABall>(TEXT("BallDetail"), this, &ABall::AddBallPower);
+	PlayerInputComponent->BindAxis<ABall>(TEXT("BallDetail"), this, &ABall::AddBallHeight);
 }
 
 void ABall::SwingStraight()
 {
+	//if (!mIsEnableSwing)
+	//	return;
+
 	//PrintViewport(1.f, FColor::Red, TEXT("SwingStraight"));
 
 	// Projectile
@@ -191,8 +210,9 @@ void ABall::SwingStraight()
 	//mProjectile->Friction = 300.f;
 	//mProjectile->bBounceAngleAffectsFriction = true;
 
+	mMainHUD->SetBallStateVisible(false);
 	mRoot->SetSimulatePhysics(true);
-	mIsSwing = true;
+	mIsEnableSwing = false;
 
 	// Spin
 	mIsSwingStraight = true;
@@ -202,28 +222,19 @@ void ABall::SwingStraight()
 	// Ball Info
 	mBallInfo.StartPos = GetActorLocation();
 	mBallInfo.BallPower = mTempBallPower;
-	mBallInfo.SwingArc = 0.3f;
+	mBallInfo.BallHeight = 0.3f;
 	mBallInfo.TargetDir = mBallInfo.TargetPos - GetActorLocation();
 	mBallInfo.TargetDir.Normalize();
 
 	// landscape
 	if (mHitMaterialName == L"PM_LandscapeBunker")
-		mBallInfo.SwingArc *= 2.f;
+		mBallInfo.BallHeight *= 2.f;
 
 	//FVector StartPos = GetActorLocation();
 	FVector TargetPos;
 
 	////FVector TargetPos = GetActorLocation() + FVector(mBallInfo.BallPower, mBallInfo.BallDir, 0.0);
 	//FVector TargetPos = GetActorLocation() + FVector(mBallInfo.BallPower, 0.0, 0.0);
-
-	//double radian = mBallInfo.BallSpinDir * (float)(3.141592 / 180);
-	//////double x2 = cos(radian) * TargetPos.X - sin(radian) * TargetPos.Y;
-	//////double y2 = sin(radian) * TargetPos.X + cos(radian) * TargetPos.Y;
-
-	//double x2 = (cos(radian) * TargetPos.X);
-	//double y2 = (sin(radian) * TargetPos.X) + (cos(radian) * TargetPos.Y);
-	//double z2 = (sin(radian) * TargetPos.X);
-	//FVector RotVec = FVector(x2, 0, z2);
 
 	// dir
 	if (abs(mBallInfo.BallSpinDir) <= 90.f)
@@ -251,8 +262,6 @@ void ABall::SwingStraight()
 
 	mBallInfo.BallSpinDir = 0.0;
 
-	//TargetPos = GetActorLocation() + FVector(600.0, 0.0, 0.0);
-
 	// club
 	switch (mGolfClubType)
 	{
@@ -263,19 +272,49 @@ void ABall::SwingStraight()
 
 		break;
 	case EGolfClub::Club3:
-		mBallInfo.SwingArc /= 1.5f;
+		mBallInfo.BallHeight /= 1.5f;
 		break;
 	}
 
 	FVector outVelocity = FVector::ZeroVector;
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-		this, outVelocity, mBallInfo.StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
+		this, outVelocity, mBallInfo.StartPos, TargetPos, GetWorld()->GetGravityZ(), 0.4);
 
 	if (mHitMaterialName == L"PM_LandscapeBunker")
 		outVelocity /= 2.0;
+	
+	double x = 170000.0;
+	double z = 250000.0;
 
-	mRoot->AddImpulse(outVelocity);
+	FVector powerVec = FVector(x, 0.0, z);
+	//mRoot->AddImpulse(powerVec);
+
+	//FVector angleVec = FVector(0.5, 0.0, angle);
+	//FVector vel = powerVec * angleVec.Normalize();
+
+	// BallMesh->AddImpulse(FVector(Vector.X, Vector.Y, (abs(Vector.X)+abs(Vector.Y))*BallAng).GetSafeNormal()*1000.0f*BallVel);
+
+
+	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	FVector controllerVec;
+	if (IsValid(BallController))
+	{
+		controllerVec = BallController->GetControlRotation().Vector();
+	}
+
+	//FVector power = FVector(controllerVec.X, controllerVec.Y, (abs(controllerVec.X) + abs(controllerVec.Y)) * 0.3);
+	FVector power = FVector(1.0, 0.0, 0.4);
+	power.Normalize();
+
+	mRoot->AddImpulse(power * 450000.0);
+	//mRoot->AddImpulse(power * 200000.0);
+
+	//mRoot->AddImpulse(outVelocity);
 	mBallInfo.Score++;
+
+	//PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("normal X: %f"), power.X));
+	//PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("normal Y: %f"), power.Y));
+	//PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("normal Z: %f"), power.Z));
 }
 
 void ABall::SwingLeft()
@@ -296,14 +335,14 @@ void ABall::SwingLeft()
 
 	// Ball Info
 	mBallInfo.BallPower = mTempBallPower;
-	mBallInfo.SwingArc = 0.3f;
+	mBallInfo.BallHeight = 0.3f;
 
 	FVector StartPos = GetActorLocation();
 	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower, 0.0, 0.0);
 	FVector outVelocity = FVector::ZeroVector;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
+		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.BallHeight);
 
 	mRoot->AddImpulse(outVelocity);
 }
@@ -326,14 +365,14 @@ void ABall::SwingRight()
 
 	// Ball Info
 	mBallInfo.BallPower = mTempBallPower;
-	mBallInfo.SwingArc = 0.3f;
+	mBallInfo.BallHeight = 0.3f;
 
 	FVector StartPos = GetActorLocation();
 	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower, 0.0, 0.0);
 	FVector outVelocity = FVector::ZeroVector;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
+		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.BallHeight);
 
 	mRoot->AddImpulse(outVelocity);
 }
@@ -354,18 +393,18 @@ void ABall::Roll()
 
 	// Ball Info
 	mBallInfo.StartPos = GetActorLocation();
-	mBallInfo.SwingArc = 0.9f;
+	mBallInfo.BallHeight = 0.9f;
 	mBallInfo.TargetDir = mBallInfo.TargetPos - GetActorLocation();
 	mBallInfo.TargetDir.Normalize();
 
 	FVector StartPos = GetActorLocation();
-	FVector TargetPos = StartPos + FVector(10, 0, 0);	// test
+	FVector TargetPos = StartPos + FVector(100000, 0, 0);	// test
 	FVector outVelocity = FVector::ZeroVector;
 
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.SwingArc);
+		this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.BallHeight);
 
-	mRoot->AddImpulse(outVelocity / 4);
+	mRoot->AddImpulse(FVector(1000000, 0, 0));
 }
 
 void ABall::SetSwingDir(float scale)
@@ -396,8 +435,12 @@ void ABall::SetSwingDir(float scale)
 
 	SetActorRelativeRotation(rot);
 	mSpringArm->SetRelativeRotation(FRotator(0.0, rot.Pitch, 0.0));
+	
+	FRotator Rot = GetActorRotation();
 
-	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Pitch: %f"), rot.Pitch));
+	//PrintViewport(3.f, FColor::Red, FString::Printf(TEXT("Roll: %f"), Rot.Roll));
+	//PrintViewport(3.f, FColor::Red, FString::Printf(TEXT("Pitch: %f"), Rot.Pitch));
+	//PrintViewport(3.f, FColor::Red, FString::Printf(TEXT("Yaw: %f"), Rot.Yaw));
 
 	//FRotator springArmRot = FRotator(0.0, rot.Pitch, 0.0);
 	//mSpringArm->SetRelativeRotation(springArmRot);
@@ -447,9 +490,14 @@ void ABall::AddForceToSide()
 	mRoot->AddForce(CrossPrdt * 100.0);
 }
 
+void ABall::SetBallDetailTurn()
+{
+	mIsPowerTurn = !mIsPowerTurn;
+}
+
 void ABall::AddBallPower(float scale)
 {
-	if (scale == 0.f)
+	if (scale == 0.f || !mIsPowerTurn)
 		return;
 
 	// 5000 ~ 30000
@@ -477,6 +525,22 @@ void ABall::AddBallPower(float scale)
 	}
 
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("power: %f"), mBallInfo.BallPower));
+}
+
+void ABall::AddBallHeight(float scale)
+{
+	if (scale == 0.f || mIsPowerTurn)
+		return;
+
+	if (mIsHeightUp)
+	{
+
+	}
+
+	else
+	{
+
+	}
 }
 
 void ABall::ShowDistance()
@@ -531,7 +595,7 @@ void ABall::CheckMaterialCollision()
 
 void ABall::SetBallDetail()
 {
-	PrintViewport(1.f, FColor::Red, mHitMaterialName);
+	//PrintViewport(1.f, FColor::Red, mHitMaterialName);
 	
 	if (mHitMaterialName == L"PM_LandscapeBase")
 	{
@@ -657,7 +721,7 @@ void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 		mRoot->SetSimulatePhysics(false);
 	}
 
-	else if (mHitMaterialName == L"PM_LandscapeLine")
+	else if (mHitMaterialName == L"PM_LandscapeGreen")
 	{
 		if (IsBallStopped())
 		{
@@ -677,20 +741,46 @@ void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 		}
 	}
 
+	else if (mHitMaterialName == L"PM_LandscapeLine")
+	{
+		//// 위치 조정
+		//mRoot->SetSimulatePhysics(false);
+
+		//if (IsBallStopped())
+		//{
+		//	mIsResetPos = true;
+
+		//	if (GetActorLocation().Y < 0)
+		//	{
+
+		//	}
+
+		//	else
+		//	{
+
+		//	}
+		//}
+
+	}
+
 	if (IsBallStopped())
 	{
 		if (mIsSwingStraight)	// 추가
 		{
-			SetActorRelativeRotation(FRotator(0.0, 0.0, 0.0));
-			mSpringArm->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
+			//SetActorRelativeRotation(FRotator(0.0, 0.0, 0.0));
+			//mSpringArm->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
 
 		}
 
+		mIsEnableSwing = true;
 		mIsSwingStraight = false;
 		mIsSwingLeft = false;
 		mIsSwingRight = false;
 
+		PrintViewport(1.f, FColor::Red, TEXT("Stop"));
+
 		mMainHUD->SetDistanceText(0.f);
+		mMainHUD->SetBallStateVisible(true);
 	}
 }
 

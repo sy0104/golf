@@ -35,7 +35,9 @@ private:
 	void AddForceToStraight();
 	void AddForceToSide();
 
+	void SetBallDetailTurn();
 	void AddBallPower(float scale);
+	void AddBallHeight(float scale);
 
 	void ShowDistance();
 	void PrintPower();
@@ -87,12 +89,14 @@ protected:
 	FBallInfo	mBallInfo;
 
 private:
-	bool		mIsSwing;
+	bool		mIsEnableSwing;
 	bool		mIsSwingStraight;
 	bool		mIsSwingLeft;
 	bool		mIsSwingRight;
 
 	bool		mIsPowerUp;
+	bool		mIsPowerTurn;
+	bool		mIsHeightUp;
 
 	double		mTempBallPower;
 
@@ -121,7 +125,7 @@ public:
 
 	void SetSwingArc(float arc)
 	{
-		mBallInfo.SwingArc = arc;
+		mBallInfo.BallHeight = arc;
 	}
 
 	void SetGolfClubType(EGolfClub GolfClub)

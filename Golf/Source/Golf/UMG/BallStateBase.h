@@ -2,15 +2,14 @@
 
 #pragma once
 
-#include <Components\ProgressBar.h>
+#include <Components\TextBlock.h>
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
-#include "BallDetailBase.generated.h"
-
+#include "BallStateBase.generated.h"
 
 UCLASS()
-class GOLF_API UBallDetailBase : public UUserWidget
+class GOLF_API UBallStateBase : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -19,10 +18,8 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:
-	UProgressBar*	mBallPowerBar;
-	UProgressBar*	mBallHeightBar;
+	UTextBlock*		mBallStateText;
 
 public:
-	void SetBallPower(float ratio);
-	void SetBallHeight(float ratio);
+	void SetBallStateText(FString StateText);
 };
