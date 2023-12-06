@@ -47,10 +47,6 @@ private:
 	void SetBallDetail();
 
 	void ResetBallPos(float DeltaTime);
-	void FindResetPos();
-
-	// camera
-	void ChangeCamera();
 
 public:
 	UFUNCTION()

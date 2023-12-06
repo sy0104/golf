@@ -54,11 +54,6 @@ ABall::ABall()
 	mProjectile->OnProjectileBounce.AddDynamic(this, &ABall::BallBounced);
 	mProjectile->OnProjectileStop.AddDynamic(this, &ABall::BallStopped);
 
-	// Rotating Movement
-	//mRotating = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("Rotating"));
-	//mRotating->SetUpdatedComponent(mRoot);
-	//mRotating->RotationRate = FRotator(0.0, 0.0, 0.0);
-
 	// Collision
 	mRoot->SetCollisionProfileName(TEXT("Ball"));
 	mRoot->SetSimulatePhysics(false);
@@ -136,19 +131,12 @@ void ABall::Tick(float DeltaTime)
 
 	CheckMaterialCollision();
 
-	//CheckCameraChange(DeltaTime);
-
 	ResetBallPos(DeltaTime);
-	//FindResetPos();
 
 	//FVector target = mSpringArm->GetForwardVector();
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel X: %f"), target.X));
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Y: %f"), target.Y));
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Z: %f"), target.Z));
-
-	//FVector loc = GetActorLocation();
-	//loc.Y++;
-	//SetActorLocation(loc);
 
 	//if (mIsSwingStraight)
 	//{
@@ -187,7 +175,7 @@ void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction<ABall>(TEXT("SwingRight"), EInputEvent::IE_Pressed, this, &ABall::SwingRight);
 	PlayerInputComponent->BindAction<ABall>(TEXT("Roll"), EInputEvent::IE_Pressed, this, &ABall::Roll);
 	PlayerInputComponent->BindAction<ABall>(TEXT("PrintPower"), EInputEvent::IE_Pressed, this, &ABall::PrintPower);
-	PlayerInputComponent->BindAction<ABall>(TEXT("ChangeCamera"), EInputEvent::IE_Pressed, this, &ABall::ChangeCamera);
+	//PlayerInputComponent->BindAction<ABall>(TEXT("ChangeCamera"), EInputEvent::IE_Pressed, this, &ABall::ChangeCamera);
 	PlayerInputComponent->BindAction<ABall>(TEXT("StopRotate"), EInputEvent::IE_Released, this, &ABall::StopRotate);
 	//PlayerInputComponent->BindAction<ABall>(TEXT("BallDetail"), EInputEvent::IE_Pressed, this, &ABall::);
 
@@ -252,14 +240,6 @@ void ABall::SwingStraight()
 	//if (mBallInfo.BallSpinDir < 0.0)
 	//	RotVec.X *= -1.0;
 
-	//mBallInfo.TargetPos = RotVec;
-
-	//PrintViewport(10.f, FColor::Blue, FString::Printf(TEXT("SpinDir: %f"), mBallInfo.BallSpinDir));
-	//PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("X1: %f"), TargetPos.X));
-	//PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("X2: %f"), x2));
-	//PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("Z1: %f"), TargetPos.Z));
-	//PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("Z2: %f"), z2));
-
 	mBallInfo.BallSpinDir = 0.0;
 
 	// club
@@ -292,9 +272,6 @@ void ABall::SwingStraight()
 	//FVector angleVec = FVector(0.5, 0.0, angle);
 	//FVector vel = powerVec * angleVec.Normalize();
 
-	// BallMesh->AddImpulse(FVector(Vector.X, Vector.Y, (abs(Vector.X)+abs(Vector.Y))*BallAng).GetSafeNormal()*1000.0f*BallVel);
-
-
 	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	FVector controllerVec;
 	if (IsValid(BallController))
@@ -302,7 +279,6 @@ void ABall::SwingStraight()
 		controllerVec = BallController->GetControlRotation().Vector();
 	}
 
-	//FVector power = FVector(controllerVec.X, controllerVec.Y, (abs(controllerVec.X) + abs(controllerVec.Y)) * 0.3);
 	FVector power = FVector(1.0, 0.0, 0.4);
 	power.Normalize();
 
@@ -647,47 +623,6 @@ void ABall::ResetBallPos(float DeltaTime)
 	}
 }
 
-void ABall::FindResetPos()
-{
-	if (!mIsFindResetPos)
-		return;
-
-	if (mResetPos.Y < 0)
-		mResetPos.Y += 10.0;
-	else
-		mResetPos.Y -= 10.0;
-
-	SetActorLocation(mResetPos);
-
-	if (mHitMaterialName == L"PM_LandscapeBase")
-	{
-		mIsFindResetPos = false;
-		mIsResetPos = false;
-	}
-}
-
-void ABall::ChangeCamera()
-{
-	// APlayerController::SetViewTargetWithBlend(mSubCamera, 2.f);
-
-	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	//if (IsValid(BallController))
-	//{
-	//	PrintViewport(1.f, FColor::Red, TEXT("ChangeCamera"));
-	//	BallController->SetViewTargetWithBlend(mSubCamera, 2.f);
-	//}
-
-	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (IsValid(BallController))
-	{
-		FRotator Rot = BallController->GetControlRotation();
-
-		PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Roll: %f"), Rot.Roll));
-		PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Pitch: %f"), Rot.Pitch));
-		PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Yaw: %f"), Rot.Yaw));
-	}
-}
-
 void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
@@ -793,11 +728,6 @@ void ABall::BallStopped(const FHitResult& ImpactResult)
 {
 	//PrintViewport(1.f, FColor::Blue, TEXT("Stopped"));
 
-	if (mHitMaterialName == L"PM_LandscapeWater")
-	{
-		PrintViewport(1.f, FColor::Blue, TEXT("Water"));
-		// 위치 옮김 추가
-	}
 }
 
 void ABall::SetStaticMesh(const FString& path)
