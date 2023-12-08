@@ -7,6 +7,7 @@
 #include "GolfClubBase.h"
 #include "ScoreBase.h"
 #include "BallStateBase.h"
+#include "CourseBase.h"
 
 void UMainHUDBase::NativeConstruct()
 {
@@ -17,6 +18,7 @@ void UMainHUDBase::NativeConstruct()
 	mGolfClubBase = Cast<UGolfClubBase>(GetWidgetFromName(FName(TEXT("GolfClubUI"))));
 	mScoreBase = Cast<UScoreBase>(GetWidgetFromName(FName(TEXT("ScoreUI"))));
 	mBallStateBase = Cast<UBallStateBase>(GetWidgetFromName(FName(TEXT("BallStateUI"))));
+	mCourseBase = Cast<UCourseBase>(GetWidgetFromName(FName(TEXT("CourseUI"))));
 }
 
 void UMainHUDBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -61,4 +63,9 @@ void UMainHUDBase::SetBallStateVisible(bool visible)
 		mBallStateBase->SetVisibility(ESlateVisibility::Visible);
 	else
 		mBallStateBase->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UMainHUDBase::SetCourseText(FString CourseText)
+{
+	mCourseBase->SetCourseText(CourseText);
 }

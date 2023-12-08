@@ -23,6 +23,7 @@ private:
 	class UGolfClubBase*	mGolfClubBase;
 	class UScoreBase*		mScoreBase;
 	class UBallStateBase*	mBallStateBase;
+	class UCourseBase*		mCourseBase;
 	
 public:
 	class UDistanceBase* GetDistanceBase()
@@ -44,4 +45,7 @@ public:
 	// Ball State
 	void SetBallStateText(FString StateText);
 	void SetBallStateVisible(bool visible);
+
+	// Course
+	void SetCourseText(FString CourseText);
 };

@@ -138,7 +138,6 @@ void ABall::Tick(float DeltaTime)
 	ShowDistance();	
 	
 	CheckBallStopped();
-	SetBallDetail();
 
 	CheckMaterialCollision();
 
@@ -558,6 +557,7 @@ void ABall::CheckMaterialCollision()
 		if (IsValid(material))
 		{
 			mHitMaterialName = material->GetName();
+			SetBallDetail();
 		}
 	}
 }
@@ -565,43 +565,22 @@ void ABall::CheckMaterialCollision()
 void ABall::SetBallDetail()
 {
 	//PrintViewport(1.f, FColor::Red, mHitMaterialName);
-	
-	if (!mIsBallStopped)
-		return;
 
-	//if (mIsSwingStraight || mIsSwingLeft || mIsSwingRight)
-	//	mRoot->SetSimulatePhysics(false);
-
-	//if (mIsSwingStraight)	// 추가
-	//{
-	//	//SetActorRelativeRotation(FRotator(0.0, 0.0, 0.0));
-	//	//mSpringArm->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
-	//}
-
-	//mIsEnableSwing = true;
-	//mIsSwingStraight = false;
-	//mIsSwingLeft = false;
-	//mIsSwingRight = false;
-
-	////mRoot->SetLinearDamping(0.5f);
-
-	//mMainHUD->SetDistanceText(0.f);
-	//mMainHUD->SetBallStateVisible(true);
-
-
-	// Check Physics Material
 	if (mHitMaterialName == L"PM_LandscapeBase")
 	{
-
+		mMainHUD->SetCourseText(L"Base");
 	}
 
 	else if (mHitMaterialName == L"PM_LandscapeFairway")
 	{
+		mMainHUD->SetCourseText(L"Fairway");
 
 	}
 
 	else if (mHitMaterialName == L"PM_LandscapeGreen")
 	{
+		mMainHUD->SetCourseText(L"Green");
+
 		if (mIsBallStopped)
 		{
 			// 점수 계산
@@ -622,6 +601,8 @@ void ABall::SetBallDetail()
 
 	else if (mHitMaterialName == L"PM_LandscapeWater")
 	{
+		mMainHUD->SetCourseText(L"Water");
+
 		mRoot->SetSimulatePhysics(false);
 
 		if (mIsBallStopped)
@@ -633,6 +614,8 @@ void ABall::SetBallDetail()
 
 	else if (mHitMaterialName == L"PM_LandscapeBunker")
 	{
+		mMainHUD->SetCourseText(L"Bunker");
+
 		mRoot->SetSimulatePhysics(false);
 	}
 
@@ -648,6 +631,8 @@ void ABall::SetBallDetail()
 
 	else if (mHitMaterialName == L"PM_LandscapeRough")
 	{
+		mMainHUD->SetCourseText(L"Rough");
+
 		mRoot->SetSimulatePhysics(false);
 
 		if (mIsBallStopped)
@@ -657,6 +642,11 @@ void ABall::SetBallDetail()
 			curPos.Y = 0.0;
 			mResetPos = FVector(curPos.X, curPos.Y, curPos.Z);
 		}
+	}
+
+	else if (mHitMaterialName == L"PM_LandscapeTee")
+	{
+		mMainHUD->SetCourseText(L"Tee");
 	}
 }
 
