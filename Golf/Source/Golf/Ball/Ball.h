@@ -47,6 +47,9 @@ private:
 	void SetBallDetail();
 
 	void ResetBallPos(float DeltaTime);
+	void FindResetPos(float DeltaTime);
+
+	void CheckBallStopped();
 
 public:
 	UFUNCTION()
@@ -94,7 +97,7 @@ private:
 	bool		mIsPowerTurn;
 	bool		mIsHeightUp;
 
-	double		mTempBallPower;
+	bool		mIsBallStopped;
 
 	float		mResetTime;
 	bool		mIsResetPos;
@@ -121,7 +124,7 @@ public:
 
 	void SetSwingArc(float arc)
 	{
-		mBallInfo.BallHeight = arc;
+		//mBallInfo.BallHeight = arc;
 	}
 
 	void SetGolfClubType(EGolfClub GolfClub)
@@ -131,5 +134,4 @@ public:
 
 public:
 	float GetDistanceToTarget(FVector src, FVector dst);
-	bool IsBallStopped();
 };

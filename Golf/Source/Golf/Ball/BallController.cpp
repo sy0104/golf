@@ -33,6 +33,8 @@ void ABallController::OnPossess(APawn* aPawn)
 	Super::OnPossess(aPawn);
 
 	//PrintViewport(1.f, FColor::Red, TEXT("OnPossess"));
+	//FString name = aPawn->GetFName().ToString();
+	//PrintViewport(1.f, FColor::Red, name);
 }
 
 void ABallController::OnUnPossess()

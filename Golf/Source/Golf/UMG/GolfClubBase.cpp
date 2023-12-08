@@ -26,7 +26,7 @@ void UGolfClubBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 void UGolfClubBase::OnClub1ButtonClicked()
 {
-	PrintViewport(1.f, FColor::Red, TEXT("1"));
+	//PrintViewport(1.f, FColor::Red, TEXT("1"));
 
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode))
@@ -34,7 +34,8 @@ void UGolfClubBase::OnClub1ButtonClicked()
 		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 		if (IsValid(Ball))
 		{
-			Ball->SetBallMaxPower(1200.0);	// 250m
+			Ball->SetBallMinPower(0.0);
+			Ball->SetBallMaxPower(280000.0);	// 250m
 			Ball->SetGolfClubType(EGolfClub::Club1);
 		}
 	}
@@ -42,7 +43,7 @@ void UGolfClubBase::OnClub1ButtonClicked()
 
 void UGolfClubBase::OnClub2ButtonClicked()
 {
-	PrintViewport(1.f, FColor::Red, TEXT("2"));
+	//PrintViewport(1.f, FColor::Red, TEXT("2"));
 
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode))
@@ -50,8 +51,8 @@ void UGolfClubBase::OnClub2ButtonClicked()
 		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 		if (IsValid(Ball))
 		{
-			//Ball->SetBallMinPower(190.0);
-			Ball->SetBallMaxPower(800.0);	// 170m
+			Ball->SetBallMinPower(0.0);
+			Ball->SetBallMaxPower(250000.0);	// 200m
 			Ball->SetGolfClubType(EGolfClub::Club2);
 		}
 	}
@@ -59,7 +60,7 @@ void UGolfClubBase::OnClub2ButtonClicked()
 
 void UGolfClubBase::OnClub3ButtonClicked()
 {
-	PrintViewport(1.f, FColor::Red, TEXT("3"));
+	//PrintViewport(1.f, FColor::Red, TEXT("3"));
 
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode))
@@ -67,8 +68,8 @@ void UGolfClubBase::OnClub3ButtonClicked()
 		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 		if (IsValid(Ball))
 		{
-			//Ball->SetBallMinPower(90.0);
-			Ball->SetBallMaxPower(600.0);	// 130m
+			Ball->SetBallMinPower(0.0);
+			Ball->SetBallMaxPower(200000.0);	// 130m
 			Ball->SetGolfClubType(EGolfClub::Club3);
 		}
 	}
