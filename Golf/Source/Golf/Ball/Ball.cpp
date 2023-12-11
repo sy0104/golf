@@ -2,6 +2,7 @@
 #include "../GFGameModeBase.h"
 #include "../UMG/DistanceBase.h"
 #include "../UMG/MainHUDBase.h"
+#include "../UMG/PlayInfoBase.h"
 #include "BallController.h"
 #include "../GFGameInstance.h"
 #include "../Manager/ScoreSubsystem.h"
@@ -14,7 +15,7 @@ ABall::ABall()
 	mRoot = CreateDefaultSubobject<USphereComponent>(TEXT("Root"));
 	SetRootComponent(mRoot);
 	mRoot->SetSphereRadius(2.15f);
-
+	
 	// Static Mesh
 	mStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	mStaticMesh->SetupAttachment(mRoot);
@@ -89,6 +90,7 @@ ABall::ABall()
 	mBallInfo.BallSpinDir = 0.0;
 
 	mBallInfo.Score = -4;
+	mBallInfo.ShotNum = 1;
 
 	// spin
 	mIsEnableSwing = true;
@@ -117,10 +119,12 @@ void ABall::BeginPlay()
 	Super::BeginPlay();
 
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode))
+	if (UGameplayStatics::GetCurrentLevelName(GetWorld()) == L"Main" && IsValid(GameMode))
 	{
 		mMainHUD = GameMode->GetMainHUD();
 		mMainHUD->SetDistanceText(0.f);
+		mMainHUD->SetCourseDistanceText(mBallInfo.DestPos.X / 10000.f);
+		mMainHUD->SetShotNumText(mBallInfo.ShotNum);
 	}
 
 	mRoot->OnComponentHit.AddDynamic(this, &ABall::OnHit);
@@ -129,6 +133,12 @@ void ABall::BeginPlay()
 void ABall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (UGameplayStatics::GetCurrentLevelName(GetWorld()) == L"Start")
+	{
+		return;
+	}
 
 	if (mIsSwingLeft || mIsSwingRight)
 		AddForceToSide();
@@ -222,6 +232,7 @@ void ABall::SwingStraight()
 
 	// Ball Info
 	mBallInfo.StartPos = GetActorLocation();
+	mBallInfo.ShotNum++;
 
 	//// landscape
 	//if (mHitMaterialName == L"PM_LandscapeBunker")
@@ -273,7 +284,7 @@ void ABall::SwingStraight()
 		conVec = BallController->GetControlRotation().Vector();
 	}
 
-	//mBallInfo.BallPower = 250000.0;
+	mBallInfo.BallPower = 25000.0;
 	mBallInfo.BallAngle = 1.0;
 
 	FVector forwardVec = mRoot->GetForwardVector();
@@ -291,6 +302,8 @@ void ABall::SwingStraight()
 	//PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("normal X: %f"), power.X));
 	//PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("normal Y: %f"), power.Y));
 	//PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("normal Z: %f"), power.Z));
+
+	mMainHUD->SetPlayInfoVisible(false);
 }
 
 void ABall::SwingLeft()
@@ -311,6 +324,7 @@ void ABall::SwingLeft()
 
 	// Ball Info
 	//mBallInfo.BallHeight = 0.3f;
+	mBallInfo.ShotNum++;
 
 	FVector StartPos = GetActorLocation();
 	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower, 0.0, 0.0);
@@ -321,6 +335,7 @@ void ABall::SwingLeft()
 
 	mRoot->AddImpulse(outVelocity);
 	mBallInfo.Score++;
+	mMainHUD->SetPlayInfoVisible(false);
 }
 
 void ABall::SwingRight()
@@ -341,6 +356,7 @@ void ABall::SwingRight()
 
 	// Ball Info
 	//mBallInfo.BallHeight = 0.3f;
+	mBallInfo.ShotNum++;
 
 	FVector StartPos = GetActorLocation();
 	FVector TargetPos = StartPos + FVector(mBallInfo.BallPower, 0.0, 0.0);
@@ -360,6 +376,8 @@ void ABall::SwingRight()
 
 	//mRoot->AddImpulse(power * mBallInfo.BallPower);
 	//mBallInfo.Score++;
+
+	mMainHUD->SetPlayInfoVisible(false);
 }
 
 void ABall::Roll()
@@ -520,13 +538,14 @@ void ABall::ShowDistance()
 {
 	float leftDis = GetDistanceToTarget(GetActorLocation(), mBallInfo.DestPos);
 	// float dis = GetActorLocation().X;
-
+	
 	float dis = GetDistanceToTarget(mBallInfo.StartPos, GetActorLocation());
 
 	if (IsValid(mMainHUD))
 	{
-		mMainHUD->SetLeftDistanceText(leftDis / 100.f);
-		mMainHUD->SetDistanceText(dis / 100.f);
+		mMainHUD->SetLeftDistanceText(leftDis / 10000.f);
+		mMainHUD->SetDistanceText(dis / 10000.f);
+		mMainHUD->SetTargetDistanceText(leftDis / 10000.f);
 	}
 }
 
@@ -721,12 +740,15 @@ void ABall::CheckBallStopped()
 
 		mMainHUD->SetDistanceText(0.f);
 		mMainHUD->SetBallStateVisible(true);
+		mMainHUD->SetShotNumText(mBallInfo.ShotNum);
+		mMainHUD->SetPlayInfoVisible(true);
 	}
 
 	else
 	{
 		mIsBallStopped = false;
 		mMainHUD->SetBallStateVisible(false);
+		mMainHUD->SetPlayInfoVisible(false);
 	}
 }
 
@@ -817,6 +839,8 @@ void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 
 		mMainHUD->SetDistanceText(0.f);
 		mMainHUD->SetBallStateVisible(true);
+		mMainHUD->SetShotNumText(mBallInfo.ShotNum);
+		mMainHUD->SetPlayInfoVisible(true);
 	}
 
 	else

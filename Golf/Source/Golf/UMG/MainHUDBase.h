@@ -24,7 +24,8 @@ private:
 	class UScoreBase*		mScoreBase;
 	class UBallStateBase*	mBallStateBase;
 	class UCourseBase*		mCourseBase;
-	
+	class UPlayInfoBase* mPlayInfoBase;
+
 public:
 	class UDistanceBase* GetDistanceBase()
 	{
@@ -48,4 +49,11 @@ public:
 
 	// Course
 	void SetCourseText(FString CourseText);
+
+	// Play Information
+	void SetCourseDistanceText(float dis);
+	void SetTargetDistanceText(float dis);
+	void SetShotNumText(int32 shot);
+	void SetScoreText();
+	void SetPlayInfoVisible(bool visible);
 };

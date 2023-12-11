@@ -87,6 +87,9 @@ protected:
 
 	FBallInfo	mBallInfo;
 
+	UPROPERTY()
+	UParticleSystemComponent* mTrailer;
+
 private:
 	bool		mIsEnableSwing;
 	bool		mIsSwingStraight;
