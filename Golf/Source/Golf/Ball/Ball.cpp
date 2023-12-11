@@ -185,16 +185,26 @@ void ABall::SwingStraight()
 	mIsSwingLeft = false;
 
 	// Ball Info
-	mBallInfo.BallDis = 100000000.0;		// test, 클럽별로 다르게 설정
-	mBallInfo.BallArc = 0.4f;
+	////mBallInfo.BallDis = 20000000.0;		// test, 클럽별로 다르게 설정
+	//mBallInfo.BallDis = 60000.0;		// test, 클럽별로 다르게 설정
+	//mBallInfo.BallArc = 0.2f;
 
 	mBallInfo.StartPos = GetActorLocation();
-	//FVector TargetPos = mBallInfo.StartPos + (mCamera->GetForwardVector() * (mBallInfo.BallDis * mBallInfo.BallPower));
-	FVector TargetPos = mBallInfo.StartPos + (mCamera->GetForwardVector() * (mBallInfo.BallDis));
+	FVector targetPos = mBallInfo.StartPos + (mCamera->GetForwardVector() * (mBallInfo.BallDis * mBallInfo.BallPower));
+	//FVector targetPos = mBallInfo.StartPos + (mCamera->GetForwardVector() * (mBallInfo.BallDis));
 
 	FVector outVelocity = FVector::ZeroVector;
-	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-		this, outVelocity, mBallInfo.StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.BallArc);
+
+	if (mGolfClubType == EGolfClub::Putter)
+	{
+		outVelocity = mCamera->GetForwardVector() * FVector(1.0, 1.0, 1.0) * mBallInfo.BallDis;
+	}
+
+	else
+	{
+		UGameplayStatics::SuggestProjectileVelocity_CustomArc(
+			this, outVelocity, mBallInfo.StartPos, targetPos, GetWorld()->GetGravityZ(), mBallInfo.BallArc);
+	}
 
 	mStaticMesh->AddImpulse(outVelocity);
 }
@@ -352,8 +362,6 @@ void ABall::AddBallPower(float scale)
 	{
 		mMainHUD->SetBallPower(mBallInfo.BallPower);
 	}
-
-	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("power: %f"), mBallInfo.BallPower));
 }
 
 void ABall::ShowDistance()
@@ -570,23 +578,24 @@ void ABall::SetBallInfoByClub(EGolfClub club)
 	switch (club)
 	{
 	case EGolfClub::Driver:
-		mBallInfo.BallDis = 100000000.0;
+		mBallInfo.BallDis = 80000000.0;
 		mBallInfo.BallArc = 0.4;
 		break;
 	case EGolfClub::Wood:
-		mBallInfo.BallDis = 10000.0;
+		mBallInfo.BallDis = 60000000.0;
+		mBallInfo.BallArc = 0.5;
 		break;
 	case EGolfClub::Iron:
-		mBallInfo.BallDis = 10000.0;
-
+		mBallInfo.BallDis = 55000000.0;
+		mBallInfo.BallArc = 0.5;
 		break;
 	case EGolfClub::Wedge:
-		mBallInfo.BallDis = 10000.0;
-
+		mBallInfo.BallDis = 20000000.0;
+		mBallInfo.BallArc = 0.2;
 		break;
 	case EGolfClub::Putter:
-		mBallInfo.BallDis = 10000.0;
-
+		mBallInfo.BallDis = 60000.0;
+		mBallInfo.BallArc = 1.0;
 		break;
 	}
 }
@@ -688,12 +697,12 @@ void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 
 void ABall::BallBounced(const FHitResult& Hit, const FVector& ImpactVelocity)
 {
-	//PrintViewport(1.f, FColor::Blue, TEXT("Bounced"));
+	PrintViewport(1.f, FColor::Blue, TEXT("Bounced"));
 }
 
 void ABall::BallStopped(const FHitResult& ImpactResult)
 {
-	//PrintViewport(1.f, FColor::Blue, TEXT("Stopped"));
+	PrintViewport(1.f, FColor::Blue, TEXT("Stopped"));
 
 }
 

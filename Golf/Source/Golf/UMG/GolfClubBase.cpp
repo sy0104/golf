@@ -10,11 +10,11 @@ void UGolfClubBase::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	mDriverButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("Club1Button"))));
-	mWoodButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("Club2Button"))));
-	mIronButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("Club3Button"))));
-	mWedgeButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("Club3Button"))));
-	mPutterButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("Club3Button"))));
+	mDriverButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("DriverButton"))));
+	mWoodButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("WoodButton"))));
+	mIronButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("IronButton"))));
+	mWedgeButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("WedgeButton"))));
+	mPutterButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("PutterButton"))));
 
 	mDriverButton->OnClicked.AddDynamic(this, &UGolfClubBase::OnDriverButtonClicked);
 	mWoodButton->OnClicked.AddDynamic(this, &UGolfClubBase::OnWoodButtonClicked);

@@ -100,19 +100,9 @@ private:
 
 public:
 	void SetStaticMesh(const FString& path);
-	void SetSwingArc(float arc)
-	{
-		//mBallInfo.BallHeight = arc;
-	}
-
 	void SetGolfClubType(EGolfClub GolfClub)
 	{
 		mGolfClubType = GolfClub;
-	}
-
-	void SetBallPower(float power)
-	{
-		mBallInfo.BallPower = power;
 	}
 
 public:
