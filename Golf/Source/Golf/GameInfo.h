@@ -34,25 +34,16 @@ public:
 	FVector		DestPos;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		BallDir;
+	float		BallDis;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		BallSpinDir;
+	float		BallPower;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float		BallArc;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	float		SpinForce;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		BallPower;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		BallAngle;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		BallMinPower;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		BallMaxPower;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	int32		Score;
@@ -61,9 +52,11 @@ public:
 UENUM(BlueprintType)
 enum class EGolfClub : uint8
 {
-	Club1,
-	Club2,
-	Club3
+	Driver,
+	Wood,
+	Iron,
+	Wedge,
+	Putter,
 };
 
 UCLASS()

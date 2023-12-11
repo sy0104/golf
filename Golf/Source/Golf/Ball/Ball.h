@@ -29,18 +29,14 @@ private:
 
 	// Dir
 	void SetSwingDir(float scale);
-	void StopRotate();
 
 	// Spin
 	void AddForceToStraight();
 	void AddForceToSide();
 
-	void SetBallDetailTurn();
 	void AddBallPower(float scale);
-	void AddBallHeight(float scale);
 
 	void ShowDistance();
-	void PrintPower();
 
 	// Ãæµ¹
 	void CheckMaterialCollision();
@@ -50,6 +46,9 @@ private:
 	void FindResetPos(float DeltaTime);
 
 	void CheckBallStopped();
+
+	// Club
+	void SetBallInfoByClub(EGolfClub club);
 
 public:
 	UFUNCTION()
@@ -65,7 +64,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	USphereComponent*			mRoot;
+	USphereComponent*			mSphereComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UStaticMeshComponent*		mStaticMesh;
@@ -75,12 +74,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
 	UCameraComponent*			mCamera;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UProjectileMovementComponent*	mProjectile;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	URotatingMovementComponent*		mRotating;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EGolfClub	mGolfClubType;
@@ -94,9 +87,6 @@ private:
 	bool		mIsSwingRight;
 
 	bool		mIsPowerUp;
-	bool		mIsPowerTurn;
-	bool		mIsHeightUp;
-
 	bool		mIsBallStopped;
 
 	float		mResetTime;
@@ -110,18 +100,6 @@ private:
 
 public:
 	void SetStaticMesh(const FString& path);
-	void SetBallMinPower(double power)
-	{
-		mBallInfo.BallMinPower = power;
-		//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Min: %f"), mBallInfo.BallMinPower));
-	}
-
-	void SetBallMaxPower(double power)
-	{
-		mBallInfo.BallMaxPower = power;
-		//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Max: %f"), mBallInfo.BallMaxPower));
-	}
-
 	void SetSwingArc(float arc)
 	{
 		//mBallInfo.BallHeight = arc;
@@ -130,6 +108,11 @@ public:
 	void SetGolfClubType(EGolfClub GolfClub)
 	{
 		mGolfClubType = GolfClub;
+	}
+
+	void SetBallPower(float power)
+	{
+		mBallInfo.BallPower = power;
 	}
 
 public:

@@ -19,17 +19,25 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:
-	UButton*		mClub1Button;
-	UButton*		mClub2Button;
-	UButton*		mClub3Button;
+	UButton*		mDriverButton;
+	UButton*		mWoodButton;
+	UButton*		mIronButton;
+	UButton*		mWedgeButton;
+	UButton*		mPutterButton;
 
 public:
 	UFUNCTION()
-	void OnClub1ButtonClicked();
+	void OnDriverButtonClicked();
 
 	UFUNCTION()
-	void OnClub2ButtonClicked();
+	void OnWoodButtonClicked();
 
 	UFUNCTION()
-	void OnClub3ButtonClicked();
+	void OnIronButtonClicked();
+
+	UFUNCTION()
+	void OnWedgeButtonClicked();
+
+	UFUNCTION()
+	void OnPutterButtonClicked();
 };
