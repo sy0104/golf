@@ -8,6 +8,7 @@
 #include "ScoreBase.h"
 #include "BallStateBase.h"
 #include "CourseBase.h"
+#include "BallSpinBase.h"
 
 void UMainHUDBase::NativeConstruct()
 {
@@ -19,6 +20,7 @@ void UMainHUDBase::NativeConstruct()
 	mScoreBase = Cast<UScoreBase>(GetWidgetFromName(FName(TEXT("ScoreUI"))));
 	mBallStateBase = Cast<UBallStateBase>(GetWidgetFromName(FName(TEXT("BallStateUI"))));
 	mCourseBase = Cast<UCourseBase>(GetWidgetFromName(FName(TEXT("CourseUI"))));
+	mBallSpinBase = Cast<UBallSpinBase>(GetWidgetFromName(FName(TEXT("BallSpinUI"))));
 }
 
 void UMainHUDBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -39,11 +41,6 @@ void UMainHUDBase::SetDistanceText(float dis)
 void UMainHUDBase::SetBallPower(float ratio)
 {
 	mBallDetailBase->SetBallPower(ratio);
-}
-
-void UMainHUDBase::SetBallHeight(float ratio)
-{
-	mBallDetailBase->SetBallHeight(ratio);
 }
 
 void UMainHUDBase::SetScoreText(FString ScoreText)

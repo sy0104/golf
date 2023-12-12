@@ -59,6 +59,21 @@ enum class EGolfClub : uint8
 	Putter,
 };
 
+UENUM(BlueprintType)
+enum class ECameraType : uint8
+{
+	Main,
+	Side,
+};
+
+UENUM(BlueprintType)
+enum class EBallSwingType : uint8
+{
+	Left,
+	Straight,
+	Right
+};
+
 UCLASS()
 class GOLF_API UGameInfo : public UObject
 {

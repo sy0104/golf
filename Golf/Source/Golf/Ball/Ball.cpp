@@ -36,20 +36,33 @@ ABall::ABall()
 	mSphereComponent->SetUseCCD(true);
 
 	//// Camera & Spring Arm
-	mCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	// spring arm
 	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-
 	mSpringArm->SetupAttachment(mStaticMesh);
-	mCamera->SetupAttachment(mSpringArm);
 
 	mSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 0.0));
 	mSpringArm->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
 	mSpringArm->TargetArmLength = 400.f;
-	mSpringArm->bEnableCameraLag = true;
-	mSpringArm->CameraLagSpeed = 0.0f;
 	mSpringArm->bUsePawnControlRotation = true;
+	mSpringArm->bEnableCameraLag = true;
+	mSpringArm->CameraLagSpeed = 0.f;
+	mSpringArm->CameraLagMaxDistance = 10000.f;
 
-	mCamera->SetRelativeLocation(FVector(-150.0, 0.0, 70.0));
+	// main camera
+	mMainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	mMainCamera->SetupAttachment(mSpringArm);
+	mMainCamera->SetRelativeLocation(FVector(-150.0, 0.0, 70.0));
+	mMainCamera->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
+	mMainCamera->bConstrainAspectRatio = true;
+	mMainCamera->SetActive(true);
+
+	// side camera
+	mSideCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("SideCamera"));
+	mSideCamera->SetupAttachment(mSpringArm);
+	mSideCamera->SetRelativeLocation(FVector(130.0, 0.0, 0.0));
+	mSideCamera->SetRelativeRotation(FRotator(0.0, 180.0, 0.0));
+	mSideCamera->bConstrainAspectRatio = true;
+	mSideCamera->SetActive(false);
 
 	//// Ball Info
 	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
@@ -61,7 +74,6 @@ ABall::ABall()
 
 	// spin
 	mIsEnableSwing = true;
-	mIsSwingStraight = true;
 	mIsSwingLeft = false;
 	mIsSwingRight = false;
 
@@ -88,8 +100,6 @@ void ABall::BeginPlay()
 		mMainHUD->SetDistanceText(0.f);
 	}
 
-	////
-	//mSphereComponent->OnComponentHit.AddDynamic(this, &ABall::OnHit);
 	mStaticMesh->OnComponentHit.AddDynamic(this, &ABall::OnHit);
 }
 
@@ -99,8 +109,6 @@ void ABall::Tick(float DeltaTime)
 
 	if (mIsSwingLeft || mIsSwingRight)
 		AddForceToSide();
-	else if (mIsSwingStraight)
-		AddForceToStraight();
 
 	ShowDistance();	
 	
@@ -112,43 +120,10 @@ void ABall::Tick(float DeltaTime)
 
 	FindResetPos(DeltaTime);
 
-	//if (mIsBallStopped)
-	//	PrintViewport(1.f, FColor::Red, TEXT("Stop"));
-
-	//FVector loc = GetActorLocation();
-	//loc.Y += 10.0;
-	//SetActorLocation(loc);
-
-	//FVector target = mSpringArm->GetForwardVector();
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel X: %f"), target.X));
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Y: %f"), target.Y));
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Vel Z: %f"), target.Z));
-
-	//if (mIsSwingStraight)
-	//{
-	//	static float power = 100.0;
-	//	FVector resistance = -mRoot->GetPhysicsLinearVelocity().GetSafeNormal();
-	//	mRoot->AddForce(resistance * power);
-	//	power += 0.1f;
-	//}
-
-	//FVector upVec = mRoot->GetUpVector();
-	//FVector forwardVec = mRoot->GetForwardVector();
-
 	//FVector vel = mRoot->GetComponentVelocity();
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel X: %f"), vel.X));
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel Y: %f"), vel.Y));
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel Z: %f"), vel.Z));
-
-	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	//if (IsValid(BallController))
-	//{
-	//	FVector vec = BallController->GetControlRotation().Vector();
-
-	//	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Controller X: %f"), vec.X));
-	//	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Controller Y: %f"), vec.Y));
-	//	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Controller Z: %f"), vec.Z));
-	//}
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -156,48 +131,51 @@ void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	// 액션 매핑
-	PlayerInputComponent->BindAction<ABall>(TEXT("SwingStraight"), EInputEvent::IE_Pressed, this, &ABall::SwingStraight);
-	PlayerInputComponent->BindAction<ABall>(TEXT("SwingLeft"), EInputEvent::IE_Pressed, this, &ABall::SwingLeft);
-	PlayerInputComponent->BindAction<ABall>(TEXT("SwingRight"), EInputEvent::IE_Pressed, this, &ABall::SwingRight);
-	PlayerInputComponent->BindAction<ABall>(TEXT("Roll"), EInputEvent::IE_Pressed, this, &ABall::Roll);
+	PlayerInputComponent->BindAction<ABall>(TEXT("SwingStraight"), EInputEvent::IE_Pressed, this, &ABall::Swing);
+	PlayerInputComponent->BindAction<ABall>(TEXT("ChangeCamera"), EInputEvent::IE_Pressed, this, &ABall::ChangeCamera);
 
 	// 축 매핑
-	PlayerInputComponent->BindAxis<ABall>(TEXT("SwingDir"), this, &ABall::SetSwingDir);
-	PlayerInputComponent->BindAxis<ABall>(TEXT("BallDetail"), this, &ABall::AddBallPower);
+	PlayerInputComponent->BindAxis<ABall>(TEXT("BallDir"), this, &ABall::SetSwingDir);
+	PlayerInputComponent->BindAxis<ABall>(TEXT("BallPower"), this, &ABall::AddBallPower);
 }
 
-void ABall::SwingStraight()
+void ABall::Swing()
 {
 	if (!mIsEnableSwing)
 		return;
 
-	//PrintViewport(1.f, FColor::Red, TEXT("SwingStraight"));
+	// Spin
+	if (mBallSwingType == EBallSwingType::Left)
+	{
+		PrintViewport(1.f, FColor::Red, TEXT("Left"));
+		mIsSwingLeft = true;
+	}
+
+	else if (mBallSwingType == EBallSwingType::Right)
+	{
+		PrintViewport(1.f, FColor::Red, TEXT("Right"));
+		mIsSwingRight = true;
+	}
 
 	mMainHUD->SetBallStateVisible(false);
 	mIsEnableSwing = false;
 
-	// Club에 따라 볼 정보 설정
+	// Club에 따라 볼 정보(dis, arc) 설정
 	SetBallInfoByClub(mGolfClubType);
 
-	// Spin
-	mIsSwingStraight = true;
-	mIsSwingRight = false;
-	mIsSwingLeft = false;
-
 	// Ball Info
-	////mBallInfo.BallDis = 20000000.0;		// test, 클럽별로 다르게 설정
-	//mBallInfo.BallDis = 60000.0;		// test, 클럽별로 다르게 설정
+	//mBallInfo.BallDis = 20000000.0;		// test, 클럽별로 다르게 설정
 	//mBallInfo.BallArc = 0.2f;
 
 	mBallInfo.StartPos = GetActorLocation();
-	FVector targetPos = mBallInfo.StartPos + (mCamera->GetForwardVector() * (mBallInfo.BallDis * mBallInfo.BallPower));
-	//FVector targetPos = mBallInfo.StartPos + (mCamera->GetForwardVector() * (mBallInfo.BallDis));
+	FVector targetPos = mBallInfo.StartPos + (mMainCamera->GetForwardVector() * (mBallInfo.BallDis * mBallInfo.BallPower));
+	//FVector targetPos = mBallInfo.StartPos + (mMainCamera->GetForwardVector() * (mBallInfo.BallDis));
 
 	FVector outVelocity = FVector::ZeroVector;
 
 	if (mGolfClubType == EGolfClub::Putter)
 	{
-		outVelocity = mCamera->GetForwardVector() * FVector(1.0, 1.0, 1.0) * mBallInfo.BallDis;
+		outVelocity = mMainCamera->GetForwardVector() * FVector(1.0, 1.0, 1.0) * mBallInfo.BallDis;
 	}
 
 	else
@@ -209,114 +187,12 @@ void ABall::SwingStraight()
 	mStaticMesh->AddImpulse(outVelocity);
 }
 
-void ABall::SwingLeft()
-{
-	//mRoot->SetSimulatePhysics(true);
-
-	//// Projectile
-	//mProjectile->bShouldBounce = true;
-	//mProjectile->Bounciness = 0.5f;
-	//mProjectile->Friction = 0.8f;
-
-	//// Spin
-	//mBallInfo.StartPos = GetActorLocation();
-	//mBallInfo.SpinForce = 1000.f;
-	//mIsSwingStraight = false;
-	//mIsSwingRight = false;
-	//mIsSwingLeft = true;
-
-	//// Ball Info
-	////mBallInfo.BallHeight = 0.3f;
-
-	//FVector StartPos = GetActorLocation();
-	//FVector TargetPos = StartPos + FVector(mBallInfo.BallPower, 0.0, 0.0);
-	//FVector outVelocity = FVector::ZeroVector;
-
-	//UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-	//	this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), 0.3);
-
-	//mRoot->AddImpulse(outVelocity);
-	//mBallInfo.Score++;
-}
-
-void ABall::SwingRight()
-{
-	//mRoot->SetSimulatePhysics(true);
-
-	//// Projectile
-	//mProjectile->bShouldBounce = true;
-	//mProjectile->Bounciness = 0.5f;
-	//mProjectile->Friction = 0.8f;
-
-	//// Spin
-	//mBallInfo.StartPos = GetActorLocation();
-	//mBallInfo.SpinForce = 1000.f;
-	//mIsSwingStraight = false;
-	//mIsSwingRight = true;
-	//mIsSwingLeft = false;
-
-	//// Ball Info
-	////mBallInfo.BallHeight = 0.3f;
-
-	//FVector StartPos = GetActorLocation();
-	//FVector TargetPos = StartPos + FVector(mBallInfo.BallPower, 0.0, 0.0);
-	//FVector outVelocity = FVector::ZeroVector;
-
-	//UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-	//	this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.BallSpinDir);
-
-	//mRoot->AddImpulse(outVelocity);
-	//mBallInfo.Score++;
-
-	////mBallInfo.BallPower = 300000.0;
-	////mBallInfo.BallAngle = 1.3;
-
-	////FVector power = FVector(1.0, 0.0, mBallInfo.BallAngle);
-	////power.Normalize();
-
-	////mRoot->AddImpulse(power * mBallInfo.BallPower);
-	////mBallInfo.Score++;
-}
-
-void ABall::Roll()
-{
-	////PrintViewport(1.f, FColor::Red, TEXT("Roll"));
-	//mRoot->SetSimulatePhysics(true);
-
-	//// Projectile
-	//mProjectile->bShouldBounce = false;
-	//mProjectile->Bounciness = 0.f;
-	//mProjectile->Friction = 1.5f;
-
-	//// Spin
-	//mIsSwingRight = false;
-	//mIsSwingLeft = false;
-
-	//// Ball Info
-	////mBallInfo.BallHeight = 0.9f;
-
-	//FVector StartPos = GetActorLocation();
-	//FVector TargetPos = StartPos + FVector(100000, 0, 0);	// test
-	//FVector outVelocity = FVector::ZeroVector;
-
-	//UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-	//	this, outVelocity, StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.BallSpinDir);
-
-	//mRoot->AddImpulse(FVector(10000, 0, 0));
-	//mBallInfo.Score++;
-}
-
 void ABall::SetSwingDir(float scale)
 {
-	if (scale == 0.f)
+	if (scale == 0.f || !mIsEnableSwing)
 		return;
 
 	AddControllerYawInput(scale * 0.5);
-}
-
-void ABall::AddForceToStraight()
-{
-	//mProjectile->ConstrainDirectionToPlane(GetActorForwardVector());
 }
 
 void ABall::AddForceToSide()
@@ -330,17 +206,21 @@ void ABall::AddForceToSide()
 	FVector CrossPrdt = FVector::CrossProduct(forwardVec, leftVec);
 
 	if (mIsSwingRight)
+	{
 		CrossPrdt.Y *= -1.0;
+		PrintViewport(1.f, FColor::Red, TEXT("Right"));
+	}
 
-	mStaticMesh->AddForce(CrossPrdt * 100.0);
+	else if (mIsSwingLeft)
+		PrintViewport(1.f, FColor::Red, TEXT("Left"));
+
+	mStaticMesh->AddForce(CrossPrdt * 10000.0);
 }
 
 void ABall::AddBallPower(float scale)
 {
 	if (scale == 0.f)
 		return;
-
-	// 5000 ~ 30000
 
 	if (mIsPowerUp)
 	{
@@ -555,12 +435,10 @@ void ABall::CheckBallStopped()
 	if (vel.X == 0.0 && vel.Y == 0.0 && vel.Z == 0.0)
 	{
 		mIsBallStopped = true;
-		//mRoot->SetSimulatePhysics(false);
 
 		mIsEnableSwing = true;
-		mIsSwingStraight = false;
-		mIsSwingLeft = false;
-		mIsSwingRight = false;
+		//mIsSwingLeft = false;
+		//mIsSwingRight = false;
 
 		mMainHUD->SetDistanceText(0.f);
 		mMainHUD->SetBallStateVisible(true);
@@ -598,6 +476,14 @@ void ABall::SetBallInfoByClub(EGolfClub club)
 		mBallInfo.BallArc = 1.0;
 		break;
 	}
+}
+
+void ABall::ChangeCamera()
+{
+	mMainCamera->SetActive(false);
+	mSideCamera->SetActive(true);
+
+	//mSpringArm->CameraLagSpeed = 10.f;
 }
 
 void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -664,34 +550,6 @@ void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 			mIsResetPos = true;
 		}
 
-	}
-
-	if (mIsBallStopped)
-	{
-		mStaticMesh->SetSimulatePhysics(false);
-		PrintViewport(1.f, FColor::Red, TEXT("Stop"));
-
-		if (mIsSwingStraight)	// 추가
-		{
-			//SetActorRelativeRotation(FRotator(0.0, 0.0, 0.0));
-			//mSpringArm->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
-
-		}
-
-		mIsEnableSwing = true;
-		mIsSwingStraight = false;
-		mIsSwingLeft = false;
-		mIsSwingRight = false;
-
-		//mRoot->SetLinearDamping(0.5f);
-
-		mMainHUD->SetDistanceText(0.f);
-		mMainHUD->SetBallStateVisible(true);
-	}
-
-	else
-	{
-		//mRoot->SetLinearDamping(0.0f);
 	}
 }
 

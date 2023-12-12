@@ -22,33 +22,32 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-	void SwingStraight();
-	void SwingLeft();
-	void SwingRight();
-	void Roll();
-
-	// Dir
+	// Swing
+	void AddBallPower(float scale);
 	void SetSwingDir(float scale);
+	void Swing();
 
 	// Spin
-	void AddForceToStraight();
 	void AddForceToSide();
 
-	void AddBallPower(float scale);
-
+	// Distance
 	void ShowDistance();
+	float GetDistanceToTarget(FVector src, FVector dst);
 
-	// Ãæµ¹
+	// Collision
 	void CheckMaterialCollision();
 	void SetBallDetail();
+	void CheckBallStopped();
 
+	// 
 	void ResetBallPos(float DeltaTime);
 	void FindResetPos(float DeltaTime);
 
-	void CheckBallStopped();
-
 	// Club
 	void SetBallInfoByClub(EGolfClub club);
+
+	// Camera
+	void ChangeCamera();
 
 public:
 	UFUNCTION()
@@ -73,16 +72,21 @@ protected:
 	USpringArmComponent*		mSpringArm;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	UCameraComponent*			mCamera;
+	UCameraComponent*			mMainCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	UCameraComponent*			mSideCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	EGolfClub	mGolfClubType;
+	EGolfClub			mGolfClubType;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EBallSwingType		mBallSwingType;
 
 	FBallInfo	mBallInfo;
 
 private:
 	bool		mIsEnableSwing;
-	bool		mIsSwingStraight;
 	bool		mIsSwingLeft;
 	bool		mIsSwingRight;
 
@@ -105,6 +109,10 @@ public:
 		mGolfClubType = GolfClub;
 	}
 
+	void SetBallSwingType(EBallSwingType SwingType)
+	{
+		mBallSwingType = SwingType;
+	}
+
 public:
-	float GetDistanceToTarget(FVector src, FVector dst);
 };

@@ -24,6 +24,7 @@ private:
 	class UScoreBase*		mScoreBase;
 	class UBallStateBase*	mBallStateBase;
 	class UCourseBase*		mCourseBase;
+	class UBallSpinBase*	mBallSpinBase;
 	
 public:
 	class UDistanceBase* GetDistanceBase()
@@ -37,7 +38,6 @@ public:
 
 	// Ball Detail
 	void SetBallPower(float ratio);
-	void SetBallHeight(float ratio);
 
 	// Score UI
 	void SetScoreText(FString ScoreText);
