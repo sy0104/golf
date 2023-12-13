@@ -49,6 +49,14 @@ void UMainHUDBase::SetScoreText(FString ScoreText)
 	mScoreBase->SetScoreText(ScoreText);
 }
 
+void UMainHUDBase::SetConcedeTextVisible(bool visible)
+{
+	if (visible)
+		mScoreBase->SetConcedeTextVisible(true);
+	else
+		mScoreBase->SetConcedeTextVisible(false);
+}
+
 void UMainHUDBase::SetBallStateText(FString StateText)
 {
 	mBallStateBase->SetBallStateText(StateText);

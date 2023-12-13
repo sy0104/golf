@@ -69,8 +69,8 @@ enum class ECameraType : uint8
 UENUM(BlueprintType)
 enum class EBallSwingType : uint8
 {
-	Left,
 	Straight,
+	Left,
 	Right
 };
 

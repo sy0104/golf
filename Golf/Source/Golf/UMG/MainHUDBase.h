@@ -41,6 +41,7 @@ public:
 
 	// Score UI
 	void SetScoreText(FString ScoreText);
+	void SetConcedeTextVisible(bool visible);
 
 	// Ball State
 	void SetBallStateText(FString StateText);
