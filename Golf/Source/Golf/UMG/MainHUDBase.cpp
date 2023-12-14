@@ -10,6 +10,7 @@
 #include "CourseBase.h"
 #include "PlayInfoBase.h"
 #include "BallSpinBase.h"
+#include "WindBase.h"
 
 void UMainHUDBase::NativeConstruct()
 {
@@ -24,6 +25,7 @@ void UMainHUDBase::NativeConstruct()
 	mPlayInfoBase = Cast<UPlayInfoBase>(GetWidgetFromName(FName(TEXT("PlayInfoUI"))));
 	//mMiniMap = Cast<UMiniMap>(GetWidgetFromName(FName(TEXT("MiniMapUI"))));
 	mBallSpinBase = Cast<UBallSpinBase>(GetWidgetFromName(FName(TEXT("BallSpinUI"))));
+	mWindBase = Cast<UWindBase>(GetWidgetFromName(FName(TEXT("WindUI"))));
 }
 
 void UMainHUDBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -109,4 +111,23 @@ void UMainHUDBase::SetPlayInfoVisible(bool visible)
 
 void UMainHUDBase::SetMapImage()
 {
+}
+
+void UMainHUDBase::SetWindTextVisible(EWindType WindType, bool visible)
+{
+	switch (WindType)
+	{
+	case EWindType::Left:
+		mWindBase->SetLeftWindTextVisible(visible);
+		break;
+	case EWindType::Right:
+		mWindBase->SetRightWindTextVisible(visible);
+		break;
+	case EWindType::Forward:
+		mWindBase->SetForwardWindTextVisible(visible);
+		break;
+	case EWindType::Back:
+		mWindBase->SetBackWindTextVisible(visible);
+		break;
+	}
 }

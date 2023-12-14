@@ -20,9 +20,7 @@ protected:
 
 private:
 	UProgressBar*	mBallPowerBar;
-	UProgressBar*	mBallHeightBar;
 
 public:
 	void SetBallPower(float ratio);
-	void SetBallHeight(float ratio);
 };

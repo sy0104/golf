@@ -26,8 +26,8 @@ private:
 	class UCourseBase*		mCourseBase;
 	class UPlayInfoBase*	mPlayInfoBase;
 	//class UMiniMap*			mMiniMap;
-
 	class UBallSpinBase*	mBallSpinBase;
+	class UWindBase* mWindBase;
 	
 public:
 	class UDistanceBase* GetDistanceBase()
@@ -62,4 +62,7 @@ public:
 
 	// MiniMap
 	void SetMapImage();
+
+	// Wind
+	void SetWindTextVisible(EWindType WindType, bool visible);
 };

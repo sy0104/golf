@@ -23,33 +23,38 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-	void SwingStraight();
-	void SwingLeft();
-	void SwingRight();
-	void Roll();
-
-	// Dir
+	// Swing
+	void AddBallPower(float scale);
 	void SetSwingDir(float scale);
+	void Swing();
 
 	// Spin
-	void AddForceToStraight();
 	void AddForceToSide();
 
-	void AddBallPower(float scale);
-
+	// Distance
 	void ShowDistance();
 
-	// Ãæµ¹
+	// Collision
 	void CheckMaterialCollision();
-	void SetBallDetail();
+	void SetBallHitMaterial(FString MaterialName);
+	void CheckBallStopped();
 
+	// 
+	void SetBallDetailsByMaterial();
 	void ResetBallPos(float DeltaTime);
 	void FindResetPos(float DeltaTime);
 
-	void CheckBallStopped();
-
 	// Club
 	void SetBallInfoByClub(EGolfClub club);
+
+	// Camera
+	void ChangeCamera();
+
+	// Score
+	void CalculateScore();
+
+	// Wind
+	void Wind();
 
 public:
 	UFUNCTION()
@@ -74,12 +79,22 @@ protected:
 	USpringArmComponent*		mSpringArm;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	UCameraComponent*			mCamera;
+	UCameraComponent*			mMainCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	ACameraActor*				mSubCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	UCameraComponent*			mSideCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	EGolfClub	mGolfClubType;
+	EGolfClub			mGolfClubType;
 
-	FBallInfo	mBallInfo;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EBallSwingType		mBallSwingType;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EMaterialType		mHitMaterialType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	//UParticleSystemComponent*	mTrailer;
@@ -91,10 +106,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
 	USceneCaptureComponent2D*	mMinimapCapture;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EWindType			mWindType;
+
+	FBallInfo	mBallInfo;
 
 private:
 	bool		mIsEnableSwing;
-	bool		mIsSwingStraight;
 	bool		mIsSwingLeft;
 	bool		mIsSwingRight;
 
@@ -106,7 +124,10 @@ private:
 	bool		mIsFindResetPos;
 	FVector		mResetPos;
 
-	FString		mHitMaterialName;
+	float		mWindPower;
+	float		mWindPowerMin;
+	float		mWindPowerMax;
+	bool		mIsWindBlow;
 
 	class UMainHUDBase*		mMainHUD;
 
@@ -117,6 +138,10 @@ public:
 		mGolfClubType = GolfClub;
 	}
 
+	void SetBallSwingType(EBallSwingType SwingType)
+	{
+		mBallSwingType = SwingType;
+	}
+
 public:
-	float GetDistanceToTarget(FVector src, FVector dst);
 };

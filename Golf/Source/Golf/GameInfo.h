@@ -34,25 +34,16 @@ public:
 	FVector		DestPos;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		BallDir;
+	float		BallDis;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		BallSpinDir;
+	float		BallPower;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float		BallArc;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	float		SpinForce;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		BallPower;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		BallAngle;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		BallMinPower;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	double		BallMaxPower;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	int32		Score;
@@ -64,9 +55,48 @@ public:
 UENUM(BlueprintType)
 enum class EGolfClub : uint8
 {
-	Club1,
-	Club2,
-	Club3
+	Driver,
+	Wood,
+	Iron,
+	Wedge,
+	Putter,
+};
+
+UENUM(BlueprintType)
+enum class ECameraType : uint8
+{
+	Main,
+	Side,
+};
+
+UENUM(BlueprintType)
+enum class EBallSwingType : uint8
+{
+	Straight,
+	Left,
+	Right
+};
+
+UENUM(BlueprintType)
+enum class EMaterialType : uint8
+{
+	Tee,
+	Fairway,
+	Green,
+	Rough,
+	Water,
+	Bunker,
+	Road,
+	OB
+};
+
+UENUM(BlueprintType)
+enum class EWindType : uint8
+{
+	Left,
+	Right,
+	Forward,
+	Back
 };
 
 UCLASS()

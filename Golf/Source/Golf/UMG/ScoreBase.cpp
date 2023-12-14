@@ -19,3 +19,11 @@ void UScoreBase::SetScoreText(FString ScoreText)
 {
 	mScoreText->SetText(FText::FromString(ScoreText));
 }
+
+void UScoreBase::SetConcedeTextVisible(bool visible)
+{
+	if (visible)
+		mConcedeText->SetVisibility(ESlateVisibility::Visible);
+	else
+		mConcedeText->SetVisibility(ESlateVisibility::Hidden);
+}

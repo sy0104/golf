@@ -6,11 +6,10 @@
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
-#include "GolfClubBase.generated.h"
-
+#include "BallSpinBase.generated.h"
 
 UCLASS()
-class GOLF_API UGolfClubBase : public UUserWidget
+class GOLF_API UBallSpinBase : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -19,25 +18,17 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:
-	UButton*		mDriverButton;
-	UButton*		mWoodButton;
-	UButton*		mIronButton;
-	UButton*		mWedgeButton;
-	UButton*		mPutterButton;
+	UButton*		mSwingLeftButton;
+	UButton*		mSwingStraightButton;
+	UButton*		mSwingRightButton;
 
 public:
 	UFUNCTION()
-	void OnDriverButtonClicked();
+	void OnSwingLeftButtonClicked();
 
 	UFUNCTION()
-	void OnWoodButtonClicked();
+	void OnSwingStraightButtonClicked();
 
 	UFUNCTION()
-	void OnIronButtonClicked();
-
-	UFUNCTION()
-	void OnWedgeButtonClicked();
-
-	UFUNCTION()
-	void OnPutterButtonClicked();
+	void OnSwingRightButtonClicked();
 };

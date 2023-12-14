@@ -18,8 +18,10 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:
-	UTextBlock* mScoreText;
+	UTextBlock*		mScoreText;
+	UTextBlock*		mConcedeText;
 
 public:
 	void SetScoreText(FString ScoreText);
+	void SetConcedeTextVisible(bool visible);
 };

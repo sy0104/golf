@@ -25,7 +25,6 @@ void ABallController::Tick(float DeltaTime)
 void ABallController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-
 }
 
 void ABallController::OnPossess(APawn* aPawn)
