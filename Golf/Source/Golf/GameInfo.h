@@ -74,6 +74,28 @@ enum class EBallSwingType : uint8
 	Right
 };
 
+UENUM(BlueprintType)
+enum class EMaterialType : uint8
+{
+	Tee,
+	Fairway,
+	Green,
+	Rough,
+	Water,
+	Bunker,
+	Road,
+	OB
+};
+
+UENUM(BlueprintType)
+enum class EWindType : uint8
+{
+	Left,
+	Right,
+	Forward,
+	Back
+};
+
 UCLASS()
 class GOLF_API UGameInfo : public UObject
 {

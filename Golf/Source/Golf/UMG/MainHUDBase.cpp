@@ -9,6 +9,7 @@
 #include "BallStateBase.h"
 #include "CourseBase.h"
 #include "BallSpinBase.h"
+#include "WindBase.h"
 
 void UMainHUDBase::NativeConstruct()
 {
@@ -21,6 +22,7 @@ void UMainHUDBase::NativeConstruct()
 	mBallStateBase = Cast<UBallStateBase>(GetWidgetFromName(FName(TEXT("BallStateUI"))));
 	mCourseBase = Cast<UCourseBase>(GetWidgetFromName(FName(TEXT("CourseUI"))));
 	mBallSpinBase = Cast<UBallSpinBase>(GetWidgetFromName(FName(TEXT("BallSpinUI"))));
+	mWindBase = Cast<UWindBase>(GetWidgetFromName(FName(TEXT("WindUI"))));
 }
 
 void UMainHUDBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -73,4 +75,23 @@ void UMainHUDBase::SetBallStateVisible(bool visible)
 void UMainHUDBase::SetCourseText(FString CourseText)
 {
 	mCourseBase->SetCourseText(CourseText);
+}
+
+void UMainHUDBase::SetWindTextVisible(EWindType WindType, bool visible)
+{
+	switch (WindType)
+	{
+	case EWindType::Left:
+		mWindBase->SetLeftWindTextVisible(visible);
+		break;
+	case EWindType::Right:
+		mWindBase->SetRightWindTextVisible(visible);
+		break;
+	case EWindType::Forward:
+		mWindBase->SetForwardWindTextVisible(visible);
+		break;
+	case EWindType::Back:
+		mWindBase->SetBackWindTextVisible(visible);
+		break;
+	}
 }

@@ -25,6 +25,7 @@ private:
 	class UBallStateBase*	mBallStateBase;
 	class UCourseBase*		mCourseBase;
 	class UBallSpinBase*	mBallSpinBase;
+	class UWindBase*		mWindBase;
 	
 public:
 	class UDistanceBase* GetDistanceBase()
@@ -49,4 +50,7 @@ public:
 
 	// Course
 	void SetCourseText(FString CourseText);
+
+	// Wind
+	void SetWindTextVisible(EWindType WindType, bool visible);
 };

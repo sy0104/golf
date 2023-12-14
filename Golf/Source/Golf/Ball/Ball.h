@@ -32,14 +32,14 @@ private:
 
 	// Distance
 	void ShowDistance();
-	float GetDistanceToTarget(FVector src, FVector dst);
 
 	// Collision
 	void CheckMaterialCollision();
-	void SetBallDetail();
+	void SetBallHitMaterial(FString MaterialName);
 	void CheckBallStopped();
 
 	// 
+	void SetBallDetailsByMaterial();
 	void ResetBallPos(float DeltaTime);
 	void FindResetPos(float DeltaTime);
 
@@ -48,6 +48,12 @@ private:
 
 	// Camera
 	void ChangeCamera();
+
+	// Score
+	void CalculateScore();
+
+	// Wind
+	void Wind();
 
 public:
 	UFUNCTION()
@@ -86,6 +92,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EBallSwingType		mBallSwingType;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EMaterialType		mHitMaterialType;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EWindType			mWindType;
+
 	FBallInfo	mBallInfo;
 
 private:
@@ -101,7 +113,10 @@ private:
 	bool		mIsFindResetPos;
 	FVector		mResetPos;
 
-	FString		mHitMaterialName;
+	float		mWindPower;
+	float		mWindPowerMin;
+	float		mWindPowerMax;
+	bool		mIsWindBlow;
 
 	class UMainHUDBase*		mMainHUD;
 
