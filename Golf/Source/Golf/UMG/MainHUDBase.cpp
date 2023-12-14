@@ -9,6 +9,7 @@
 #include "BallStateBase.h"
 #include "CourseBase.h"
 #include "PlayInfoBase.h"
+#include "BallSpinBase.h"
 
 void UMainHUDBase::NativeConstruct()
 {
@@ -21,6 +22,8 @@ void UMainHUDBase::NativeConstruct()
 	mBallStateBase = Cast<UBallStateBase>(GetWidgetFromName(FName(TEXT("BallStateUI"))));
 	mCourseBase = Cast<UCourseBase>(GetWidgetFromName(FName(TEXT("CourseUI"))));
 	mPlayInfoBase = Cast<UPlayInfoBase>(GetWidgetFromName(FName(TEXT("PlayInfoUI"))));
+	//mMiniMap = Cast<UMiniMap>(GetWidgetFromName(FName(TEXT("MiniMapUI"))));
+	mBallSpinBase = Cast<UBallSpinBase>(GetWidgetFromName(FName(TEXT("BallSpinUI"))));
 }
 
 void UMainHUDBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -43,15 +46,18 @@ void UMainHUDBase::SetBallPower(float ratio)
 	mBallDetailBase->SetBallPower(ratio);
 }
 
-void UMainHUDBase::SetBallHeight(float ratio)
-{
-	mBallDetailBase->SetBallHeight(ratio);
-}
-
 void UMainHUDBase::SetScoreText(FString ScoreText)
 {
 	mScoreBase->SetVisibility(ESlateVisibility::Visible);
 	mScoreBase->SetScoreText(ScoreText);
+}
+
+void UMainHUDBase::SetConcedeTextVisible(bool visible)
+{
+	if (visible)
+		mScoreBase->SetConcedeTextVisible(true);
+	else
+		mScoreBase->SetConcedeTextVisible(false);
 }
 
 void UMainHUDBase::SetBallStateText(FString StateText)
@@ -99,4 +105,8 @@ void UMainHUDBase::SetPlayInfoVisible(bool visible)
 	else
 		mPlayInfoBase->SetVisibility(ESlateVisibility::Hidden);
 
+}
+
+void UMainHUDBase::SetMapImage()
+{
 }

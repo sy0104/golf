@@ -10,13 +10,17 @@ void UGolfClubBase::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	mClub1Button = Cast<UButton>(GetWidgetFromName(FName(TEXT("Club1Button"))));
-	mClub2Button = Cast<UButton>(GetWidgetFromName(FName(TEXT("Club2Button"))));
-	mClub3Button = Cast<UButton>(GetWidgetFromName(FName(TEXT("Club3Button"))));
+	mDriverButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("DriverButton"))));
+	mWoodButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("WoodButton"))));
+	mIronButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("IronButton"))));
+	mWedgeButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("WedgeButton"))));
+	mPutterButton = Cast<UButton>(GetWidgetFromName(FName(TEXT("PutterButton"))));
 
-	mClub1Button->OnClicked.AddDynamic(this, &UGolfClubBase::OnClub1ButtonClicked);
-	mClub2Button->OnClicked.AddDynamic(this, &UGolfClubBase::OnClub2ButtonClicked);
-	mClub3Button->OnClicked.AddDynamic(this, &UGolfClubBase::OnClub3ButtonClicked);
+	mDriverButton->OnClicked.AddDynamic(this, &UGolfClubBase::OnDriverButtonClicked);
+	mWoodButton->OnClicked.AddDynamic(this, &UGolfClubBase::OnWoodButtonClicked);
+	mIronButton->OnClicked.AddDynamic(this, &UGolfClubBase::OnIronButtonClicked);
+	mWedgeButton->OnClicked.AddDynamic(this, &UGolfClubBase::OnWedgeButtonClicked);
+	mPutterButton->OnClicked.AddDynamic(this, &UGolfClubBase::OnPutterButtonClicked);
 }
 
 void UGolfClubBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -24,9 +28,9 @@ void UGolfClubBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	Super::NativeTick(MyGeometry, InDeltaTime);
 }
 
-void UGolfClubBase::OnClub1ButtonClicked()
+void UGolfClubBase::OnDriverButtonClicked()
 {
-	//PrintViewport(1.f, FColor::Red, TEXT("1"));
+	PrintViewport(1.f, FColor::Red, TEXT("Driver"));
 
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode))
@@ -34,16 +38,14 @@ void UGolfClubBase::OnClub1ButtonClicked()
 		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 		if (IsValid(Ball))
 		{
-			Ball->SetBallMinPower(0.0);
-			Ball->SetBallMaxPower(280000.0);	// 250m
-			Ball->SetGolfClubType(EGolfClub::Club1);
+			Ball->SetGolfClubType(EGolfClub::Driver);
 		}
 	}
 }
 
-void UGolfClubBase::OnClub2ButtonClicked()
+void UGolfClubBase::OnWoodButtonClicked()
 {
-	//PrintViewport(1.f, FColor::Red, TEXT("2"));
+	PrintViewport(1.f, FColor::Red, TEXT("Wood"));
 
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode))
@@ -51,16 +53,14 @@ void UGolfClubBase::OnClub2ButtonClicked()
 		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 		if (IsValid(Ball))
 		{
-			Ball->SetBallMinPower(0.0);
-			Ball->SetBallMaxPower(250000.0);	// 200m
-			Ball->SetGolfClubType(EGolfClub::Club2);
+			Ball->SetGolfClubType(EGolfClub::Wood);
 		}
 	}
 }
 
-void UGolfClubBase::OnClub3ButtonClicked()
+void UGolfClubBase::OnIronButtonClicked()
 {
-	//PrintViewport(1.f, FColor::Red, TEXT("3"));
+	PrintViewport(1.f, FColor::Red, TEXT("Iron"));
 
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode))
@@ -68,9 +68,37 @@ void UGolfClubBase::OnClub3ButtonClicked()
 		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 		if (IsValid(Ball))
 		{
-			Ball->SetBallMinPower(0.0);
-			Ball->SetBallMaxPower(200000.0);	// 130m
-			Ball->SetGolfClubType(EGolfClub::Club3);
+			Ball->SetGolfClubType(EGolfClub::Iron);
+		}
+	}
+}
+
+void UGolfClubBase::OnWedgeButtonClicked()
+{
+	PrintViewport(1.f, FColor::Red, TEXT("Wedge"));
+
+	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (IsValid(GameMode))
+	{
+		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
+		if (IsValid(Ball))
+		{
+			Ball->SetGolfClubType(EGolfClub::Wedge);
+		}
+	}
+}
+
+void UGolfClubBase::OnPutterButtonClicked()
+{
+	PrintViewport(1.f, FColor::Red, TEXT("Putter"));
+
+	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (IsValid(GameMode))
+	{
+		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
+		if (IsValid(Ball))
+		{
+			Ball->SetGolfClubType(EGolfClub::Putter);
 		}
 	}
 }

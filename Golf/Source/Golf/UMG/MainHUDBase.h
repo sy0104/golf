@@ -24,8 +24,11 @@ private:
 	class UScoreBase*		mScoreBase;
 	class UBallStateBase*	mBallStateBase;
 	class UCourseBase*		mCourseBase;
-	class UPlayInfoBase* mPlayInfoBase;
+	class UPlayInfoBase*	mPlayInfoBase;
+	//class UMiniMap*			mMiniMap;
 
+	class UBallSpinBase*	mBallSpinBase;
+	
 public:
 	class UDistanceBase* GetDistanceBase()
 	{
@@ -38,10 +41,10 @@ public:
 
 	// Ball Detail
 	void SetBallPower(float ratio);
-	void SetBallHeight(float ratio);
 
 	// Score UI
 	void SetScoreText(FString ScoreText);
+	void SetConcedeTextVisible(bool visible);
 
 	// Ball State
 	void SetBallStateText(FString StateText);
@@ -56,4 +59,7 @@ public:
 	void SetShotNumText(int32 shot);
 	void SetScoreText();
 	void SetPlayInfoVisible(bool visible);
+
+	// MiniMap
+	void SetMapImage();
 };
