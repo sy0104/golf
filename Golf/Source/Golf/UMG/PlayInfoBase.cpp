@@ -54,4 +54,5 @@ void UPlayInfoBase::SetShotNumText(int32 shot)
 void UPlayInfoBase::SetScoreText()
 {
 
+
 }

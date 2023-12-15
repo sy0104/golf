@@ -29,4 +29,5 @@ public:
 	void SetTargetDistanceText(float dis);
 	void SetShotNumText(int32 shot);
 	void SetScoreText();
+
 };
