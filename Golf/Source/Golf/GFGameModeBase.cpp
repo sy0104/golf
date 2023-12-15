@@ -6,6 +6,7 @@
 #include "Ball/BallController.h"
 #include "UMG/StartSceneBase.h"
 #include "UMG/MainHUDBase.h"
+#include "UMG/LobbySceneBase.h"
 #include "Camera/FixedCamera.h"
 
 AGFGameModeBase::AGFGameModeBase()
@@ -35,6 +36,12 @@ AGFGameModeBase::AGFGameModeBase()
 	if (MainFinder.Succeeded())
 		mMainHUDClass = MainFinder.Class;
 
+	// Lobby Scene UI Class
+	ConstructorHelpers::FClassFinder<UUserWidget>
+		LobbyFinder(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UMG/UI_LobbyScene.UI_LobbyScene_C'"));
+	if (LobbyFinder.Succeeded())
+		mLobbySceneUIClass = LobbyFinder.Class;
+
 	// Fixed Camera
 	mFixedCameraClass = AFixedCamera::StaticClass();
 }
@@ -48,9 +55,7 @@ void AGFGameModeBase::BeginPlay()
 		mStartSceneUI = Cast<UStartSceneBase>(CreateWidget(GetWorld(), mStartSceneUIClass));
 
 		if (IsValid(mStartSceneUI))
-		{
 			mStartSceneUI->AddToViewport();
-		}
 	}
 
 	else if (UGameplayStatics::GetCurrentLevelName(GetWorld()) == L"Main" && IsValid(mMainHUDClass))
@@ -58,18 +63,19 @@ void AGFGameModeBase::BeginPlay()
 		mMainHUD = Cast<UMainHUDBase>(CreateWidget(GetWorld(), mMainHUDClass));
 
 		if (IsValid(mMainHUD))
-		{
 			mMainHUD->AddToViewport();
-		}
+	}
+
+	else if (UGameplayStatics::GetCurrentLevelName(GetWorld()) == L"Lobby" && IsValid(mLobbySceneUIClass))
+	{
+		mLobbySceneUI = Cast<ULobbySceneBase>(CreateWidget(GetWorld(), mLobbySceneUIClass));
+
+		if (IsValid(mLobbySceneUI))
+			mLobbySceneUI->AddToViewport();
 	}
 
 	// Fixed Camera
 	mFixedCamera = NewObject<AFixedCamera>();
 	mFixedCamera->SetActorLocation(FVector(-1500.0, 0.0, 1050.0));
 	mFixedCamera->SetActorRotation(FRotator(-5.0, 0.0, 0.0));
-
-	//if (IsValid(mFixedCamera))
-	//{
-	//	PrintViewport(1.f, FColor::Red, TEXT("Fixed Camera Valid"));
-	//}
 }

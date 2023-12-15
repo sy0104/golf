@@ -27,6 +27,9 @@ private:
 	TSubclassOf<UUserWidget>	mMainHUDClass;
 	class UMainHUDBase*			mMainHUD;
 
+	TSubclassOf<UUserWidget>	mLobbySceneUIClass;
+	class ULobbySceneBase*		mLobbySceneUI;
+
 	TSubclassOf<AActor>			mFixedCameraClass;
 	class AFixedCamera*			mFixedCamera;
 

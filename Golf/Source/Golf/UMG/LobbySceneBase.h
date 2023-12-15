@@ -1,15 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include <Components\Button.h>
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
-#include "StartSceneBase.generated.h"
+#include "LobbySceneBase.generated.h"
 
 UCLASS()
-class GOLF_API UStartSceneBase : public UUserWidget
+class GOLF_API ULobbySceneBase : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -17,7 +15,7 @@ protected:
 	virtual void NativeConstruct();
 
 private:
-	UButton*	mStartButton;
+	UButton*		mStartButton;
 
 public:
 	UFUNCTION()

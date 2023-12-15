@@ -15,5 +15,5 @@ void UStartSceneBase::NativeConstruct()
 
 void UStartSceneBase::OnStartButtonClicked()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Main"));
+	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Lobby"));
 }
