@@ -4,7 +4,6 @@
 
 #include "../GameInfo.h"
 #include "GameFramework/Pawn.h"
-#include <NiagaraComponent.h>
 #include "Ball.generated.h"
 
 UCLASS()
@@ -49,12 +48,15 @@ private:
 
 	// Camera
 	void ChangeCamera();
+	void CameraMove();
 
 	// Score
 	void CalculateScore();
 
 	// Wind
 	void Wind();
+
+	void TestKey();
 
 public:
 	UFUNCTION()
@@ -81,12 +83,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
 	UCameraComponent*			mMainCamera;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	ACameraActor*				mSubCamera;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	UCameraComponent*			mSideCamera;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EGolfClub			mGolfClubType;
 
@@ -95,16 +91,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EMaterialType		mHitMaterialType;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	//UParticleSystemComponent*	mTrailer;
-	UNiagaraComponent* mTrailer;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	USpringArmComponent*		mMinimapSpringArm;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	USceneCaptureComponent2D*	mMinimapCapture;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EWindType			mWindType;
@@ -129,7 +115,10 @@ private:
 	float		mWindPowerMax;
 	bool		mIsWindBlow;
 
+	float		mCameraBlendTime;
+
 	class UMainHUDBase*		mMainHUD;
+	class AFixedCamera*		mFixedCamera;
 
 public:
 	void SetStaticMesh(const FString& path);

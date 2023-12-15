@@ -9,7 +9,7 @@ public class Golf : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore"
-		, "UMG", "Landscape", "Niagara"});
+		, "UMG", "Landscape"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

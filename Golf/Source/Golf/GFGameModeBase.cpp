@@ -6,6 +6,7 @@
 #include "Ball/BallController.h"
 #include "UMG/StartSceneBase.h"
 #include "UMG/MainHUDBase.h"
+#include "Camera/FixedCamera.h"
 
 AGFGameModeBase::AGFGameModeBase()
 {
@@ -28,10 +29,14 @@ AGFGameModeBase::AGFGameModeBase()
 	if (StartFinder.Succeeded())
 		mStartSceneUIClass = StartFinder.Class;
 
+	// Main UI
 	ConstructorHelpers::FClassFinder<UUserWidget> 
 		MainFinder(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UMG/UI_MainHUD.UI_MainHUD_C'"));
 	if (MainFinder.Succeeded())
 		mMainHUDClass = MainFinder.Class;
+
+	// Fixed Camera
+	mFixedCameraClass = AFixedCamera::StaticClass();
 }
 
 void AGFGameModeBase::BeginPlay()
@@ -57,4 +62,14 @@ void AGFGameModeBase::BeginPlay()
 			mMainHUD->AddToViewport();
 		}
 	}
+
+	// Fixed Camera
+	mFixedCamera = NewObject<AFixedCamera>();
+	mFixedCamera->SetActorLocation(FVector(-1500.0, 0.0, 1050.0));
+	mFixedCamera->SetActorRotation(FRotator(-5.0, 0.0, 0.0));
+
+	//if (IsValid(mFixedCamera))
+	//{
+	//	PrintViewport(1.f, FColor::Red, TEXT("Fixed Camera Valid"));
+	//}
 }

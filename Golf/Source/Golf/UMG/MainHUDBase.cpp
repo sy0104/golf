@@ -8,7 +8,6 @@
 #include "ScoreBase.h"
 #include "BallStateBase.h"
 #include "CourseBase.h"
-#include "PlayInfoBase.h"
 #include "BallSpinBase.h"
 #include "WindBase.h"
 
@@ -22,8 +21,6 @@ void UMainHUDBase::NativeConstruct()
 	mScoreBase = Cast<UScoreBase>(GetWidgetFromName(FName(TEXT("ScoreUI"))));
 	mBallStateBase = Cast<UBallStateBase>(GetWidgetFromName(FName(TEXT("BallStateUI"))));
 	mCourseBase = Cast<UCourseBase>(GetWidgetFromName(FName(TEXT("CourseUI"))));
-	mPlayInfoBase = Cast<UPlayInfoBase>(GetWidgetFromName(FName(TEXT("PlayInfoUI"))));
-	//mMiniMap = Cast<UMiniMap>(GetWidgetFromName(FName(TEXT("MiniMapUI"))));
 	mBallSpinBase = Cast<UBallSpinBase>(GetWidgetFromName(FName(TEXT("BallSpinUI"))));
 	mWindBase = Cast<UWindBase>(GetWidgetFromName(FName(TEXT("WindUI"))));
 }
@@ -78,39 +75,6 @@ void UMainHUDBase::SetBallStateVisible(bool visible)
 void UMainHUDBase::SetCourseText(FString CourseText)
 {
 	mCourseBase->SetCourseText(CourseText);
-}
-
-void UMainHUDBase::SetCourseDistanceText(float dis)
-{
-	mPlayInfoBase->SetCourseDistanceText(dis);
-}
-
-void UMainHUDBase::SetTargetDistanceText(float dis)
-{
-	mPlayInfoBase->SetTargetDistanceText(dis);
-}
-
-void UMainHUDBase::SetShotNumText(int32 shot)
-{
-	mPlayInfoBase->SetShotNumText(shot);
-}
-
-void UMainHUDBase::SetScoreText()
-{
-	mPlayInfoBase->SetScoreText();
-}
-
-void UMainHUDBase::SetPlayInfoVisible(bool visible)
-{
-	if (visible)
-		mPlayInfoBase->SetVisibility(ESlateVisibility::Visible);
-	else
-		mPlayInfoBase->SetVisibility(ESlateVisibility::Hidden);
-
-}
-
-void UMainHUDBase::SetMapImage()
-{
 }
 
 void UMainHUDBase::SetWindTextVisible(EWindType WindType, bool visible)

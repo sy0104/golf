@@ -27,9 +27,17 @@ private:
 	TSubclassOf<UUserWidget>	mMainHUDClass;
 	class UMainHUDBase*			mMainHUD;
 
+	TSubclassOf<AActor>			mFixedCameraClass;
+	class AFixedCamera*			mFixedCamera;
+
 public:
 	UMainHUDBase* GetMainHUD()
 	{
 		return mMainHUD;
+	}
+
+	AFixedCamera* GetFixedCamera()
+	{
+		return mFixedCamera;
 	}
 };

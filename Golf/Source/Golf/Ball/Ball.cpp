@@ -2,12 +2,10 @@
 #include "../GFGameModeBase.h"
 #include "../UMG/DistanceBase.h"
 #include "../UMG/MainHUDBase.h"
-#include "../UMG/PlayInfoBase.h"
-#include "../UMG/MiniMap.h"
 #include "BallController.h"
 #include "../GFGameInstance.h"
 #include "../Manager/ScoreSubsystem.h"
-#include "NiagaraSystem.h"
+#include "../Camera/FixedCamera.h"
 
 ABall::ABall()
 {
@@ -21,7 +19,6 @@ ABall::ABall()
 
 	if (IsValid(mesh))
 	{
-		//PrintViewport(1.f, FColor::Red, TEXT("Mesh Load"));
 		mStaticMesh->SetStaticMesh(mesh);
 		mStaticMesh->SetRelativeScale3D(FVector(12.0, 12.0, 12.0));
 	}
@@ -51,21 +48,14 @@ ABall::ABall()
 	mSpringArm->CameraLagSpeed = 0.f;
 	mSpringArm->CameraLagMaxDistance = 10000.f;
 
-	// main camera
-	mMainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	// main camera (moving)
+	mMainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("MainCamera"));
 	mMainCamera->SetupAttachment(mSpringArm);
 	mMainCamera->SetRelativeLocation(FVector(-150.0, 0.0, 70.0));
-	mMainCamera->SetRelativeRotation(FRotator(0.0, 0.0, 0.0));
-	mMainCamera->bConstrainAspectRatio = true;
+	mMainCamera->SetRelativeRotation(FRotator(-5.0, 0.0, 0.0));
+	//mMainCamera->bConstrainAspectRatio = true;
+	mMainCamera->SetAutoActivate(false);
 	mMainCamera->SetActive(true);
-
-	// side camera
-	mSideCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("SideCamera"));
-	mSideCamera->SetupAttachment(mSpringArm);
-	mSideCamera->SetRelativeLocation(FVector(130.0, 0.0, 0.0));
-	mSideCamera->SetRelativeRotation(FRotator(0.0, 180.0, 0.0));
-	mSideCamera->bConstrainAspectRatio = true;
-	mSideCamera->SetActive(false);
 
 	//// Ball Info
 	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
@@ -76,7 +66,6 @@ ABall::ABall()
 	mBallInfo.BallArc = 0.4f;
 	mBallInfo.SpinForce = 10000.f;
 	mBallInfo.Score = -4;
-	mBallInfo.ShotNum = 1;
 
 	// spin
 	mIsEnableSwing = true;
@@ -93,43 +82,6 @@ ABall::ABall()
 	mIsBallStopped = true;
 
 	mGolfClubType = EGolfClub::Driver;
-
-	// Trailer
-	mTrailer = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Trailer"));
-	mTrailer->SetupAttachment(mStaticMesh);
-
-	const FString& niagaraPath = TEXT("/Game/Materials/N_BallTrail.N_BallTrail");
-	UNiagaraSystem* niagara = LoadObject<UNiagaraSystem>(nullptr, *niagaraPath);
-	if (IsValid(niagara))
-	{
-		mTrailer->SetAsset(niagara);
-	}
-
-	// Minimap
-	mMinimapSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("MinimapSpringArm"));
-	mMinimapSpringArm->SetupAttachment(mStaticMesh);
-	mMinimapSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 0.0));
-	mMinimapSpringArm->SetRelativeRotation(FRotator(-90.0, 0.0, 0.0));
-	mMinimapSpringArm->TargetArmLength = 35000.f;
-	mMinimapSpringArm->bUsePawnControlRotation = true;
-	mMinimapSpringArm->bInheritPitch = false;
-	//mMinimapSpringArm->bInheritYaw = false;
-	//mMinimapSpringArm->bInheritRoll = false;
-
-	mMinimapCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("MinimapCapture"));
-	mMinimapCapture->SetupAttachment(mMinimapSpringArm);
-	mMinimapCapture->SetRelativeLocation(FVector(0.0, 150.0, 2000.0));
-	mMinimapCapture->bCaptureEveryFrame = false;
-	mMinimapCapture->bCaptureOnMovement = false;
-
-	const FString& mapRenderPath = TEXT("/Game/UMG/UI_IMAGE/R_MiniMapCapture.R_MiniMapCapture");
-	UTextureRenderTarget2D* mapRender = LoadObject<UTextureRenderTarget2D>(nullptr, *mapRenderPath);
-	if (IsValid(mapRender))
-	{
-		mMinimapCapture->TextureTarget = mapRender;
-	}
-
-	mGolfClubType = EGolfClub::Driver;
 	mHitMaterialType = EMaterialType::Tee;
 
 	mWindType = EWindType(FMath::RandRange(0, 3));
@@ -138,10 +90,10 @@ ABall::ABall()
 	mWindPower = FMath::RandRange(mWindPowerMin, mWindPowerMax);
 	mIsWindBlow = false;
 
+	mCameraBlendTime = 10.f;
+
 	SetActorLocation(mBallInfo.StartPos);
 }
-
-
 
 void ABall::BeginPlay()
 {
@@ -155,26 +107,23 @@ void ABall::BeginPlay()
 		if (IsValid(mMainHUD))
 		{
 			mMainHUD->SetDistanceText(0.f);
-			mMainHUD->SetCourseDistanceText(mBallInfo.DestPos.X / 100.f);
-			mMainHUD->SetShotNumText(mBallInfo.ShotNum);
-			//mMainHUD->SetMapImage();
-			mMinimapCapture->bCaptureEveryFrame = true;
 			mMainHUD->SetWindTextVisible(mWindType, true);
 		}
 	}
 
 	mStaticMesh->OnComponentHit.AddDynamic(this, &ABall::OnHit);
+
+	// 시작 카메라 설정 (Fixed Camera)
+	mFixedCamera = GameMode->GetFixedCamera();
+	
+	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (IsValid(BallController))
+		BallController->SetViewTarget(mFixedCamera);
 }
 
 void ABall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (UGameplayStatics::GetCurrentLevelName(GetWorld()) == L"Start")
-	{
-		return;
-	}
 
 	if (mBallSwingType != EBallSwingType::Straight)
 		AddForceToSide();
@@ -191,6 +140,9 @@ void ABall::Tick(float DeltaTime)
 
 	FindResetPos(DeltaTime);
 
+	CameraMove();
+
+
 	// Wind();
 
 	//FVector vel = mStaticMesh->GetComponentVelocity();
@@ -206,6 +158,7 @@ void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	// 액션 매핑
 	PlayerInputComponent->BindAction<ABall>(TEXT("SwingStraight"), EInputEvent::IE_Pressed, this, &ABall::Swing);
 	PlayerInputComponent->BindAction<ABall>(TEXT("ChangeCamera"), EInputEvent::IE_Pressed, this, &ABall::ChangeCamera);
+	PlayerInputComponent->BindAction<ABall>(TEXT("Test"), EInputEvent::IE_Pressed, this, &ABall::TestKey);
 
 	// 축 매핑
 	PlayerInputComponent->BindAxis<ABall>(TEXT("BallDir"), this, &ABall::SetSwingDir);
@@ -236,7 +189,6 @@ void ABall::Swing()
 	//mBallInfo.BallArc = 0.2f;
 
 	mBallInfo.StartPos = GetActorLocation();
-	mBallInfo.ShotNum++;
 
 	FVector TargetPos = mBallInfo.StartPos + (mMainCamera->GetForwardVector() * (mBallInfo.BallDis * mBallInfo.BallPower));
 	FVector OutVelocity = FVector::ZeroVector;
@@ -258,10 +210,6 @@ void ABall::Swing()
 	mBallInfo.BallPower = 0.f;
 	mBallInfo.BallDis = 0.0;
 	mMainHUD->SetBallPower(0.f);
-
-	mMainHUD->SetPlayInfoVisible(false);
-	mTrailer->Activate();
-	mMinimapCapture->bCaptureEveryFrame = false;
 }
 
 void ABall::SetSwingDir(float scale)
@@ -324,7 +272,6 @@ void ABall::ShowDistance()
 	{
 		mMainHUD->SetDistanceText(dis / 100.f);
 		mMainHUD->SetLeftDistanceText(leftDis / 100.f);
-		mMainHUD->SetTargetDistanceText(leftDis / 100.f);
 	}
 }
 
@@ -526,27 +473,12 @@ void ABall::CheckBallStopped()
 		{
 			mMainHUD->SetDistanceText(0.f);
 			mMainHUD->SetBallStateVisible(true);
-			mMainHUD->SetShotNumText(mBallInfo.ShotNum);
-			mMainHUD->SetPlayInfoVisible(true);
-			mTrailer->Deactivate();
 		}
 	}
 
 	else
 	{
-		//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel X: %f"), vel.X));
-		//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel Y: %f"), vel.Y));
-		//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel Z: %f"), vel.Z));
-
 		mIsBallStopped = false;
-
-		if (IsValid(mMainHUD))
-		{
-			mMainHUD->SetBallStateVisible(false);
-			//mMainHUD->SetBallStateVisible(false);
-			mMainHUD->SetPlayInfoVisible(false);
-			mTrailer->Activate();
-		}
 		mIsEnableSwing = false;
 
 		if (IsValid(mMainHUD))
@@ -583,21 +515,19 @@ void ABall::SetBallInfoByClub(EGolfClub club)
 
 void ABall::ChangeCamera()
 {
-	//mMainCamera->SetActive(false);
-	//mSideCamera->SetActive(true);
+	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	BallController->SetViewTargetWithBlend(mMainCamera->GetOwner(), mCameraBlendTime);
+}
 
-	//mSpringArm->CameraLagSpeed = 10.f;
+void ABall::CameraMove()
+{
+	mCameraBlendTime -= 0.01f;
+}
 
-	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	////BallController->SetViewTarget(mSubCamera);
-	//BallController->SetViewTargetWithBlend(mSubCamera, 2.f);
-
-	if (IsValid(mMainHUD))
-	{
-		mMainHUD->SetWindTextVisible(mWindType, false);
-		mWindType = (EWindType)FMath::RandRange(0, 3);
-		mMainHUD->SetWindTextVisible(mWindType, true);
-	}
+void ABall::TestKey()
+{
+	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	BallController->SetViewTargetWithBlend(mFixedCamera, mCameraBlendTime);
 }
 
 void ABall::CalculateScore()
@@ -644,7 +574,7 @@ void ABall::Wind()
 void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
-	//PrintViewport(5.f, FColor::Blue, TEXT("OnHit"));
+	PrintViewport(5.f, FColor::Blue, TEXT("OnHit"));
 }
 
 void ABall::BallBounced(const FHitResult& Hit, const FVector& ImpactVelocity)
