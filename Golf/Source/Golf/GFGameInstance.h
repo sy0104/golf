@@ -17,4 +17,13 @@ public:
 
 public:
 	virtual void Init();
+
+private:
+	class UScoreSubsystem* mScoreSubsystem;
+
+public:
+	class UScoreSubsystem* GetScoreSubsystem()
+	{
+		return mScoreSubsystem;
+	}
 };

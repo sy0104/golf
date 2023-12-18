@@ -2,9 +2,12 @@
 #include "../GFGameModeBase.h"
 #include "../UMG/DistanceBase.h"
 #include "../UMG/MainHUDBase.h"
+#include "../UMG/PlayInfoBase.h"
+#include "../UMG/MiniMap.h"
 #include "BallController.h"
 #include "../GFGameInstance.h"
 #include "../Manager/ScoreSubsystem.h"
+#include "NiagaraSystem.h"
 #include "../Camera/FixedCamera.h"
 
 ABall::ABall()
@@ -61,11 +64,13 @@ ABall::ABall()
 	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
 	//mBallInfo.DestPos = FVector(4300000.0, 0.0, 0.0);
 	mBallInfo.DestPos = FVector(43000.0, 0.0, 0.0);
+	mBallInfo.CourseLen = 500;
 	mBallInfo.BallDis = 0.f;
 	mBallInfo.BallPower = 0.0;
 	mBallInfo.BallArc = 0.4f;
 	mBallInfo.SpinForce = 10000.f;
 	mBallInfo.Score = -4;
+	mBallInfo.ShotNum = 1;
 
 	// spin
 	mIsEnableSwing = true;
@@ -92,6 +97,43 @@ ABall::ABall()
 
 	mCameraBlendTime = 10.f;
 
+	// Trailer
+	mTrailer = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Trailer"));
+	mTrailer->SetupAttachment(mStaticMesh);
+
+	const FString& niagaraPath = TEXT("/Game/Materials/N_BallTrail.N_BallTrail");
+	UNiagaraSystem* niagara = LoadObject<UNiagaraSystem>(nullptr, *niagaraPath);
+	if (IsValid(niagara))
+	{
+		mTrailer->SetAsset(niagara);
+	}
+
+	// Minimap
+	mMinimapSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("MinimapSpringArm"));
+	mMinimapSpringArm->SetupAttachment(mStaticMesh);
+	mMinimapSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 0.0));
+	mMinimapSpringArm->SetRelativeRotation(FRotator(-90.0, 0.0, 0.0));
+	mMinimapSpringArm->TargetArmLength = 35000.f;
+	mMinimapSpringArm->bUsePawnControlRotation = true;
+	mMinimapSpringArm->bInheritPitch = false;
+	//mMinimapSpringArm->bInheritYaw = false;
+	//mMinimapSpringArm->bInheritRoll = false;
+
+	mMinimapCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("MinimapCapture"));
+	mMinimapCapture->SetupAttachment(mMinimapSpringArm);
+	mMinimapCapture->SetRelativeLocation(FVector(0.0, 150.0, 2000.0));
+	mMinimapCapture->bCaptureEveryFrame = false;
+	mMinimapCapture->bCaptureOnMovement = false;
+
+	const FString& mapRenderPath = TEXT("/Game/UMG/UI_IMAGE/R_MiniMapCapture.R_MiniMapCapture");
+	UTextureRenderTarget2D* mapRender = LoadObject<UTextureRenderTarget2D>(nullptr, *mapRenderPath);
+	if (IsValid(mapRender))
+	{
+		mMinimapCapture->TextureTarget = mapRender;
+	}
+
+	mTargetPos = FVector(0.0, 0.0, 0.0);
+
 	SetActorLocation(mBallInfo.StartPos);
 }
 
@@ -107,6 +149,12 @@ void ABall::BeginPlay()
 		if (IsValid(mMainHUD))
 		{
 			mMainHUD->SetDistanceText(0.f);
+			mMainHUD->SetCourseDistanceText(mBallInfo.CourseLen);
+			mMainHUD->SetShotNumText(mBallInfo.ShotNum);
+			mMinimapCapture->bCaptureEveryFrame = true;
+			//mMainHUD->SetMiniMapHoleImage(mBallInfo.DestPos);
+			mMainHUD->SetMiniMapBallCurrent();
+			mMainHUD->SetMiniMapBallTarget();
 			mMainHUD->SetWindTextVisible(mWindType, true);
 		}
 	}
@@ -124,6 +172,12 @@ void ABall::BeginPlay()
 void ABall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (UGameplayStatics::GetCurrentLevelName(GetWorld()) == L"Start")
+	{
+		return;
+	}
 
 	if (mBallSwingType != EBallSwingType::Straight)
 		AddForceToSide();
@@ -189,6 +243,7 @@ void ABall::Swing()
 	//mBallInfo.BallArc = 0.2f;
 
 	mBallInfo.StartPos = GetActorLocation();
+	mBallInfo.ShotNum++;
 
 	FVector TargetPos = mBallInfo.StartPos + (mMainCamera->GetForwardVector() * (mBallInfo.BallDis * mBallInfo.BallPower));
 	FVector OutVelocity = FVector::ZeroVector;
@@ -210,6 +265,11 @@ void ABall::Swing()
 	mBallInfo.BallPower = 0.f;
 	mBallInfo.BallDis = 0.0;
 	mMainHUD->SetBallPower(0.f);
+
+	mMainHUD->SetPlayInfoVisible(false);
+	mTrailer->Activate();
+	mMinimapCapture->bCaptureEveryFrame = false;
+	mMainHUD->SetMiniMapVisible(false);
 }
 
 void ABall::SetSwingDir(float scale)
@@ -272,6 +332,7 @@ void ABall::ShowDistance()
 	{
 		mMainHUD->SetDistanceText(dis / 100.f);
 		mMainHUD->SetLeftDistanceText(leftDis / 100.f);
+		mMainHUD->SetTargetDistanceText(leftDis / 100.f);
 	}
 }
 
@@ -286,6 +347,7 @@ void ABall::CheckMaterialCollision()
 
 	bool hit = GetWorld()->LineTraceSingleByChannel(hitResult, startPos, endPos, ECC_GameTraceChannel12, collisionParams);
 	//DrawDebugLine(GetWorld(), startPos, endPos, FColor::Red, false, 1.0f);
+	mTargetPos = endPos;
 
 	if (hit)
 	{
@@ -473,6 +535,12 @@ void ABall::CheckBallStopped()
 		{
 			mMainHUD->SetDistanceText(0.f);
 			mMainHUD->SetBallStateVisible(true);
+			mMainHUD->SetShotNumText(mBallInfo.ShotNum);
+			mMainHUD->SetPlayInfoVisible(true);
+			mMainHUD->SetMiniMapBallCurrent();
+			mMainHUD->SetMiniMapBallTarget();
+			mMainHUD->SetMiniMapVisible(true);
+			mTrailer->Deactivate();
 		}
 	}
 
@@ -482,7 +550,12 @@ void ABall::CheckBallStopped()
 		mIsEnableSwing = false;
 
 		if (IsValid(mMainHUD))
+		{
 			mMainHUD->SetBallStateVisible(false);
+			mMainHUD->SetPlayInfoVisible(false);
+			mMainHUD->SetMiniMapVisible(false);
+			mTrailer->Activate();
+		}
 	}
 }
 
@@ -528,20 +601,12 @@ void ABall::TestKey()
 {
 	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	BallController->SetViewTargetWithBlend(mFixedCamera, mCameraBlendTime);
-
-	//UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
-	//UScoreSubsystem* SubSystem = GameInst->GetSubsystem<UScoreSubsystem>();
-	//
-	//if (IsValid(SubSystem))
-	//{
-	//	PrintViewport(1.f, FColor::Red, TEXT("Sub System Valid"));
-	//}
 }
 
 void ABall::CalculateScore()
 {
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
-	UScoreSubsystem* ScoreSub = GameInst->GetSubsystem<UScoreSubsystem>();
+	UScoreSubsystem* ScoreSub = GameInst->GetScoreSubsystem();
 	FString ScoreText = "";
 
 	if (IsValid(ScoreSub))

@@ -12,13 +12,5 @@ class GOLF_API UScoreSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
-	UScoreSubsystem();
-	~UScoreSubsystem();
-
-public:
-	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
-	virtual void Deinitialize() override;
-
-public:
 	const FString GetScoreText(int score);
 };

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <Components/Image.h>
 #include <Components/TextBlock.h>
 
 #include "../GameInfo.h"
@@ -20,18 +19,14 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:
-	UImage*			mPlayerImage;
-
-	UTextBlock*		mPlayerNameText;
-	UTextBlock*		mTargetDistanceText;
-	UTextBlock*		mShotNumText;
-	UTextBlock*		mScoreText;
+	UTextBlock* mCourseDistanceText;
+	UTextBlock* mTargetDistanceText;
+	UTextBlock* mShotNumText;
+	UTextBlock* mScoreText;
 
 public:
-	void SetPlayerImage(const FString& path);
-
-	void SetPlayerNameText(FString name);
+	void SetCourseDistanceText(float dis);
 	void SetTargetDistanceText(float dis);
 	void SetShotNumText(int32 shot);
-	void SetScoreText(int32 score);
+	void SetScoreText();
 };

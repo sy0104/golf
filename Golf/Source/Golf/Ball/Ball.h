@@ -4,6 +4,8 @@
 
 #include "../GameInfo.h"
 #include "GameFramework/Pawn.h"
+#include <NiagaraComponent.h>
+#include <PaperSpriteComponent.h>
 #include "Ball.generated.h"
 
 UCLASS()
@@ -56,6 +58,9 @@ private:
 	// Wind
 	void Wind();
 
+	// MiniMap
+	void SetMiniMapInfo();
+
 	void TestKey();
 
 public:
@@ -93,6 +98,19 @@ protected:
 	EMaterialType		mHitMaterialType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	//UParticleSystemComponent*	mTrailer;
+	UNiagaraComponent* mTrailer;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	USpringArmComponent* mMinimapSpringArm;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	USceneCaptureComponent2D* mMinimapCapture;
+
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	//UPaperSpriteComponent*		mMinimapCurrentBall;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EWindType			mWindType;
 
 	FBallInfo	mBallInfo;
@@ -116,6 +134,8 @@ private:
 	bool		mIsWindBlow;
 
 	float		mCameraBlendTime;
+
+	FVector mTargetPos;
 
 	class UMainHUDBase*		mMainHUD;
 	class AFixedCamera*		mFixedCamera;
