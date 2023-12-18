@@ -49,6 +49,22 @@ public:
 	int32		Score;
 };
 
+USTRUCT(BlueprintType)
+struct FPlayerInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32		Score;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32		Shot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32		Distance;
+};
+
 UENUM(BlueprintType)
 enum class EGolfClub : uint8
 {

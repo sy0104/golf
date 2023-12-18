@@ -4,21 +4,19 @@
 
 #include "../GameInfo.h"
 #include "Subsystems/GameInstanceSubsystem.h"
-#include "ScoreSubsystem.generated.h"
+#include "GameManager.generated.h"
 
 UCLASS()
-class GOLF_API UScoreSubsystem : public UGameInstanceSubsystem
+class GOLF_API UGameManager : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
-
+	
 public:
-	UScoreSubsystem();
-	~UScoreSubsystem();
+	UGameManager();
+	~UGameManager();
 
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-public:
-	const FString GetScoreText(int score);
 };

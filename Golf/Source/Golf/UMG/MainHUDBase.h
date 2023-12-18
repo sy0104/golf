@@ -18,14 +18,17 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:
-	class UDistanceBase*	mDistanceBase;
-	class UBallDetailBase*	mBallDetailBase;
-	class UGolfClubBase*	mGolfClubBase;
-	class UScoreBase*		mScoreBase;
-	class UBallStateBase*	mBallStateBase;
-	class UCourseBase*		mCourseBase;
-	class UBallSpinBase*	mBallSpinBase;
-	class UWindBase*		mWindBase;
+	class UDistanceBase*		mDistanceBase;
+	class UBallDetailBase*		mBallDetailBase;
+	class UGolfClubBase*		mGolfClubBase;
+	class UScoreBase*			mScoreBase;
+	class UBallStateBase*		mBallStateBase;
+	class UCourseBase*			mCourseBase;
+	class UBallSpinBase*		mBallSpinBase;
+	class UWindBase*			mWindBase;
+	class UHoleInfoBase*		mHoleInfoBase;
+	class UPlayInfoBase*		mPlayInfoBase;
+	class UPlaySimpleInfoBase*	mPlaySimpleInfoBase;
 	
 public:
 	class UDistanceBase* GetDistanceBase()
@@ -53,4 +56,13 @@ public:
 
 	// Wind
 	void SetWindTextVisible(EWindType WindType, bool visible);
+
+	// Play Info & Play Simple Info
+	void SetPlayerImage(const FString& path, bool isDetail = true);
+	void SetPlayerNameText(FString name, bool isDetail = true);
+	void SetShotNumText(int shot, bool isDetail = true);
+	void SetScoreText(int score, bool isDetail = true);
+	
+	// Play Info
+	void SetTargetDistanceText(float dis);
 };

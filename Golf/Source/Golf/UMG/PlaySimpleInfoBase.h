@@ -2,36 +2,31 @@
 
 #pragma once
 
-#include <Components/Image.h>
-#include <Components/TextBlock.h>
+#include <Components\Image.h>
+#include <Components\TextBlock.h>
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
-#include "PlayInfoBase.generated.h"
-
+#include "PlaySimpleInfoBase.generated.h"
 
 UCLASS()
-class GOLF_API UPlayInfoBase : public UUserWidget
+class GOLF_API UPlaySimpleInfoBase : public UUserWidget
 {
 	GENERATED_BODY()
-
+	
 protected:
 	virtual void NativeConstruct();
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:
 	UImage*			mPlayerImage;
 
 	UTextBlock*		mPlayerNameText;
-	UTextBlock*		mTargetDistanceText;
 	UTextBlock*		mShotNumText;
 	UTextBlock*		mScoreText;
 
 public:
 	void SetPlayerImage(const FString& path);
-
 	void SetPlayerNameText(FString name);
-	void SetTargetDistanceText(float dis);
-	void SetShotNumText(int32 shot);
-	void SetScoreText(int32 score);
+	void SetShotNumText(int ShotNum);
+	void SetScoreText(int score);
 };

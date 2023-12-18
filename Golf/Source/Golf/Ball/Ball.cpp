@@ -528,12 +528,20 @@ void ABall::TestKey()
 {
 	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	BallController->SetViewTargetWithBlend(mFixedCamera, mCameraBlendTime);
+
+	//UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
+	//UScoreSubsystem* SubSystem = GameInst->GetSubsystem<UScoreSubsystem>();
+	//
+	//if (IsValid(SubSystem))
+	//{
+	//	PrintViewport(1.f, FColor::Red, TEXT("Sub System Valid"));
+	//}
 }
 
 void ABall::CalculateScore()
 {
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
-	UScoreSubsystem* ScoreSub = GameInst->GetScoreSubsystem();
+	UScoreSubsystem* ScoreSub = GameInst->GetSubsystem<UScoreSubsystem>();
 	FString ScoreText = "";
 
 	if (IsValid(ScoreSub))

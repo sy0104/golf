@@ -10,6 +10,9 @@
 #include "CourseBase.h"
 #include "BallSpinBase.h"
 #include "WindBase.h"
+#include "HoleInfoBase.h"
+#include "PlayInfoBase.h"
+#include "PlaySimpleInfoBase.h"
 
 void UMainHUDBase::NativeConstruct()
 {
@@ -23,6 +26,9 @@ void UMainHUDBase::NativeConstruct()
 	mCourseBase = Cast<UCourseBase>(GetWidgetFromName(FName(TEXT("CourseUI"))));
 	mBallSpinBase = Cast<UBallSpinBase>(GetWidgetFromName(FName(TEXT("BallSpinUI"))));
 	mWindBase = Cast<UWindBase>(GetWidgetFromName(FName(TEXT("WindUI"))));
+	mHoleInfoBase = Cast<UHoleInfoBase>(GetWidgetFromName(FName(TEXT("HoleInfoUI"))));
+	mPlayInfoBase = Cast<UPlayInfoBase>(GetWidgetFromName(FName(TEXT("PlayInfoUI"))));
+	mPlaySimpleInfoBase = Cast<UPlaySimpleInfoBase>(GetWidgetFromName(FName(TEXT("PlaySimpleInfoUI"))));
 }
 
 void UMainHUDBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -94,4 +100,45 @@ void UMainHUDBase::SetWindTextVisible(EWindType WindType, bool visible)
 		mWindBase->SetBackWindTextVisible(visible);
 		break;
 	}
+}
+
+void UMainHUDBase::SetPlayerImage(const FString& path, bool isDetail)
+{
+	if (isDetail)
+		mPlayInfoBase->SetPlayerImage(path);
+
+	else
+		mPlaySimpleInfoBase->SetPlayerImage(path);
+}
+
+void UMainHUDBase::SetPlayerNameText(FString name, bool isDetail)
+{
+	if (isDetail)
+		mPlayInfoBase->SetPlayerNameText(name);
+
+	else
+		mPlaySimpleInfoBase->SetPlayerNameText(name);
+}
+
+void UMainHUDBase::SetShotNumText(int shot, bool isDetail)
+{
+	if (isDetail)
+		mPlayInfoBase->SetShotNumText(shot);
+
+	else
+		mPlaySimpleInfoBase->SetShotNumText(shot);
+}
+
+void UMainHUDBase::SetScoreText(int score, bool isDetail)
+{
+	if (isDetail)
+		mPlayInfoBase->SetScoreText(score);
+
+	else
+		mPlaySimpleInfoBase->SetScoreText(score);
+}
+
+void UMainHUDBase::SetTargetDistanceText(float dis)
+{
+	mPlayInfoBase->SetTargetDistanceText(dis);
 }

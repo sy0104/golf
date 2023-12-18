@@ -3,6 +3,26 @@
 
 #include "ScoreSubsystem.h"
 
+UScoreSubsystem::UScoreSubsystem()
+{
+}
+
+UScoreSubsystem::~UScoreSubsystem()
+{
+}
+
+void UScoreSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+	Super::Initialize(Collection);
+
+}
+
+void UScoreSubsystem::Deinitialize()
+{
+	Super::Deinitialize();
+
+}
+
 const FString UScoreSubsystem::GetScoreText(int score)
 {
 	FString ScoreText;
