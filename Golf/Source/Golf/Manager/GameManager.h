@@ -65,6 +65,19 @@ public:
 		return mCurPlayer;
 	}
 
+	FPlayerInfo GetCurPlayerInfo() const
+	{
+		return mPlayers[(int)mCurPlayer];
+	}
+
+	FPlayerInfo GetNextPlayerInfo() const
+	{
+		if (mCurPlayer == EPlayer::Player1)
+			return mPlayers[(int)EPlayer::Player2];
+		else
+			return mPlayers[(int)EPlayer::Player1];
+	}
+
 	EPlayer GetNextPlayer() const
 	{
 		if (mCurPlayer == EPlayer::Player1)

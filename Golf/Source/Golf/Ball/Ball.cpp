@@ -15,7 +15,6 @@ ABall::ABall()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-
 	//// Static Mesh (Root)
 	mStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 
@@ -260,30 +259,23 @@ void ABall::Swing()
 	SetBallInfoByClub(mGolfClubType);
 
 	// Ball Info
-	//mBallInfo.BallDis = 20000000.0;		// test, 클럽별로 다르게 설정
-	//mBallInfo.BallArc = 0.2f;
-
 	mBallInfo.StartPos = GetActorLocation();
 	mBallInfo.ShotNum++;
 
+	// Swing
 	FVector TargetPos = mBallInfo.StartPos + (mMainCamera->GetForwardVector() * (mBallInfo.BallDis * mBallInfo.BallPower));
 	FVector OutVelocity = FVector::ZeroVector;
 
 	if (mGolfClubType == EGolfClub::Putter)
-	{
 		OutVelocity = mMainCamera->GetForwardVector() * FVector(1.0, 1.0, 1.0) * mBallInfo.BallDis;
-	}
 
 	else
-	{
 		UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 			this, OutVelocity, mBallInfo.StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.BallArc);
-	}
 
 	mStaticMesh->AddImpulse(OutVelocity);
 
-	//mBallInfo.Score++;
-
+	// Ball Info 초기화
 	mBallInfo.BallPower = 0.f;
 	mBallInfo.BallDis = 0.0;
 	mMainHUD->SetBallPower(0.f);
@@ -292,6 +284,23 @@ void ABall::Swing()
 	mTrailer->Activate();
 	mMinimapCapture->bCaptureEveryFrame = false;
 	mMainHUD->SetMiniMapVisible(false);
+
+	// Player UI 업데이트 (Shot)
+	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
+	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
+
+	if (IsValid(GameManager))
+	{
+		EPlayer CurPlayer = GameManager->GetCurPlayer();
+		FPlayerInfo CurPlayerInfo = GameManager->GetCurPlayerInfo();
+		CurPlayerInfo.Shot++;
+		GameManager->SetPlayer(CurPlayerInfo, (int)CurPlayer);
+
+		if (IsValid(mMainHUD))
+		{
+			mMainHUD->SetShotNumText(CurPlayerInfo.Shot, true);
+		}
+	}
 }
 
 void ABall::SetSwingDir(float scale)
@@ -541,7 +550,7 @@ void ABall::CheckBallStopped()
 	{
 		mStaticMesh->ComponentVelocity = FVector(0.0, 0.0, 0.0);
 		mIsBallStopped = true;
-		mIsEnableSwing = true;
+		// mIsEnableSwing = true;
 
 		//UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
 		//UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
@@ -564,7 +573,7 @@ void ABall::CheckBallStopped()
 		//	mIsWindBlow = false;
 		//}
 
-		if (IsValid(mMainHUD))
+		if (IsValid(mMainHUD) && mIsEnableSwing)
 		{
 			mMainHUD->SetDistanceText(0.f);
 			mMainHUD->SetBallStateVisible(true);
@@ -580,7 +589,6 @@ void ABall::CheckBallStopped()
 	else
 	{
 		mIsBallStopped = false;
-		mIsEnableSwing = false;
 
 		if (IsValid(mMainHUD))
 		{
@@ -597,13 +605,13 @@ void ABall::CheckChangeTurn(float DeltaTime)
 	if (mPlayType == EPlayType::Single)
 		return;
 
-	if (mIsBallStopped)
+	if (mIsBallStopped && !mIsEnableSwing)
 		mChangeTurnTime += DeltaTime;
 
-	else
-		mChangeTurnTime = 0;
+	else if (!mIsBallStopped)
+		mChangeTurnTime = 0.f;
 
-	if (!mIsChangeTurn && mChangeTurnTime >= 3.0)
+	if (!mIsChangeTurn && mChangeTurnTime >= 3.f)
 	{
 		PrintViewport(1.f, FColor::Red, TEXT("Change Turn"));
 		mIsChangeTurn = true;
@@ -672,14 +680,14 @@ void ABall::SetPlayerInfoUI()
 		mMainHUD->SetPlayerImage(NextPlayerInfo.ImagePath, true);
 		mMainHUD->SetPlayerNameText(NextPlayerInfo.Name, true);
 		mMainHUD->SetShotNumText(NextPlayerInfo.Shot, true);
-		mMainHUD->SetScoreText(NextPlayerInfo.Score, true);
+		//mMainHUD->SetScoreText(NextPlayerInfo.Score, true);
 		mMainHUD->SetTargetDistanceText(NextPlayerInfo.LeftDistance / 100.f);
 
 		// Player Simple Info - 현재 플레이어(방금 스윙한 플레이어)
 		mMainHUD->SetPlayerImage(CurPlayerInfo.ImagePath, false);
 		mMainHUD->SetPlayerNameText(CurPlayerInfo.Name, false);
 		mMainHUD->SetShotNumText(CurPlayerInfo.Shot, false);
-		mMainHUD->SetScoreText(CurPlayerInfo.Score, false);
+		//mMainHUD->SetScoreText(CurPlayerInfo.Score, false);
 	}
 }
 
@@ -688,6 +696,7 @@ void ABall::ChangeTurn()
 	if (!mIsChangeTurn)
 		return;
 
+	// Players 정보 업데이트
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
 	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
 
@@ -701,18 +710,10 @@ void ABall::ChangeTurn()
 		FPlayerInfo NextPlayerInfo = GameManager->GetPlayer(NextPlayer);	// 이제 스윙할 플레이어
 
 		// 다음 플레이어(Single -> Detail) - 이제 스윙할 차례인 플레이어
-		//NewPlayerInfo.Name = FString("Player ") + FString::Printf(TEXT("%d"), ((int)NextPlayer) + 1);
-		//NewPlayerInfo.Score = ++OldPlayerInfo.Score;
-		//NewPlayerInfo.Shot = ++OldPlayerInfo.Shot;
-		//NewPlayerInfo.BallPos = GetActorLocation();
 
 		// 현재 플레이어(Detail -> Single) - 방금 스윙한 플레이어
 		CurPlayerInfo.Score++;
-		CurPlayerInfo.Shot++;
 		CurPlayerInfo.BallPos = GetActorLocation();
-
-		GameManager->SetPlayer(CurPlayerInfo, (int)CurPlayer);
-		GameManager->SetCurPlayer(((int)CurPlayer + 1) % 2);
 
 		// 다음 순서 플레이어의 공 위치로 현재 공 위치 변경
 		SetActorLocation(NextPlayerInfo.BallPos);
@@ -721,10 +722,24 @@ void ABall::ChangeTurn()
 		SetPlayerInfoUI();
 
 		// CurPlayer와 NextPlayer 변경
+		GameManager->SetPlayer(CurPlayerInfo, (int)CurPlayer);
+		//GameManager->SetCurPlayer(((int)CurPlayer + 1) % 2);
+
 		GameManager->SetCurPlayer((int)NextPlayer);
 
 		// Turn 증가
 		GameManager->AddTurn(1);
+	}
+
+	// 턴 넘어갈 때 변수들 초기화
+	mIsEnableSwing = true;
+	mIsChangeTurn = false;
+	mChangeTurnTime = 0.f;
+
+	// UI 업데이트
+	if (IsValid(mMainHUD))
+	{
+		mMainHUD->SetDistanceText(0.f);
 	}
 }
 
