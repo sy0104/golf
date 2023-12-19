@@ -7,7 +7,9 @@ void UPlayInfoBase::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	mCourseDistanceText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("CourseDistanceText"))));
+	mPlayerImage = Cast<UImage>(GetWidgetFromName(FName(TEXT("PlayerImage"))));
+
+	mPlayerNameText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("PlayerNameText"))));
 	mTargetDistanceText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("TargetDistanceText"))));
 	mShotNumText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("ShotNumText"))));
 	mScoreText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("ScoreText"))));
@@ -18,9 +20,17 @@ void UPlayInfoBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	Super::NativeTick(MyGeometry, InDeltaTime);
 }
 
-void UPlayInfoBase::SetCourseDistanceText(float dis)
+void UPlayInfoBase::SetPlayerImage(const FString& path)
 {
-	mCourseDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), dis) + TEXT("m")));
+	UTexture2D* Tex2D = LoadObject<UTexture2D>(nullptr, *path);
+
+	if (IsValid(Tex2D))
+		mPlayerImage->SetBrushFromTexture(Tex2D);
+}
+
+void UPlayInfoBase::SetPlayerNameText(FString name)
+{
+	mPlayerNameText->SetText(FText::FromString(name));
 }
 
 void UPlayInfoBase::SetTargetDistanceText(float dis)
@@ -51,7 +61,7 @@ void UPlayInfoBase::SetShotNumText(int32 shot)
 	mShotNumText->SetText(FText::FromString(FString::Printf(TEXT("%d"), shot) + ShotNumText + TEXT(" shot")));
 }
 
-void UPlayInfoBase::SetScoreText()
+void UPlayInfoBase::SetScoreText(int32 score)
 {
-
+	mScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), score)));
 }

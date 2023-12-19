@@ -12,7 +12,9 @@
 #include "MiniMap.h"
 #include "BallSpinBase.h"
 #include "WindBase.h"
-
+#include "HoleInfoBase.h"
+#include "PlayInfoBase.h"
+#include "PlaySimpleInfoBase.h"
 
 void UMainHUDBase::NativeConstruct()
 {
@@ -28,6 +30,9 @@ void UMainHUDBase::NativeConstruct()
 	mMiniMap = Cast<UMiniMap>(GetWidgetFromName(FName(TEXT("MiniMapUI"))));
 	mBallSpinBase = Cast<UBallSpinBase>(GetWidgetFromName(FName(TEXT("BallSpinUI"))));
 	mWindBase = Cast<UWindBase>(GetWidgetFromName(FName(TEXT("WindUI"))));
+	mHoleInfoBase = Cast<UHoleInfoBase>(GetWidgetFromName(FName(TEXT("HoleInfoUI"))));
+	mPlayInfoBase = Cast<UPlayInfoBase>(GetWidgetFromName(FName(TEXT("PlayInfoUI"))));
+	mPlaySimpleInfoBase = Cast<UPlaySimpleInfoBase>(GetWidgetFromName(FName(TEXT("PlaySimpleInfoUI"))));
 }
 
 void UMainHUDBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -82,24 +87,64 @@ void UMainHUDBase::SetCourseText(FString CourseText)
 	mCourseBase->SetCourseText(CourseText);
 }
 
-void UMainHUDBase::SetCourseDistanceText(float dis)
+void UMainHUDBase::SetWindTextVisible(EWindType WindType, bool visible)
 {
-	mPlayInfoBase->SetCourseDistanceText(dis);
+	switch (WindType)
+	{
+	case EWindType::Left:
+		mWindBase->SetLeftWindTextVisible(visible);
+		break;
+	case EWindType::Right:
+		mWindBase->SetRightWindTextVisible(visible);
+		break;
+	case EWindType::Forward:
+		mWindBase->SetForwardWindTextVisible(visible);
+		break;
+	case EWindType::Back:
+		mWindBase->SetBackWindTextVisible(visible);
+		break;
+	}
+}
+
+void UMainHUDBase::SetPlayerImage(const FString& path, bool isDetail)
+{
+	if (isDetail)
+		mPlayInfoBase->SetPlayerImage(path);
+
+	else
+		mPlaySimpleInfoBase->SetPlayerImage(path);
+}
+
+void UMainHUDBase::SetPlayerNameText(FString name, bool isDetail)
+{
+	if (isDetail)
+		mPlayInfoBase->SetPlayerNameText(name);
+
+	else
+		mPlaySimpleInfoBase->SetPlayerNameText(name);
+}
+
+void UMainHUDBase::SetShotNumText(int shot, bool isDetail)
+{
+	if (isDetail)
+		mPlayInfoBase->SetShotNumText(shot);
+
+	else
+		mPlaySimpleInfoBase->SetShotNumText(shot);
+}
+
+void UMainHUDBase::SetScoreText(int score, bool isDetail)
+{
+	if (isDetail)
+		mPlayInfoBase->SetScoreText(score);
+
+	else
+		mPlaySimpleInfoBase->SetScoreText(score);
 }
 
 void UMainHUDBase::SetTargetDistanceText(float dis)
 {
 	mPlayInfoBase->SetTargetDistanceText(dis);
-}
-
-void UMainHUDBase::SetShotNumText(int32 shot)
-{
-	mPlayInfoBase->SetShotNumText(shot);
-}
-
-void UMainHUDBase::SetScoreText()
-{
-	mPlayInfoBase->SetScoreText();
 }
 
 void UMainHUDBase::SetPlayInfoVisible(bool visible)
@@ -132,23 +177,4 @@ void UMainHUDBase::SetMiniMapVisible(bool visible)
 		mMiniMap->SetVisibility(ESlateVisibility::Visible);
 	else
 		mMiniMap->SetVisibility(ESlateVisibility::Hidden);
-}
-
-void UMainHUDBase::SetWindTextVisible(EWindType WindType, bool visible)
-{
-	switch (WindType)
-	{
-	case EWindType::Left:
-		mWindBase->SetLeftWindTextVisible(visible);
-		break;
-	case EWindType::Right:
-		mWindBase->SetRightWindTextVisible(visible);
-		break;
-	case EWindType::Forward:
-		mWindBase->SetForwardWindTextVisible(visible);
-		break;
-	case EWindType::Back:
-		mWindBase->SetBackWindTextVisible(visible);
-		break;
-	}
 }

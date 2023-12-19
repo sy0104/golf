@@ -64,7 +64,6 @@ ABall::ABall()
 	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
 	//mBallInfo.DestPos = FVector(4300000.0, 0.0, 0.0);
 	mBallInfo.DestPos = FVector(43000.0, 0.0, 0.0);
-	mBallInfo.CourseLen = 500;
 	mBallInfo.BallDis = 0.f;
 	mBallInfo.BallPower = 0.0;
 	mBallInfo.BallArc = 0.4f;
@@ -146,10 +145,9 @@ void ABall::BeginPlay()
 	{
 		mMainHUD = GameMode->GetMainHUD();
 
-		if (IsValid(mMainHUD))
+		if (IsValid(mMainHUD) && UGameplayStatics::GetCurrentLevelName(GetWorld()) == L"Main")
 		{
 			mMainHUD->SetDistanceText(0.f);
-			mMainHUD->SetCourseDistanceText(mBallInfo.CourseLen);
 			mMainHUD->SetShotNumText(mBallInfo.ShotNum);
 			mMinimapCapture->bCaptureEveryFrame = true;
 			//mMainHUD->SetMiniMapHoleImage(mBallInfo.DestPos);
@@ -601,12 +599,20 @@ void ABall::TestKey()
 {
 	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	BallController->SetViewTargetWithBlend(mFixedCamera, mCameraBlendTime);
+
+	//UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
+	//UScoreSubsystem* SubSystem = GameInst->GetSubsystem<UScoreSubsystem>();
+	//
+	//if (IsValid(SubSystem))
+	//{
+	//	PrintViewport(1.f, FColor::Red, TEXT("Sub System Valid"));
+	//}
 }
 
 void ABall::CalculateScore()
 {
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
-	UScoreSubsystem* ScoreSub = GameInst->GetScoreSubsystem();
+	UScoreSubsystem* ScoreSub = GameInst->GetSubsystem<UScoreSubsystem>();
 	FString ScoreText = "";
 
 	if (IsValid(ScoreSub))
