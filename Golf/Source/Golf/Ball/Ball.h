@@ -61,6 +61,11 @@ private:
 	// MiniMap
 	void SetMiniMapInfo();
 
+	// Turn (Multi)
+	void SetPlayerInfoUI();
+	void CheckChangeTurn(float DeltaTime);
+	void ChangeTurn();
+
 	void TestKey();
 
 public:
@@ -114,6 +119,7 @@ protected:
 	EWindType			mWindType;
 
 	FBallInfo	mBallInfo;
+	EPlayType	mPlayType;
 
 private:
 	bool		mIsEnableSwing;
@@ -137,6 +143,9 @@ private:
 
 	FVector mTargetPos;
 
+	float		mChangeTurnTime;
+	bool		mIsChangeTurn;
+
 	class UMainHUDBase*		mMainHUD;
 	class AFixedCamera*		mFixedCamera;
 
@@ -152,5 +161,8 @@ public:
 		mBallSwingType = SwingType;
 	}
 
-public:
+	void SetPlayType(EPlayType PlayType)
+	{
+		mPlayType = PlayType;
+	}
 };

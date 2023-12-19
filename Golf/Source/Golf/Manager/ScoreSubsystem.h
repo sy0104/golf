@@ -21,4 +21,5 @@ public:
 
 public:
 	const FString GetScoreText(int score);
+
 };

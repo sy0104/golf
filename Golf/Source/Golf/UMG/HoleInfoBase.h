@@ -16,5 +16,4 @@ class GOLF_API UHoleInfoBase : public UUserWidget
 protected:
 	virtual void NativeConstruct();
 
-
 };

@@ -8,6 +8,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MainHUDBase.generated.h"
 
+
 UCLASS()
 class GOLF_API UMainHUDBase : public UUserWidget
 {
@@ -16,6 +17,7 @@ class GOLF_API UMainHUDBase : public UUserWidget
 protected:
 	virtual void NativeConstruct();
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+
 
 private:
 	class UDistanceBase*	mDistanceBase;
@@ -74,5 +76,18 @@ public:
 	//void SetMiniMapHoleImage(FVector loc);
 	void SetMiniMapVisible(bool visible);
 
+	// Wind
+	void SetWindTextVisible(EWindType WindType, bool visible);
 
+	// Play Info & Play Simple Info
+	void SetPlayerImage(const FString& path, bool isDetail = true);
+	void SetPlayerNameText(FString name, bool isDetail = true);
+	void SetShotNumText(int shot, bool isDetail = true);
+	void SetScoreText(int score, bool isDetail = true);
+	
+	// Play Info
+	void SetTargetDistanceText(float dis);
+
+	// Play Simple Info
+	void SetPlaySimpleInfoVisible(bool visible);
 };

@@ -50,5 +50,6 @@ void UPlaySimpleInfoBase::SetShotNumText(int ShotNum)
 void UPlaySimpleInfoBase::SetScoreText(int score)
 {
 	mScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), score)));
+
 }
 

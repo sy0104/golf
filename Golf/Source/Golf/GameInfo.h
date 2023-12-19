@@ -21,6 +21,7 @@ DECLARE_LOG_CATEGORY_EXTERN(PF, Log, All);
 void PrintViewport(float Time, const FColor& Color, const FString& Text);
 
 
+
 USTRUCT(BlueprintType)
 struct FBallInfo
 {
@@ -44,12 +45,31 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	float		SpinForce;
+};
+
+USTRUCT(BlueprintType)
+struct FPlayerInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FString		Name;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FString		ImagePath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	int32		Score;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	int32		ShotNum;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float		LeftDistance;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FVector		BallPos;
 };
 
 USTRUCT(BlueprintType)
@@ -113,6 +133,20 @@ enum class EWindType : uint8
 	Right,
 	Forward,
 	Back
+};
+
+UENUM(BlueprintType)
+enum class EPlayType : uint8
+{
+	Single,
+	Multi
+};
+
+UENUM(BlueprintType)
+enum class EPlayer : uint8
+{
+	Player1,
+	Player2
 };
 
 UCLASS()

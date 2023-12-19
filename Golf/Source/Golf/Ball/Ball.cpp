@@ -9,10 +9,12 @@
 #include "../Manager/ScoreSubsystem.h"
 #include "NiagaraSystem.h"
 #include "../Camera/FixedCamera.h"
+#include "../Manager/GameManager.h"
 
 ABall::ABall()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
 
 	//// Static Mesh (Root)
 	mStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
@@ -48,8 +50,7 @@ ABall::ABall()
 	mSpringArm->TargetArmLength = 400.f;
 	mSpringArm->bUsePawnControlRotation = true;
 	mSpringArm->bEnableCameraLag = true;
-	mSpringArm->CameraLagSpeed = 0.f;
-	mSpringArm->CameraLagMaxDistance = 10000.f;
+	mSpringArm->CameraLagSpeed = 2.f;
 
 	// main camera (moving)
 	mMainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("MainCamera"));
@@ -57,19 +58,21 @@ ABall::ABall()
 	mMainCamera->SetRelativeLocation(FVector(-150.0, 0.0, 70.0));
 	mMainCamera->SetRelativeRotation(FRotator(-5.0, 0.0, 0.0));
 	//mMainCamera->bConstrainAspectRatio = true;
-	mMainCamera->SetAutoActivate(false);
+	mMainCamera->SetAutoActivate(true);
 	mMainCamera->SetActive(true);
 
 	//// Ball Info
 	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
 	//mBallInfo.DestPos = FVector(4300000.0, 0.0, 0.0);
-	mBallInfo.DestPos = FVector(43000.0, 0.0, 0.0);
+	mBallInfo.CourseLen = 500;
+	mBallInfo.DestPos = FVector(37350.0, -1060.0, -50.0);
 	mBallInfo.BallDis = 0.f;
 	mBallInfo.BallPower = 0.0;
 	mBallInfo.BallArc = 0.4f;
 	mBallInfo.SpinForce = 10000.f;
 	mBallInfo.Score = -4;
-	mBallInfo.ShotNum = 1;
+	mBallInfo.ShotNum = 0;
+	// mBallInfo.Score = -4;
 
 	// spin
 	mIsEnableSwing = true;
@@ -159,12 +162,28 @@ void ABall::BeginPlay()
 
 	mStaticMesh->OnComponentHit.AddDynamic(this, &ABall::OnHit);
 
-	// 시작 카메라 설정 (Fixed Camera)
-	mFixedCamera = GameMode->GetFixedCamera();
-	
-	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (IsValid(BallController))
-		BallController->SetViewTarget(mFixedCamera);
+	// Play Type 받아오기
+	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
+	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
+
+	if (IsValid(GameManager))
+	{
+		mPlayType = GameManager->GetPlayType();
+
+		if (mPlayType == EPlayType::Multi)
+		{
+			FPlayerInfo PlayerInfo = GameManager->GetPlayer(EPlayer::Player2);
+			PlayerInfo.BallPos = GetActorLocation();
+			GameManager->SetPlayer(PlayerInfo, (int)(EPlayer::Player2));
+		}
+	}
+
+	//// 시작 카메라 설정 (Fixed Camera)
+	//mFixedCamera = GameMode->GetFixedCamera();
+	//
+	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	//if (IsValid(BallController))
+	//	BallController->SetViewTarget(mMainCamera->GetOwner());
 }
 
 void ABall::Tick(float DeltaTime)
@@ -181,10 +200,12 @@ void ABall::Tick(float DeltaTime)
 		AddForceToSide();
 
 	ShowDistance();	
+
+	CheckMaterialCollision();
 	
 	CheckBallStopped();
 
-	CheckMaterialCollision();
+	CheckChangeTurn(DeltaTime);
 
 	SetBallDetailsByMaterial();
 
@@ -192,10 +213,12 @@ void ABall::Tick(float DeltaTime)
 
 	FindResetPos(DeltaTime);
 
-	CameraMove();
-
-
 	// Wind();
+	//float dis = FVector::Dist(mBallInfo.StartPos, GetActorLocation());
+	//if (mSpringArm->CameraLagSpeed > 0.5 && dis >= 120.f)
+	//{
+	//	mSpringArm->CameraLagSpeed += 0.005f;
+	//}
 
 	//FVector vel = mStaticMesh->GetComponentVelocity();
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel X: %f"), vel.X));
@@ -258,7 +281,8 @@ void ABall::Swing()
 	}
 
 	mStaticMesh->AddImpulse(OutVelocity);
-	mBallInfo.Score++;
+
+	//mBallInfo.Score++;
 
 	mBallInfo.BallPower = 0.f;
 	mBallInfo.BallDis = 0.0;
@@ -328,8 +352,11 @@ void ABall::ShowDistance()
 
 	if (IsValid(mMainHUD))
 	{
+		// Distance UI
 		mMainHUD->SetDistanceText(dis / 100.f);
 		mMainHUD->SetLeftDistanceText(leftDis / 100.f);
+
+		// Player Info UI
 		mMainHUD->SetTargetDistanceText(leftDis / 100.f);
 	}
 }
@@ -516,6 +543,14 @@ void ABall::CheckBallStopped()
 		mIsBallStopped = true;
 		mIsEnableSwing = true;
 
+		//UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
+		//UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
+
+		//if (IsValid(GameManager))
+		//{
+
+		//}
+
 		//if (mIsWindBlow)
 		//{
 		//	mWindPower = FMath::RandRange(mWindPowerMin, mWindPowerMax);
@@ -557,6 +592,26 @@ void ABall::CheckBallStopped()
 	}
 }
 
+void ABall::CheckChangeTurn(float DeltaTime)
+{
+	if (mPlayType == EPlayType::Single)
+		return;
+
+	if (mIsBallStopped)
+		mChangeTurnTime += DeltaTime;
+
+	else
+		mChangeTurnTime = 0;
+
+	if (!mIsChangeTurn && mChangeTurnTime >= 3.0)
+	{
+		PrintViewport(1.f, FColor::Red, TEXT("Change Turn"));
+		mIsChangeTurn = true;
+
+		ChangeTurn();
+	}
+}
+
 void ABall::SetBallInfoByClub(EGolfClub club)
 {
 	switch (club)
@@ -595,6 +650,84 @@ void ABall::CameraMove()
 	mCameraBlendTime -= 0.01f;
 }
 
+void ABall::SetPlayerInfoUI()
+{
+	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
+	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
+
+	FPlayerInfo CurPlayerInfo, NextPlayerInfo;
+
+	if (IsValid(GameManager))
+	{
+		EPlayer CurPlayer = GameManager->GetCurPlayer();
+		EPlayer NextPlayer = GameManager->GetNextPlayer();
+
+		CurPlayerInfo = GameManager->GetPlayer(CurPlayer);
+		NextPlayerInfo = GameManager->GetPlayer(NextPlayer);
+	}
+
+	if (IsValid(mMainHUD))
+	{
+		// Player Info - 다음 플레이어(턴이 돌아오는 플레이어)
+		mMainHUD->SetPlayerImage(NextPlayerInfo.ImagePath, true);
+		mMainHUD->SetPlayerNameText(NextPlayerInfo.Name, true);
+		mMainHUD->SetShotNumText(NextPlayerInfo.Shot, true);
+		mMainHUD->SetScoreText(NextPlayerInfo.Score, true);
+		mMainHUD->SetTargetDistanceText(NextPlayerInfo.LeftDistance / 100.f);
+
+		// Player Simple Info - 현재 플레이어(방금 스윙한 플레이어)
+		mMainHUD->SetPlayerImage(CurPlayerInfo.ImagePath, false);
+		mMainHUD->SetPlayerNameText(CurPlayerInfo.Name, false);
+		mMainHUD->SetShotNumText(CurPlayerInfo.Shot, false);
+		mMainHUD->SetScoreText(CurPlayerInfo.Score, false);
+	}
+}
+
+void ABall::ChangeTurn()
+{
+	if (!mIsChangeTurn)
+		return;
+
+	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
+	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
+
+	if (IsValid(GameManager))
+	{
+		// Player 정보 갱신
+		EPlayer CurPlayer = GameManager->GetCurPlayer();
+		EPlayer NextPlayer = GameManager->GetNextPlayer();
+
+		FPlayerInfo CurPlayerInfo = GameManager->GetPlayer(CurPlayer);	// 방금 스윙한 플레이어
+		FPlayerInfo NextPlayerInfo = GameManager->GetPlayer(NextPlayer);	// 이제 스윙할 플레이어
+
+		// 다음 플레이어(Single -> Detail) - 이제 스윙할 차례인 플레이어
+		//NewPlayerInfo.Name = FString("Player ") + FString::Printf(TEXT("%d"), ((int)NextPlayer) + 1);
+		//NewPlayerInfo.Score = ++OldPlayerInfo.Score;
+		//NewPlayerInfo.Shot = ++OldPlayerInfo.Shot;
+		//NewPlayerInfo.BallPos = GetActorLocation();
+
+		// 현재 플레이어(Detail -> Single) - 방금 스윙한 플레이어
+		CurPlayerInfo.Score++;
+		CurPlayerInfo.Shot++;
+		CurPlayerInfo.BallPos = GetActorLocation();
+
+		GameManager->SetPlayer(CurPlayerInfo, (int)CurPlayer);
+		GameManager->SetCurPlayer(((int)CurPlayer + 1) % 2);
+
+		// 다음 순서 플레이어의 공 위치로 현재 공 위치 변경
+		SetActorLocation(NextPlayerInfo.BallPos);
+
+		// 현재 턴 플레이어로 UI 갱신
+		SetPlayerInfoUI();
+
+		// CurPlayer와 NextPlayer 변경
+		GameManager->SetCurPlayer((int)NextPlayer);
+
+		// Turn 증가
+		GameManager->AddTurn(1);
+	}
+}
+
 void ABall::TestKey()
 {
 	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -606,6 +739,10 @@ void ABall::TestKey()
 	//if (IsValid(SubSystem))
 	//{
 	//	PrintViewport(1.f, FColor::Red, TEXT("Sub System Valid"));
+	//UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
+
+	//if (IsValid(GameManager))
+	//{
 	//}
 }
 
@@ -615,11 +752,15 @@ void ABall::CalculateScore()
 	UScoreSubsystem* ScoreSub = GameInst->GetSubsystem<UScoreSubsystem>();
 	FString ScoreText = "";
 
-	if (IsValid(ScoreSub))
-		ScoreText = ScoreSub->GetScoreText(mBallInfo.Score);
+	//UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
+	//UScoreSubsystem* ScoreSub = GameInst->GetSubsystem<UScoreSubsystem>();
+	//FString ScoreText = "";
 
-	if (IsValid(mMainHUD))
-		mMainHUD->SetScoreText(ScoreText);
+	//if (IsValid(ScoreSub))
+	//	ScoreText = ScoreSub->GetScoreText(mBallInfo.Score);
+
+	//if (IsValid(mMainHUD))
+	//	mMainHUD->SetScoreText(ScoreText);
 }
 
 void ABall::Wind()

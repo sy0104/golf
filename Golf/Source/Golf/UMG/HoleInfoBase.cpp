@@ -3,4 +3,5 @@
 void UHoleInfoBase::NativeConstruct()
 {
 	Super::NativeConstruct();
+
 }

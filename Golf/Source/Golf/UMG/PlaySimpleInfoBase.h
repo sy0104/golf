@@ -17,6 +17,7 @@ class GOLF_API UPlaySimpleInfoBase : public UUserWidget
 protected:
 	virtual void NativeConstruct();
 
+
 private:
 	UImage*			mPlayerImage;
 

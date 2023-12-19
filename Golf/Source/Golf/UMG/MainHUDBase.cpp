@@ -13,8 +13,9 @@
 #include "BallSpinBase.h"
 #include "WindBase.h"
 #include "HoleInfoBase.h"
-#include "PlayInfoBase.h"
 #include "PlaySimpleInfoBase.h"
+#include "../GFGameInstance.h"
+#include "../Manager/GameManager.h"
 
 void UMainHUDBase::NativeConstruct()
 {
@@ -26,13 +27,37 @@ void UMainHUDBase::NativeConstruct()
 	mScoreBase = Cast<UScoreBase>(GetWidgetFromName(FName(TEXT("ScoreUI"))));
 	mBallStateBase = Cast<UBallStateBase>(GetWidgetFromName(FName(TEXT("BallStateUI"))));
 	mCourseBase = Cast<UCourseBase>(GetWidgetFromName(FName(TEXT("CourseUI"))));
-	mPlayInfoBase = Cast<UPlayInfoBase>(GetWidgetFromName(FName(TEXT("PlayInfoUI"))));
 	mMiniMap = Cast<UMiniMap>(GetWidgetFromName(FName(TEXT("MiniMapUI"))));
 	mBallSpinBase = Cast<UBallSpinBase>(GetWidgetFromName(FName(TEXT("BallSpinUI"))));
 	mWindBase = Cast<UWindBase>(GetWidgetFromName(FName(TEXT("WindUI"))));
 	mHoleInfoBase = Cast<UHoleInfoBase>(GetWidgetFromName(FName(TEXT("HoleInfoUI"))));
 	mPlayInfoBase = Cast<UPlayInfoBase>(GetWidgetFromName(FName(TEXT("PlayInfoUI"))));
 	mPlaySimpleInfoBase = Cast<UPlaySimpleInfoBase>(GetWidgetFromName(FName(TEXT("PlaySimpleInfoUI"))));
+
+	//FWidgetTransform transform;
+	//transform.Translation = FVector2D(10.0, 300.0);
+	//transform.Scale = (FVector2D(500.0, 100.0));
+	//mHoleInfoBase->SetRenderTransform(transform);
+
+	
+	// Multi Set
+	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
+	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
+
+	if (IsValid(GameManager))
+	{
+		EPlayType PlayType = GameManager->GetPlayType();
+		TArray<FPlayerInfo> players = GameManager->GetPlayers();
+
+		mPlayInfoBase->SetPlayerImage(players[(int)EPlayer::Player1].ImagePath);
+
+		if (PlayType == EPlayType::Multi)
+		{
+			mPlaySimpleInfoBase->SetVisibility(ESlateVisibility::Visible);
+			mPlaySimpleInfoBase->SetPlayerImage(players[(int)EPlayer::Player2].ImagePath);
+			mPlaySimpleInfoBase->SetPlayerNameText(players[(int)EPlayer::Player2].Name);
+		}
+	}
 }
 
 void UMainHUDBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -177,4 +202,72 @@ void UMainHUDBase::SetMiniMapVisible(bool visible)
 		mMiniMap->SetVisibility(ESlateVisibility::Visible);
 	else
 		mMiniMap->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UMainHUDBase::SetWindTextVisible(EWindType WindType, bool visible)
+{
+	switch (WindType)
+	{
+	case EWindType::Left:
+		mWindBase->SetLeftWindTextVisible(visible);
+		break;
+	case EWindType::Right:
+		mWindBase->SetRightWindTextVisible(visible);
+		break;
+	case EWindType::Forward:
+		mWindBase->SetForwardWindTextVisible(visible);
+		break;
+	case EWindType::Back:
+		mWindBase->SetBackWindTextVisible(visible);
+		break;
+	}
+}
+
+void UMainHUDBase::SetPlayerImage(const FString& path, bool isDetail)
+{
+	if (isDetail)
+		mPlayInfoBase->SetPlayerImage(path);
+
+	else
+		mPlaySimpleInfoBase->SetPlayerImage(path);
+}
+
+void UMainHUDBase::SetPlayerNameText(FString name, bool isDetail)
+{
+	if (isDetail)
+		mPlayInfoBase->SetPlayerNameText(name);
+
+	else
+		mPlaySimpleInfoBase->SetPlayerNameText(name);
+}
+
+void UMainHUDBase::SetShotNumText(int shot, bool isDetail)
+{
+	if (isDetail)
+		mPlayInfoBase->SetShotNumText(shot);
+
+	else
+		mPlaySimpleInfoBase->SetShotNumText(shot);
+}
+
+void UMainHUDBase::SetScoreText(int score, bool isDetail)
+{
+	if (isDetail)
+		mPlayInfoBase->SetScoreText(score);
+
+	else
+		mPlaySimpleInfoBase->SetScoreText(score);
+}
+
+void UMainHUDBase::SetTargetDistanceText(float dis)
+{
+	mPlayInfoBase->SetTargetDistanceText(dis);
+}
+
+void UMainHUDBase::SetPlaySimpleInfoVisible(bool visible)
+{
+	if (visible)
+		mPlaySimpleInfoBase->SetVisibility(ESlateVisibility::Visible);
+	else
+		mPlaySimpleInfoBase->SetVisibility(ESlateVisibility::Hidden);
 }

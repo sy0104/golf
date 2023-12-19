@@ -13,6 +13,7 @@ void UPlayInfoBase::NativeConstruct()
 	mTargetDistanceText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("TargetDistanceText"))));
 	mShotNumText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("ShotNumText"))));
 	mScoreText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("ScoreText"))));
+
 }
 
 void UPlayInfoBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
