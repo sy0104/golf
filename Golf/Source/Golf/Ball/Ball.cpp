@@ -63,14 +63,11 @@ ABall::ABall()
 	//// Ball Info
 	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
 	//mBallInfo.DestPos = FVector(4300000.0, 0.0, 0.0);
-	mBallInfo.CourseLen = 500;
 	mBallInfo.DestPos = FVector(37350.0, -1060.0, -50.0);
 	mBallInfo.BallDis = 0.f;
 	mBallInfo.BallPower = 0.0;
 	mBallInfo.BallArc = 0.4f;
 	mBallInfo.SpinForce = 10000.f;
-	mBallInfo.Score = -4;
-	mBallInfo.ShotNum = 0;
 	// mBallInfo.Score = -4;
 
 	// spin
@@ -150,7 +147,7 @@ void ABall::BeginPlay()
 		if (IsValid(mMainHUD) && UGameplayStatics::GetCurrentLevelName(GetWorld()) == L"Main")
 		{
 			mMainHUD->SetDistanceText(0.f);
-			mMainHUD->SetShotNumText(mBallInfo.ShotNum);
+			//mMainHUD->SetShotNumText(mBallInfo.ShotNum);
 			mMinimapCapture->bCaptureEveryFrame = true;
 			//mMainHUD->SetMiniMapHoleImage(mBallInfo.DestPos);
 			mMainHUD->SetMiniMapBallCurrent();
@@ -260,7 +257,7 @@ void ABall::Swing()
 
 	// Ball Info
 	mBallInfo.StartPos = GetActorLocation();
-	mBallInfo.ShotNum++;
+	//mBallInfo.ShotNum++;
 
 	// Swing
 	FVector TargetPos = mBallInfo.StartPos + (mMainCamera->GetForwardVector() * (mBallInfo.BallDis * mBallInfo.BallPower));
@@ -577,7 +574,7 @@ void ABall::CheckBallStopped()
 		{
 			mMainHUD->SetDistanceText(0.f);
 			mMainHUD->SetBallStateVisible(true);
-			mMainHUD->SetShotNumText(mBallInfo.ShotNum);
+			//mMainHUD->SetShotNumText(mBallInfo.ShotNum);
 			mMainHUD->SetPlayInfoVisible(true);
 			mMainHUD->SetMiniMapBallCurrent();
 			mMainHUD->SetMiniMapBallTarget();
