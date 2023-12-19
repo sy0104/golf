@@ -57,14 +57,17 @@ private:
 
 	// Wind
 	void Wind();
+	void UpdateWind();
 
 	// MiniMap
 	void SetMiniMapInfo();
 
 	// Turn (Multi)
-	void SetPlayerInfoUI();
+	void SetPlayerInfoUI(EPlayType PlayType);
 	void CheckChangeTurn(float DeltaTime);
 	void ChangeTurn();
+	void ChangeTurnSingle();
+	void ChangeTurnMulti();
 
 	void TestKey();
 

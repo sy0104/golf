@@ -87,6 +87,7 @@ ABall::ABall()
 	mGolfClubType = EGolfClub::Driver;
 	mHitMaterialType = EMaterialType::Tee;
 
+	// wind
 	mWindType = EWindType(FMath::RandRange(0, 3));
 	mWindPowerMin = 100.f;
 	mWindPowerMax = 300.f;
@@ -105,6 +106,8 @@ ABall::ABall()
 	{
 		mTrailer->SetAsset(niagara);
 	}
+	mTrailer->Deactivate();
+	mTrailer->bAutoActivate = false;
 
 	// Minimap
 	mMinimapSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("MinimapSpringArm"));
@@ -146,12 +149,17 @@ void ABall::BeginPlay()
 
 		if (IsValid(mMainHUD) && UGameplayStatics::GetCurrentLevelName(GetWorld()) == L"Main")
 		{
+			// Distance
 			mMainHUD->SetDistanceText(0.f);
 			//mMainHUD->SetShotNumText(mBallInfo.ShotNum);
+
+			// Minimap
 			mMinimapCapture->bCaptureEveryFrame = true;
 			//mMainHUD->SetMiniMapHoleImage(mBallInfo.DestPos);
 			mMainHUD->SetMiniMapBallCurrent();
 			mMainHUD->SetMiniMapBallTarget();
+
+			// Wind
 			mMainHUD->SetWindTextVisible(mWindType, true);
 		}
 	}
@@ -209,12 +217,7 @@ void ABall::Tick(float DeltaTime)
 
 	FindResetPos(DeltaTime);
 
-	// Wind();
-	//float dis = FVector::Dist(mBallInfo.StartPos, GetActorLocation());
-	//if (mSpringArm->CameraLagSpeed > 0.5 && dis >= 120.f)
-	//{
-	//	mSpringArm->CameraLagSpeed += 0.005f;
-	//}
+	Wind();
 
 	//FVector vel = mStaticMesh->GetComponentVelocity();
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel X: %f"), vel.X));
@@ -242,8 +245,10 @@ void ABall::Swing()
 		return;
 
 	mIsEnableSwing = false;
-	mMainHUD->SetBallStateVisible(false);
 	mIsWindBlow = true;
+	mTrailer->Activate();
+
+	//mMainHUD->SetBallStateVisible(false);
 
 	// Spin
 	if (mBallSwingType == EBallSwingType::Left)
@@ -257,7 +262,6 @@ void ABall::Swing()
 
 	// Ball Info
 	mBallInfo.StartPos = GetActorLocation();
-	//mBallInfo.ShotNum++;
 
 	// Swing
 	FVector TargetPos = mBallInfo.StartPos + (mMainCamera->GetForwardVector() * (mBallInfo.BallDis * mBallInfo.BallPower));
@@ -277,7 +281,6 @@ void ABall::Swing()
 	mBallInfo.BallDis = 0.0;
 	mMainHUD->SetBallPower(0.f);
 
-	mMainHUD->SetPlayInfoVisible(false);
 	mTrailer->Activate();
 	mMinimapCapture->bCaptureEveryFrame = false;
 	mMainHUD->SetMiniMapVisible(false);
@@ -326,7 +329,7 @@ void ABall::AddForceToSide()
 
 void ABall::AddBallPower(float scale)
 {
-	if (scale == 0.f)
+	if (scale == 0.f || !mIsEnableSwing)
 		return;
 
 	if (mIsPowerUp)
@@ -543,10 +546,15 @@ void ABall::CheckBallStopped()
 {
 	double vel = mStaticMesh->GetComponentVelocity().Size();
 
+	if (vel < 5.0)
+		mIsWindBlow = false;
+
 	if (vel < 1.0)
 	{
 		mStaticMesh->ComponentVelocity = FVector(0.0, 0.0, 0.0);
 		mIsBallStopped = true;
+		mTrailer->Deactivate();
+
 		// mIsEnableSwing = true;
 
 		//UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
@@ -575,22 +583,20 @@ void ABall::CheckBallStopped()
 			mMainHUD->SetDistanceText(0.f);
 			mMainHUD->SetBallStateVisible(true);
 			//mMainHUD->SetShotNumText(mBallInfo.ShotNum);
-			mMainHUD->SetPlayInfoVisible(true);
 			mMainHUD->SetMiniMapBallCurrent();
 			mMainHUD->SetMiniMapBallTarget();
 			mMainHUD->SetMiniMapVisible(true);
-			mTrailer->Deactivate();
 		}
 	}
 
 	else
 	{
 		mIsBallStopped = false;
+		// mIsWindBlow = false;
 
 		if (IsValid(mMainHUD))
 		{
 			mMainHUD->SetBallStateVisible(false);
-			mMainHUD->SetPlayInfoVisible(false);
 			mMainHUD->SetMiniMapVisible(false);
 			mTrailer->Activate();
 		}
@@ -599,8 +605,8 @@ void ABall::CheckBallStopped()
 
 void ABall::CheckChangeTurn(float DeltaTime)
 {
-	if (mPlayType == EPlayType::Single)
-		return;
+	//if (mPlayType == EPlayType::Single)
+	//	return;
 
 	if (mIsBallStopped && !mIsEnableSwing)
 		mChangeTurnTime += DeltaTime;
@@ -608,7 +614,7 @@ void ABall::CheckChangeTurn(float DeltaTime)
 	else if (!mIsBallStopped)
 		mChangeTurnTime = 0.f;
 
-	if (!mIsChangeTurn && mChangeTurnTime >= 3.f)
+	if (!mIsChangeTurn && mChangeTurnTime >= 1.f)
 	{
 		PrintViewport(1.f, FColor::Red, TEXT("Change Turn"));
 		mIsChangeTurn = true;
@@ -655,36 +661,49 @@ void ABall::CameraMove()
 	mCameraBlendTime -= 0.01f;
 }
 
-void ABall::SetPlayerInfoUI()
+void ABall::SetPlayerInfoUI(EPlayType PlayType)
 {
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
 	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
 
+	EPlayer CurPlayer, NextPlayer;
 	FPlayerInfo CurPlayerInfo, NextPlayerInfo;
 
 	if (IsValid(GameManager))
 	{
-		EPlayer CurPlayer = GameManager->GetCurPlayer();
-		EPlayer NextPlayer = GameManager->GetNextPlayer();
-
+		CurPlayer = GameManager->GetCurPlayer();
 		CurPlayerInfo = GameManager->GetPlayer(CurPlayer);
-		NextPlayerInfo = GameManager->GetPlayer(NextPlayer);
 	}
 
 	if (IsValid(mMainHUD))
 	{
-		// Player Info - 다음 플레이어(턴이 돌아오는 플레이어)
-		mMainHUD->SetPlayerImage(NextPlayerInfo.ImagePath, true);
-		mMainHUD->SetPlayerNameText(NextPlayerInfo.Name, true);
-		mMainHUD->SetShotNumText(NextPlayerInfo.Shot, true);
-		//mMainHUD->SetScoreText(NextPlayerInfo.Score, true);
-		mMainHUD->SetTargetDistanceText(NextPlayerInfo.LeftDistance / 100.f);
+		if (mPlayType == EPlayType::Single)
+		{
+			mMainHUD->SetShotNumText(CurPlayerInfo.Shot, true);
+			//mMainHUD->SetScoreText(CurPlayerInfo.Score, true);
+			mMainHUD->SetTargetDistanceText(CurPlayerInfo.LeftDistance / 100.f);
 
-		// Player Simple Info - 현재 플레이어(방금 스윙한 플레이어)
-		mMainHUD->SetPlayerImage(CurPlayerInfo.ImagePath, false);
-		mMainHUD->SetPlayerNameText(CurPlayerInfo.Name, false);
-		mMainHUD->SetShotNumText(CurPlayerInfo.Shot, false);
-		//mMainHUD->SetScoreText(CurPlayerInfo.Score, false);
+		}
+
+		else if (mPlayType == EPlayType::Multi)
+		{
+			NextPlayer = GameManager->GetNextPlayer();
+			NextPlayerInfo = GameManager->GetPlayer(NextPlayer);
+
+			// Player Info - 다음 플레이어(턴이 돌아오는 플레이어)
+			mMainHUD->SetPlayerImage(NextPlayerInfo.ImagePath, true);
+			mMainHUD->SetPlayerNameText(NextPlayerInfo.Name, true);
+			mMainHUD->SetShotNumText(NextPlayerInfo.Shot, true);
+			//mMainHUD->SetScoreText(NextPlayerInfo.Score, true);
+			mMainHUD->SetTargetDistanceText(NextPlayerInfo.LeftDistance / 100.f);
+
+			// Player Simple Info - 현재 플레이어(방금 스윙한 플레이어)
+			mMainHUD->SetPlayerImage(CurPlayerInfo.ImagePath, false);
+			mMainHUD->SetPlayerNameText(CurPlayerInfo.Name, false);
+			mMainHUD->SetShotNumText(CurPlayerInfo.Shot, false);
+			//mMainHUD->SetScoreText(CurPlayerInfo.Score, false);
+
+		}
 	}
 }
 
@@ -693,6 +712,8 @@ void ABall::ChangeTurn()
 	if (!mIsChangeTurn)
 		return;
 
+	mTrailer->Deactivate();
+
 	// Players 정보 업데이트
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
 	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
@@ -700,44 +721,72 @@ void ABall::ChangeTurn()
 	if (IsValid(GameManager))
 	{
 		// Player 정보 갱신
-		EPlayer CurPlayer = GameManager->GetCurPlayer();
-		EPlayer NextPlayer = GameManager->GetNextPlayer();
+		EPlayer CurPlayer;
+		
+		if (mPlayType == EPlayType::Single)
+			CurPlayer = EPlayer::Player1;
+		else
+			GameManager->GetCurPlayer();
 
 		FPlayerInfo CurPlayerInfo = GameManager->GetPlayer(CurPlayer);	// 방금 스윙한 플레이어
-		FPlayerInfo NextPlayerInfo = GameManager->GetPlayer(NextPlayer);	// 이제 스윙할 플레이어
+		EPlayer NextPlayer = GameManager->GetNextPlayer();
 
-		// 다음 플레이어(Single -> Detail) - 이제 스윙할 차례인 플레이어
-
-		// 현재 플레이어(Detail -> Single) - 방금 스윙한 플레이어
 		CurPlayerInfo.Score++;
 		CurPlayerInfo.BallPos = GetActorLocation();
 
-		// 다음 순서 플레이어의 공 위치로 현재 공 위치 변경
-		SetActorLocation(NextPlayerInfo.BallPos);
+		if (mPlayType == EPlayType::Single)
+		{
+
+		}
+
+		else if (mPlayType == EPlayType::Multi)
+		{
+			FPlayerInfo NextPlayerInfo = GameManager->GetPlayer(NextPlayer);	// 이제 스윙할 플레이어
+			SetActorLocation(NextPlayerInfo.BallPos);
+		}
 
 		// 현재 턴 플레이어로 UI 갱신
-		SetPlayerInfoUI();
+		SetPlayerInfoUI(mPlayType);
 
 		// CurPlayer와 NextPlayer 변경
 		GameManager->SetPlayer(CurPlayerInfo, (int)CurPlayer);
-		//GameManager->SetCurPlayer(((int)CurPlayer + 1) % 2);
 
-		GameManager->SetCurPlayer((int)NextPlayer);
+		if (mPlayType == EPlayType::Multi)
+			GameManager->SetCurPlayer((int)NextPlayer);
 
 		// Turn 증가
 		GameManager->AddTurn(1);
 	}
 
 	// 턴 넘어갈 때 변수들 초기화
+	mIsWindBlow = false;
 	mIsEnableSwing = true;
 	mIsChangeTurn = false;
 	mChangeTurnTime = 0.f;
+
+	// 바람
+	UpdateWind();
 
 	// UI 업데이트
 	if (IsValid(mMainHUD))
 	{
 		mMainHUD->SetDistanceText(0.f);
 	}
+}
+
+void ABall::ChangeTurnSingle()
+{
+	if (!mIsChangeTurn)
+		return;
+
+
+}
+
+void ABall::ChangeTurnMulti()
+{
+	if (!mIsChangeTurn)
+		return;
+
 }
 
 void ABall::TestKey()
@@ -780,8 +829,6 @@ void ABall::Wind()
 	if (!mIsWindBlow)
 		return;
 
-	PrintViewport(1.f, FColor::Red, TEXT("Wind"));
-
 	FVector dirVec;
 
 	switch (mWindType)
@@ -801,6 +848,19 @@ void ABall::Wind()
 	}
 
 	mStaticMesh->AddForce(dirVec * mWindPower);
+}
+
+void ABall::UpdateWind()
+{
+	if (IsValid(mMainHUD))
+	{
+		mMainHUD->SetWindTextVisible(mWindType, false);
+
+		mWindType = EWindType(FMath::RandRange(0, 3));
+		mWindPower = FMath::RandRange(mWindPowerMin, mWindPowerMax);
+
+		mMainHUD->SetWindTextVisible(mWindType, true);
+	}
 }
 
 void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,

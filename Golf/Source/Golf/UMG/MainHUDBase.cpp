@@ -34,12 +34,6 @@ void UMainHUDBase::NativeConstruct()
 	mPlayInfoBase = Cast<UPlayInfoBase>(GetWidgetFromName(FName(TEXT("PlayInfoUI"))));
 	mPlaySimpleInfoBase = Cast<UPlaySimpleInfoBase>(GetWidgetFromName(FName(TEXT("PlaySimpleInfoUI"))));
 
-	//FWidgetTransform transform;
-	//transform.Translation = FVector2D(10.0, 300.0);
-	//transform.Scale = (FVector2D(500.0, 100.0));
-	//mHoleInfoBase->SetRenderTransform(transform);
-
-	
 	// Multi Set
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
 	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
