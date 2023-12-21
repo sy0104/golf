@@ -141,8 +141,6 @@ private:
 
 	float		mCameraBlendTime;
 
-	FVector mTargetPos;
-
 	float		mChangeTurnTime;
 	bool		mIsChangeTurn;
 

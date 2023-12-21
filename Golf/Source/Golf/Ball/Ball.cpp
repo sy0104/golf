@@ -130,7 +130,9 @@ ABall::ABall()
 		mMinimapCapture->TextureTarget = mapRender;
 	}
 
-	mTargetPos = FVector(0.0, 0.0, 0.0);
+	
+
+
 
 	SetActorLocation(mBallInfo.StartPos);
 }
@@ -149,9 +151,7 @@ void ABall::BeginPlay()
 			mMainHUD->SetDistanceText(0.f);
 			//mMainHUD->SetShotNumText(mBallInfo.ShotNum);
 			mMinimapCapture->bCaptureEveryFrame = true;
-			//mMainHUD->SetMiniMapHoleImage(mBallInfo.DestPos);
-			mMainHUD->SetMiniMapBallCurrent();
-			mMainHUD->SetMiniMapBallTarget();
+			mMainHUD->SetMiniMapInfo(FVector2D(mBallInfo.StartPos), FVector2D(mBallInfo.DestPos));
 			mMainHUD->SetWindTextVisible(mWindType, true);
 		}
 	}
@@ -262,6 +262,8 @@ void ABall::Swing()
 	// Swing
 	FVector TargetPos = mBallInfo.StartPos + (mMainCamera->GetForwardVector() * (mBallInfo.BallDis * mBallInfo.BallPower));
 	FVector OutVelocity = FVector::ZeroVector;
+
+	//UE_LOG(LogTemp, Log, TEXT("TargetPos.X : %s"), *TargetPos.ToString());
 
 	if (mGolfClubType == EGolfClub::Putter)
 		OutVelocity = mMainCamera->GetForwardVector() * FVector(1.0, 1.0, 1.0) * mBallInfo.BallDis;
@@ -378,7 +380,6 @@ void ABall::CheckMaterialCollision()
 
 	bool hit = GetWorld()->LineTraceSingleByChannel(hitResult, startPos, endPos, ECC_GameTraceChannel12, collisionParams);
 	//DrawDebugLine(GetWorld(), startPos, endPos, FColor::Red, false, 1.0f);
-	mTargetPos = endPos;
 
 	if (hit)
 	{
@@ -572,13 +573,22 @@ void ABall::CheckBallStopped()
 
 		if (IsValid(mMainHUD) && mIsEnableSwing)
 		{
+			// Play info
 			mMainHUD->SetDistanceText(0.f);
 			mMainHUD->SetBallStateVisible(true);
 			//mMainHUD->SetShotNumText(mBallInfo.ShotNum);
 			mMainHUD->SetPlayInfoVisible(true);
-			mMainHUD->SetMiniMapBallCurrent();
-			mMainHUD->SetMiniMapBallTarget();
+
+			// MiniMap
+			UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
+			UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
+			EPlayer CurPlayer = GameManager->GetCurPlayer();
+			FPlayerInfo CurPlayerInfo = GameManager->GetPlayer(CurPlayer);
+			mMainHUD->SetMiniMapBallCurrent(FVector2D(CurPlayerInfo.BallPos));
+			mMainHUD->SetMiniMapBallTarget(FVector2D(mMainCamera->GetForwardVector()), mGolfClubType);
 			mMainHUD->SetMiniMapVisible(true);
+
+			// Trailer
 			mTrailer->Deactivate();
 		}
 	}

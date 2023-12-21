@@ -71,8 +71,9 @@ public:
 	void SetPlayInfoVisible(bool visible);
 
 	// MiniMap
-	void SetMiniMapBallCurrent(/*FVector loc*/);
-	void SetMiniMapBallTarget(/*FVector loc*/);
-	//void SetMiniMapHoleImage(FVector loc);
+	void SetMiniMapBallCurrent(FVector2D position);
+	void SetMiniMapBallTarget(FVector2D direction, EGolfClub club);
+	//void SetMiniMapHoleImage(FVector2D position);
 	void SetMiniMapVisible(bool visible);
+	void SetMiniMapInfo(FVector2D startPos, FVector2D destPos);
 };
