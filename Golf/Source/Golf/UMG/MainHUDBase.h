@@ -20,18 +20,19 @@ protected:
 
 
 private:
-	class UDistanceBase*	mDistanceBase;
-	class UBallDetailBase*	mBallDetailBase;
-	class UGolfClubBase*	mGolfClubBase;
-	class UScoreBase*		mScoreBase;
-	class UBallStateBase*	mBallStateBase;
-	class UCourseBase*		mCourseBase;
-	class UMiniMap*			mMiniMap;
-	class UBallSpinBase*	mBallSpinBase;
-	class UWindBase*		mWindBase;
-	class UHoleInfoBase* mHoleInfoBase;
-	class UPlayInfoBase* mPlayInfoBase;
-	class UPlaySimpleInfoBase* mPlaySimpleInfoBase;
+	class UDistanceBase*		mDistanceBase;
+	class UBallDetailBase*		mBallDetailBase;
+	class UGolfClubBase*		mGolfClubBase;
+	class UScoreBase*			mScoreBase;
+	class UBallStateBase*		mBallStateBase;
+	class UCourseBase*			mCourseBase;
+	class UMiniMap*				mMiniMap;
+	class UBallSpinBase*		mBallSpinBase;
+	class UWindBase*			mWindBase;
+	class UHoleInfoBase*		mHoleInfoBase;
+	class UPlayInfoBase*		mPlayInfoBase;
+	class UPlaySimpleInfoBase*	mPlaySimpleInfoBase;
+	class UTotalScoreBase*		mTotalScoreBase;
 	
 public:
 	class UDistanceBase* GetDistanceBase()
@@ -75,4 +76,10 @@ public:
 	void SetMiniMapBallTarget(/*FVector loc*/);
 	//void SetMiniMapHoleImage(FVector loc);
 	void SetMiniMapVisible(bool visible);
+
+	// Total Score
+	void SetTotalScoreVisible(bool visible);
+
+	// Ball Power, Ball Spin, Ball Club
+	void SetBallInfoVisible(bool visible);
 };

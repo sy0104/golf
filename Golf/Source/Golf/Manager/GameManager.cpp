@@ -6,6 +6,7 @@ UGameManager::UGameManager()
 {
 	mTurn = 0;
 	mCurPlayer = EPlayer::Player1;
+	mIsCreatePlayer = false;
 }
 
 UGameManager::~UGameManager()
@@ -31,8 +32,10 @@ void UGameManager::CreatePlayers(EPlayType PlayType)
 	player.Name = L"Player 1";
 	player.ImagePath = L"/Script/Engine.Texture2D'/Game/UMG/UI_IMAGE/Player1Image.Player1Image'";
 	player.Score = 0;
+	player.ScoreDetail = 0;
 	player.Shot = 0;
 	player.LeftDistance = 0.f;
+	player.TurnEnd = false;
 
 
 	mPlayers.Add(player);
@@ -43,8 +46,10 @@ void UGameManager::CreatePlayers(EPlayType PlayType)
 		player.Name = L"Player 2";
 		player.ImagePath = L"/Script/Engine.Texture2D'/Game/UMG/UI_IMAGE/Player2Image.Player2Image'";
 		player.Score = 0;
+		player.ScoreDetail = 0;
 		player.Shot = 0;
 		player.LeftDistance = 0.f;
+		player.TurnEnd = false;
 
 		mPlayers.Add(player);
 

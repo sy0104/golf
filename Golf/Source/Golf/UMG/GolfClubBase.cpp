@@ -30,7 +30,7 @@ void UGolfClubBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 void UGolfClubBase::OnDriverButtonClicked()
 {
-	PrintViewport(1.f, FColor::Red, TEXT("Driver"));
+	//PrintViewport(1.f, FColor::Red, TEXT("Driver"));
 
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode))
@@ -45,7 +45,7 @@ void UGolfClubBase::OnDriverButtonClicked()
 
 void UGolfClubBase::OnWoodButtonClicked()
 {
-	PrintViewport(1.f, FColor::Red, TEXT("Wood"));
+	//PrintViewport(1.f, FColor::Red, TEXT("Wood"));
 
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode))
@@ -60,7 +60,7 @@ void UGolfClubBase::OnWoodButtonClicked()
 
 void UGolfClubBase::OnIronButtonClicked()
 {
-	PrintViewport(1.f, FColor::Red, TEXT("Iron"));
+	//PrintViewport(1.f, FColor::Red, TEXT("Iron"));
 
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode))
@@ -75,7 +75,7 @@ void UGolfClubBase::OnIronButtonClicked()
 
 void UGolfClubBase::OnWedgeButtonClicked()
 {
-	PrintViewport(1.f, FColor::Red, TEXT("Wedge"));
+	//PrintViewport(1.f, FColor::Red, TEXT("Wedge"));
 
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode))
@@ -90,7 +90,7 @@ void UGolfClubBase::OnWedgeButtonClicked()
 
 void UGolfClubBase::OnPutterButtonClicked()
 {
-	PrintViewport(1.f, FColor::Red, TEXT("Putter"));
+	//PrintViewport(1.f, FColor::Red, TEXT("Putter"));
 
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode))

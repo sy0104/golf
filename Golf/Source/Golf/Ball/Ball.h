@@ -53,6 +53,7 @@ private:
 	void CameraMove();
 
 	// Score
+	void CheckPlayerGoal();
 	void CalculateScore();
 
 	// Wind
@@ -63,11 +64,13 @@ private:
 	void SetMiniMapInfo();
 
 	// Turn (Multi)
-	void SetPlayerInfoUI(EPlayType PlayType);
+	void SetPlayerInfoUI(EPlayType PlayType, bool isNextPlayerEnd = false);
 	void CheckChangeTurn(float DeltaTime);
 	void ChangeTurn();
-	void ChangeTurnSingle();
-	void ChangeTurnMulti();
+
+	// UI
+	void ShowTotalScore(float scale);
+	void CloseTotalScore();
 
 	void TestKey();
 
@@ -144,10 +147,11 @@ private:
 
 	float		mCameraBlendTime;
 
-	FVector mTargetPos;
-
 	float		mChangeTurnTime;
 	bool		mIsChangeTurn;
+
+	bool		mIsConcede;
+	bool		mIsInHole;
 
 	class UMainHUDBase*		mMainHUD;
 	class AFixedCamera*		mFixedCamera;
@@ -167,5 +171,15 @@ public:
 	void SetPlayType(EPlayType PlayType)
 	{
 		mPlayType = PlayType;
+	}
+
+	void SetConcede(bool concede)
+	{
+		mIsConcede = concede;
+	}
+
+	void SetInHole(bool InHole)
+	{
+		mIsInHole = InHole;
 	}
 };

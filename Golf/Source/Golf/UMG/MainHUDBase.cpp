@@ -14,6 +14,7 @@
 #include "WindBase.h"
 #include "HoleInfoBase.h"
 #include "PlaySimpleInfoBase.h"
+#include "TotalScoreBase.h"
 #include "../GFGameInstance.h"
 #include "../Manager/GameManager.h"
 
@@ -33,6 +34,7 @@ void UMainHUDBase::NativeConstruct()
 	mHoleInfoBase = Cast<UHoleInfoBase>(GetWidgetFromName(FName(TEXT("HoleInfoUI"))));
 	mPlayInfoBase = Cast<UPlayInfoBase>(GetWidgetFromName(FName(TEXT("PlayInfoUI"))));
 	mPlaySimpleInfoBase = Cast<UPlaySimpleInfoBase>(GetWidgetFromName(FName(TEXT("PlaySimpleInfoUI"))));
+	mTotalScoreBase = Cast<UTotalScoreBase>(GetWidgetFromName(FName(TEXT("TotalScoreUI"))));
 
 	// Multi Set
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
@@ -40,16 +42,25 @@ void UMainHUDBase::NativeConstruct()
 
 	if (IsValid(GameManager))
 	{
-		EPlayType PlayType = GameManager->GetPlayType();
-		TArray<FPlayerInfo> players = GameManager->GetPlayers();
-
-		mPlayInfoBase->SetPlayerImage(players[(int)EPlayer::Player1].ImagePath);
-
-		if (PlayType == EPlayType::Multi)
+		if (GameManager->GetIsCreatePlayer())
 		{
-			mPlaySimpleInfoBase->SetVisibility(ESlateVisibility::Visible);
-			mPlaySimpleInfoBase->SetPlayerImage(players[(int)EPlayer::Player2].ImagePath);
-			mPlaySimpleInfoBase->SetPlayerNameText(players[(int)EPlayer::Player2].Name);
+			EPlayType PlayType = GameManager->GetPlayType();
+			TArray<FPlayerInfo> players = GameManager->GetPlayers();
+
+			mPlayInfoBase->SetPlayerImage(players[(int)EPlayer::Player1].ImagePath);
+
+			if (PlayType == EPlayType::Multi)
+			{
+				mPlaySimpleInfoBase->SetVisibility(ESlateVisibility::Visible);
+				mPlaySimpleInfoBase->SetPlayerImage(players[(int)EPlayer::Player2].ImagePath);
+				mPlaySimpleInfoBase->SetPlayerNameText(players[(int)EPlayer::Player2].Name);
+			}
+		}
+
+		// [test] main에서 바로 시작
+		else
+		{
+			GameManager->CreatePlayers(EPlayType::Single);
 		}
 	}
 }
@@ -172,7 +183,6 @@ void UMainHUDBase::SetPlayInfoVisible(bool visible)
 		mPlayInfoBase->SetVisibility(ESlateVisibility::Visible);
 	else
 		mPlayInfoBase->SetVisibility(ESlateVisibility::Hidden);
-
 }
 
 void UMainHUDBase::SetMiniMapBallCurrent(/*FVector loc*/)
@@ -196,4 +206,29 @@ void UMainHUDBase::SetMiniMapVisible(bool visible)
 		mMiniMap->SetVisibility(ESlateVisibility::Visible);
 	else
 		mMiniMap->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UMainHUDBase::SetTotalScoreVisible(bool visible)
+{
+	if (visible)
+		mTotalScoreBase->SetVisibility(ESlateVisibility::Visible);
+	else
+		mTotalScoreBase->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UMainHUDBase::SetBallInfoVisible(bool visible)
+{
+	if (visible)
+	{
+		mBallDetailBase->SetVisibility(ESlateVisibility::Visible);
+		mBallSpinBase->SetVisibility(ESlateVisibility::Visible);
+		mGolfClubBase->SetVisibility(ESlateVisibility::Visible);
+	}
+
+	else
+	{
+		mBallDetailBase->SetVisibility(ESlateVisibility::Hidden);
+		mBallSpinBase->SetVisibility(ESlateVisibility::Hidden);
+		mGolfClubBase->SetVisibility(ESlateVisibility::Hidden);
+	}
 }

@@ -86,10 +86,16 @@ public:
 			return EPlayer::Player1;
 	}
 
+	bool GetIsCreatePlayer() const
+	{
+		return mIsCreatePlayer;
+	}
+
 private:
 	EPlayType				mPlayType;
 	TArray<FPlayerInfo>		mPlayers;
 	EPlayer					mCurPlayer;
 
 	int		mTurn;
+	bool	mIsCreatePlayer;
 };

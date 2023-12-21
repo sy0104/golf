@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "BallSpinBase.h"
 #include "../GFGameModeBase.h"
 #include "../Ball/BallController.h"
@@ -23,7 +20,6 @@ void UBallSpinBase::NativeConstruct()
 void UBallSpinBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
-
 }
 
 void UBallSpinBase::OnSwingLeftButtonClicked()
