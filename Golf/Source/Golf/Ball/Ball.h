@@ -60,9 +60,6 @@ private:
 	void Wind();
 	void UpdateWind();
 
-	// MiniMap
-	void SetMiniMapInfo();
-
 	// Turn (Multi)
 	void SetPlayerInfoUI(EPlayType PlayType, bool isNextPlayerEnd = false);
 	void CheckChangeTurn(float DeltaTime);
@@ -111,15 +108,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	//UParticleSystemComponent*	mTrailer;
 	UNiagaraComponent* mTrailer;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	USpringArmComponent* mMinimapSpringArm;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	USceneCaptureComponent2D* mMinimapCapture;
-
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	//UPaperSpriteComponent*		mMinimapCurrentBall;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EWindType			mWindType;
