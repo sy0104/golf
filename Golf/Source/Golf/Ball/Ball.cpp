@@ -135,7 +135,7 @@ void ABall::BeginPlay()
 			//mMainHUD->SetShotNumText(mBallInfo.ShotNum);
 
 			// Minimap
-			mMainHUD->SetMiniMapHoleImage(FVector2D(mBallInfo.DestPos));
+			mMainHUD->SetMiniMapHoleImage(mBallInfo.DestPos);
 
 			// Wind
 			mMainHUD->SetWindTextVisible(mWindType, true);
@@ -574,8 +574,8 @@ void ABall::CheckBallStopped()
 			UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
 			EPlayer CurPlayer = GameManager->GetCurPlayer();
 			FPlayerInfo CurPlayerInfo = GameManager->GetPlayer(CurPlayer);
-			mMainHUD->SetMiniMapBallCurrent(FVector2D(CurPlayerInfo.BallPos));
-			mMainHUD->SetMiniMapBallTarget(FVector2D(CurPlayerInfo.BallPos), FVector2D(mMainCamera->GetForwardVector()), mGolfClubType);
+			mMainHUD->SetMiniMapBallCurrent(CurPlayerInfo.BallPos);
+			mMainHUD->SetMiniMapBallTarget(CurPlayerInfo.BallPos, mMainCamera->GetForwardVector(), mGolfClubType);
 			mMainHUD->SetMiniMapVisible(true);
 		}
 	}

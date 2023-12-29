@@ -3,9 +3,12 @@
 #pragma once
 
 #include <Components/Image.h>
+#include <Components/CanvasPanel.h>
+#include <Components/TextBlock.h>
 #include "../GameInfo.h"
 #include <Blueprint/UserWidget.h>
 #include "MiniMap.generated.h"
+
 
 /**
  * 
@@ -26,17 +29,26 @@ private:
 	UImage* mTargetBallImage;
 	UImage* mHoleImage;
 
-	FVector2D mCurrentPos;
-	FVector2D mTargetPos;
-	FVector2D mHolePos;
+	FVector mCurrentPos;
+	FVector mTargetPos;
+	FVector mHolePos;
 
 	FVector2D mCurrentBallSize;
 	FVector2D mTargetBallSize;
 	FVector2D mHoleSize;
 
+	UCanvasPanel* mDistanceCanvas;
+	UCanvasPanel* mLeftDistanceCanvas;
+	
+	UTextBlock* mDistanceText;
+	UTextBlock* mLeftDistanceText;
+
+	FVector2D mDistanceCanvasSize;
+	FVector2D mLeftDistanceCanvasSize;
+
 
 public:
-	void SetBallCurrent(FVector2D position);
-	void SetBallTarget(FVector2D position, FVector2D direction, EGolfClub club);
-	void SetHoleImage(FVector2D position);
+	void SetBallCurrent(FVector position);
+	void SetBallTarget(FVector position, FVector direction, EGolfClub club);
+	void SetHoleImage(FVector position);
 };

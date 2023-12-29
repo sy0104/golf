@@ -6,6 +6,7 @@
 #include <Blueprint/WidgetLayoutLibrary.h>
 #include <Blueprint/WidgetBlueprintLibrary.h>
 
+
 void UMiniMap::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -17,6 +18,15 @@ void UMiniMap::NativeConstruct()
 	mCurrentBallSize = UWidgetLayoutLibrary::SlotAsCanvasSlot(mCurrentBallImage)->GetSize();
 	mTargetBallSize = UWidgetLayoutLibrary::SlotAsCanvasSlot(mTargetBallImage)->GetSize();
 	mHoleSize = UWidgetLayoutLibrary::SlotAsCanvasSlot(mHoleImage)->GetSize();
+
+	mDistanceCanvas = Cast<UCanvasPanel>(GetWidgetFromName(FName(TEXT("DistanceCanvas"))));
+	mLeftDistanceCanvas = Cast<UCanvasPanel>(GetWidgetFromName(FName(TEXT("LeftDistanceCanvas"))));
+
+	mDistanceText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("DistanceText"))));
+	mLeftDistanceText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("LeftDistanceText"))));
+
+	mDistanceCanvasSize = UWidgetLayoutLibrary::SlotAsCanvasSlot(mDistanceCanvas)->GetSize();
+	mLeftDistanceCanvasSize = UWidgetLayoutLibrary::SlotAsCanvasSlot(mLeftDistanceCanvas)->GetSize();
 }
 
 void UMiniMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -30,22 +40,22 @@ int32 UMiniMap::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 	FPaintContext Context(AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle, bParentEnabled);
 
 	// current ~ target line
-	UWidgetBlueprintLibrary::DrawLine(Context, mCurrentPos + mCurrentBallSize / 2, mTargetPos + mTargetBallSize / 2, FLinearColor::Yellow, false, 1.5f);
+	UWidgetBlueprintLibrary::DrawLine(Context, FVector2D(mCurrentPos) + mCurrentBallSize / 2, FVector2D(mTargetPos) + mTargetBallSize / 2, FLinearColor::Yellow, false, 1.5f);
 	
 	// target ~ hole dashed line
-	UWidgetBlueprintLibrary::DrawLine(Context, mTargetPos + mTargetBallSize / 2, mHolePos + mHoleSize / 2, FLinearColor::White, false, 2.0f);
+	UWidgetBlueprintLibrary::DrawLine(Context, FVector2D(mTargetPos) + mTargetBallSize / 2, FVector2D(mHolePos) + mHoleSize / 2, FLinearColor::White, false, 2.0f);
 
 	return int32();
 }
 
-void UMiniMap::SetBallCurrent(FVector2D position)
+void UMiniMap::SetBallCurrent(FVector position)
 {
 	mCurrentPos.X = position.Y * 3 / 500 + 150 - mCurrentBallSize.X / 2;
 	mCurrentPos.Y = -position.X / 125 + 376 - mCurrentBallSize.Y / 2;
-	mCurrentBallImage->SetRenderTranslation(mCurrentPos);
+	mCurrentBallImage->SetRenderTranslation(FVector2D(mCurrentPos));
 }
 
-void UMiniMap::SetBallTarget(FVector2D position, FVector2D direction, EGolfClub club)
+void UMiniMap::SetBallTarget(FVector position, FVector direction, EGolfClub club)
 {
 	double distance = 0.0;
 	switch (club)
@@ -71,12 +81,32 @@ void UMiniMap::SetBallTarget(FVector2D position, FVector2D direction, EGolfClub 
 
 	mTargetPos.X = position.Y * 3 / 500 + 150 - mTargetBallSize.X / 2;
 	mTargetPos.Y = -position.X / 125 + 376 - mTargetBallSize.Y / 2;
-	mTargetBallImage->SetRenderTranslation(mTargetPos);
+	mTargetBallImage->SetRenderTranslation(FVector2D(mTargetPos));
+
+	FVector miniMapCurrentPos, miniMapTargetPos, miniMapHolePos;
+	miniMapCurrentPos.X = mCurrentPos.X + mCurrentBallSize.X / 2;
+	miniMapCurrentPos.Y = mCurrentPos.Y + mCurrentBallSize.Y / 2;
+	miniMapTargetPos.X = mTargetPos.X + mTargetBallSize.X / 2;
+	miniMapTargetPos.Y = mTargetPos.Y + mTargetBallSize.Y / 2;
+	miniMapHolePos.X = mHolePos.X + mHoleSize.X / 2;
+	miniMapHolePos.Y = mHolePos.Y + mHoleSize.Y / 2;
+
+	FVector2D distanceCanvasPos, leftdistanceCavasPos;
+	distanceCanvasPos.X = miniMapTargetPos.X - mDistanceCanvasSize.X - 30.0;
+	distanceCanvasPos.Y = miniMapTargetPos.Y - mDistanceCanvasSize.Y / 2;
+	leftdistanceCavasPos.X = miniMapHolePos.X - mLeftDistanceCanvasSize.X - 30.0;
+	leftdistanceCavasPos.Y = miniMapHolePos.Y - mLeftDistanceCanvasSize.Y / 2;
+
+	mDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), FVector::Dist(miniMapCurrentPos, miniMapTargetPos)) + TEXT("m")));
+	mDistanceCanvas->SetRenderTranslation(distanceCanvasPos);
+
+	mLeftDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), FVector::Dist(miniMapTargetPos, miniMapHolePos)) + TEXT("m")));
+	mLeftDistanceCanvas->SetRenderTranslation(leftdistanceCavasPos);
 }
 
-void UMiniMap::SetHoleImage(FVector2D position)
+void UMiniMap::SetHoleImage(FVector position)
 {
 	mHolePos.X = position.Y * 3 / 500 + 150 - mHoleSize.X / 2;
 	mHolePos.Y = -position.X / 125 + 376 - mHoleSize.Y / 2;
-	mHoleImage->SetRenderTranslation(mHolePos);
+	mHoleImage->SetRenderTranslation(FVector2D(mHolePos));
 }
