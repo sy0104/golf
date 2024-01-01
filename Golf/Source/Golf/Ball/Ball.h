@@ -56,9 +56,6 @@ private:
 	void Wind();
 	void UpdateWind();
 
-	// MiniMap
-	void SetMiniMapInfo();
-
 	// Turn (Multi)
 	void SetPlayerInfoUI(EPlayer player, bool isDetail);
 	void CheckChangeTurn(float DeltaTime);

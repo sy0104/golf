@@ -113,30 +113,6 @@ ABall::ABall()
 	mTrailer->bAutoActivate = false;
 	mTrailer->Deactivate();
 
-	// Minimap
-	mMinimapSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("MinimapSpringArm"));
-	mMinimapSpringArm->SetupAttachment(mStaticMesh);
-	mMinimapSpringArm->SetRelativeLocation(FVector(0.0, 0.0, 0.0));
-	mMinimapSpringArm->SetRelativeRotation(FRotator(-90.0, 0.0, 0.0));
-	mMinimapSpringArm->TargetArmLength = 35000.f;
-	mMinimapSpringArm->bUsePawnControlRotation = true;
-	mMinimapSpringArm->bInheritPitch = false;
-	//mMinimapSpringArm->bInheritYaw = false;
-	//mMinimapSpringArm->bInheritRoll = false;
-
-	mMinimapCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("MinimapCapture"));
-	mMinimapCapture->SetupAttachment(mMinimapSpringArm);
-	mMinimapCapture->SetRelativeLocation(FVector(0.0, 150.0, 2000.0));
-	mMinimapCapture->bCaptureEveryFrame = false;
-	mMinimapCapture->bCaptureOnMovement = false;
-
-	const FString& mapRenderPath = TEXT("/Game/UMG/UI_IMAGE/R_MiniMapCapture.R_MiniMapCapture");
-	UTextureRenderTarget2D* mapRender = LoadObject<UTextureRenderTarget2D>(nullptr, *mapRenderPath);
-	if (IsValid(mapRender))
-	{
-		mMinimapCapture->TextureTarget = mapRender;
-	}
-
 	SetActorLocation(mBallInfo.StartPos);
 }
 
@@ -156,10 +132,7 @@ void ABall::BeginPlay()
 			//mMainHUD->SetShotNumText(mBallInfo.ShotNum);
 
 			// Minimap
-			mMinimapCapture->bCaptureEveryFrame = true;
-			//mMainHUD->SetMiniMapHoleImage(mBallInfo.DestPos);
-			mMainHUD->SetMiniMapBallCurrent();
-			mMainHUD->SetMiniMapBallTarget();
+			mMainHUD->SetMiniMapHoleImage(mBallInfo.DestPos);
 
 			// Wind
 			mMainHUD->SetWindTextVisible(mWindType, true);
@@ -284,8 +257,6 @@ void ABall::Swing()
 	mBallInfo.BallPower = 0.f;
 	mBallInfo.BallDis = 0.0;
 	mMainHUD->SetBallPower(0.f);
-
-	mMinimapCapture->bCaptureEveryFrame = false;
 	mMainHUD->SetMiniMapVisible(false);
 
 	// Player UI 업데이트 (Shot)
@@ -574,8 +545,13 @@ void ABall::CheckBallStopped()
 			mMainHUD->SetDistanceText(0.f);
 			mMainHUD->SetBallStateVisible(true);
 			//mMainHUD->SetShotNumText(mBallInfo.ShotNum);
-			mMainHUD->SetMiniMapBallCurrent();
-			mMainHUD->SetMiniMapBallTarget();
+			
+			UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
+			UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
+			EPlayer CurPlayer = GameManager->GetCurPlayer();
+			FPlayerInfo CurPlayerInfo = GameManager->GetPlayer(CurPlayer);
+			mMainHUD->SetMiniMapBallCurrent(CurPlayerInfo.BallPos);
+			mMainHUD->SetMiniMapBallTarget(CurPlayerInfo.BallPos, mMainCamera->GetForwardVector(), mGolfClubType);
 			mMainHUD->SetMiniMapVisible(true);
 		}
 
