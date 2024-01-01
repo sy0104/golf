@@ -33,6 +33,7 @@ private:
 	class UPlayInfoBase*		mPlayInfoBase;
 	class UPlaySimpleInfoBase*	mPlaySimpleInfoBase;
 	class UTotalScoreBase*		mTotalScoreBase;
+	class UGamePlayBase*		mGamePlayBase;
 	
 public:
 	class UDistanceBase* GetDistanceBase()
@@ -49,6 +50,7 @@ public:
 
 	// Score UI
 	void SetScoreText(FString ScoreText);
+	void SetScoreTextVisible(bool visible);
 	void SetConcedeTextVisible(bool visible);
 
 	// Ball State
@@ -64,12 +66,15 @@ public:
 	// Play Info & Play Simple Info
 	void SetPlayerImage(const FString& path, bool isDetail = true);
 	void SetPlayerNameText(FString name, bool isDetail = true);
-	void SetShotNumText(int shot, bool isDetail = true);
-	void SetScoreText(int score, bool isDetail = true);
+	void SetPlayerShotNumText(int shot, bool isDetail = true);
+	void SetPlayerScoreText(int score, bool isDetail = true);
 
 	// Play Info
-	void SetTargetDistanceText(float dis);
+	void SetPlayerTargetDistanceText(float dis);
 	void SetPlayInfoVisible(bool visible);
+
+	// Play Simple Info
+	void SetPlaySimpleInfoVisible(bool visible);
 
 	// MiniMap
 	void SetMiniMapBallCurrent(/*FVector loc*/);
@@ -79,7 +84,13 @@ public:
 
 	// Total Score
 	void SetTotalScoreVisible(bool visible);
+	void SetPlayerRankingText(EPlayer player, int ranking);
+	void SetPlayerScoreText(EPlayer player, int idx, int score);
+	void SetPlayerTotalScoreText(EPlayer player, int score);
 
 	// Ball Power, Ball Spin, Ball Club
 	void SetBallInfoVisible(bool visible);
+
+	// GmaePlay
+	void SetGamePlayVisible(bool visible);
 };

@@ -4,7 +4,7 @@
 
 UGameManager::UGameManager()
 {
-	mTurn = 0;
+	mTurn = 1;
 	mCurPlayer = EPlayer::Player1;
 	mIsCreatePlayer = false;
 }
@@ -32,11 +32,9 @@ void UGameManager::CreatePlayers(EPlayType PlayType)
 	player.Name = L"Player 1";
 	player.ImagePath = L"/Script/Engine.Texture2D'/Game/UMG/UI_IMAGE/Player1Image.Player1Image'";
 	player.Score = 0;
-	player.ScoreDetail = 0;
 	player.Shot = 0;
-	player.LeftDistance = 0.f;
+	player.LeftDistance = FVector::Dist(FVector(0.0, 0.0, 13.0), FVector(37303.0, -998.0, 0.0));
 	player.TurnEnd = false;
-
 
 	mPlayers.Add(player);
 
@@ -45,21 +43,23 @@ void UGameManager::CreatePlayers(EPlayType PlayType)
 	{
 		player.Name = L"Player 2";
 		player.ImagePath = L"/Script/Engine.Texture2D'/Game/UMG/UI_IMAGE/Player2Image.Player2Image'";
-		player.Score = 0;
-		player.ScoreDetail = 0;
-		player.Shot = 0;
-		player.LeftDistance = 0.f;
-		player.TurnEnd = false;
 
 		mPlayers.Add(player);
+	}
 
-		//AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-		//if (IsValid(GameMode))
-		//{
-		//	PrintViewport(1.f, FColor::Red, TEXT("GameMode Valid"));
+	mIsCreatePlayer = true;
+}
 
-		//	UMainHUDBase* MainHUD = GameMode->GetMainHUD();
-		//	MainHUD->SetPlaySimpleInfoVisible(true);
-		//}
+void UGameManager::Init()
+{
+	int PlayerSize = mPlayers.Num();
+	
+	for (int i = 0; i < PlayerSize; ++i)
+	{
+		mPlayers[i].BallPos = FVector(0.0, 0.0, 0.0);
+		mPlayers[i].Score = mPlayers[i].Shot - 4;
+		mPlayers[i].Shot = 0;
+		mPlayers[i].LeftDistance = FVector::Dist(FVector(0.0, 0.0, 13.0), FVector(37303.0, -998.0, 0.0));
+		mPlayers[i].TurnEnd = false;
 	}
 }

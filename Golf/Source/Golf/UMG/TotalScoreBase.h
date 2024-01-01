@@ -34,7 +34,7 @@ private:
 	UTextBlock*		mPlayer2TotalScoreText;
 
 public:
-	void SetPlayerRankingText(EPlayer player, int score);
+	void SetPlayerRankingText(EPlayer player, int ranking);
 	void SetPlayerScoreText(EPlayer player, int idx, int score);
 	void SetPlayerTotalScoreText(EPlayer player, int score);
 };

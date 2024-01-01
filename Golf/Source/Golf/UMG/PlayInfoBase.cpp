@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "PlayInfoBase.h"
 
 void UPlayInfoBase::NativeConstruct()
@@ -34,12 +31,12 @@ void UPlayInfoBase::SetPlayerNameText(FString name)
 	mPlayerNameText->SetText(FText::FromString(name));
 }
 
-void UPlayInfoBase::SetTargetDistanceText(float dis)
+void UPlayInfoBase::SetPlayerTargetDistanceText(float dis)
 {
 	mTargetDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), dis) + TEXT("m")));
 }
 
-void UPlayInfoBase::SetShotNumText(int32 shot)
+void UPlayInfoBase::SetPlayerShotNumText(int32 shot)
 {
 	FString ShotNumText;
 
@@ -62,7 +59,7 @@ void UPlayInfoBase::SetShotNumText(int32 shot)
 	mShotNumText->SetText(FText::FromString(FString::Printf(TEXT("%d"), shot) + ShotNumText + TEXT(" shot")));
 }
 
-void UPlayInfoBase::SetScoreText(int32 score)
+void UPlayInfoBase::SetPlayerScoreText(int32 score)
 {
 	mScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), score)));
 }

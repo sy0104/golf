@@ -1,9 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "GolfClubBase.h"
-#include "../GFGameModeBase.h"
-#include "../Ball/BallController.h"
 #include "../Ball/Ball.h"
 
 void UGolfClubBase::NativeConstruct()
@@ -30,75 +25,40 @@ void UGolfClubBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 void UGolfClubBase::OnDriverButtonClicked()
 {
-	//PrintViewport(1.f, FColor::Red, TEXT("Driver"));
+	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
-	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode))
-	{
-		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
-		if (IsValid(Ball))
-		{
-			Ball->SetGolfClubType(EGolfClub::Driver);
-		}
-	}
+	if (IsValid(Ball))
+		Ball->SetGolfClubType(EGolfClub::Driver);
 }
 
 void UGolfClubBase::OnWoodButtonClicked()
 {
-	//PrintViewport(1.f, FColor::Red, TEXT("Wood"));
+	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
-	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode))
-	{
-		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
-		if (IsValid(Ball))
-		{
-			Ball->SetGolfClubType(EGolfClub::Wood);
-		}
-	}
+	if (IsValid(Ball))
+		Ball->SetGolfClubType(EGolfClub::Wood);
 }
 
 void UGolfClubBase::OnIronButtonClicked()
 {
-	//PrintViewport(1.f, FColor::Red, TEXT("Iron"));
+	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
-	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode))
-	{
-		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
-		if (IsValid(Ball))
-		{
-			Ball->SetGolfClubType(EGolfClub::Iron);
-		}
-	}
+	if (IsValid(Ball))
+		Ball->SetGolfClubType(EGolfClub::Iron);
 }
 
 void UGolfClubBase::OnWedgeButtonClicked()
 {
-	//PrintViewport(1.f, FColor::Red, TEXT("Wedge"));
+	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
-	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode))
-	{
-		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
-		if (IsValid(Ball))
-		{
-			Ball->SetGolfClubType(EGolfClub::Wedge);
-		}
-	}
+	if (IsValid(Ball))
+		Ball->SetGolfClubType(EGolfClub::Wedge);
 }
 
 void UGolfClubBase::OnPutterButtonClicked()
 {
-	//PrintViewport(1.f, FColor::Red, TEXT("Putter"));
+	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
-	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode))
-	{
-		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
-		if (IsValid(Ball))
-		{
-			Ball->SetGolfClubType(EGolfClub::Putter);
-		}
-	}
+	if (IsValid(Ball))
+		Ball->SetGolfClubType(EGolfClub::Putter);
 }

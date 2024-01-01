@@ -1,5 +1,5 @@
 #include "ConcedeTrigger.h"
-#include "../GFGameModeBase.h"
+#include "../Manager/GameManager.h"
 #include "../Ball/Ball.h"
 
 AConcedeTrigger::AConcedeTrigger()
@@ -39,26 +39,18 @@ void AConcedeTrigger::TriggerBegin(const FHitResult& SweepResult)
 {
 	PrintViewport(1.f, FColor::Red, TEXT("Concede Trigger Begin"));
 
-	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode))
-	{
-		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
-		if (IsValid(Ball))
-			Ball->SetConcede(true);
-	}
+	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (IsValid(Ball))
+		Ball->SetConcede(true);
 }
 
 void AConcedeTrigger::TriggerEnd()
 {
 	PrintViewport(1.f, FColor::Red, TEXT("Concede Trigger End"));
 	
-	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode))
-	{
-		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
-		if (IsValid(Ball))
-			Ball->SetConcede(false);
-	}
+	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (IsValid(Ball))
+		Ball->SetConcede(false);
 }
 
 void AConcedeTrigger::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 

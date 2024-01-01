@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "MainHUDBase.h"
 #include "DistanceBase.h"
 #include "BallDetailBase.h"
@@ -15,6 +12,7 @@
 #include "HoleInfoBase.h"
 #include "PlaySimpleInfoBase.h"
 #include "TotalScoreBase.h"
+#include "GamePlayBase.h"
 #include "../GFGameInstance.h"
 #include "../Manager/GameManager.h"
 
@@ -35,6 +33,7 @@ void UMainHUDBase::NativeConstruct()
 	mPlayInfoBase = Cast<UPlayInfoBase>(GetWidgetFromName(FName(TEXT("PlayInfoUI"))));
 	mPlaySimpleInfoBase = Cast<UPlaySimpleInfoBase>(GetWidgetFromName(FName(TEXT("PlaySimpleInfoUI"))));
 	mTotalScoreBase = Cast<UTotalScoreBase>(GetWidgetFromName(FName(TEXT("TotalScoreUI"))));
+	mGamePlayBase = Cast<UGamePlayBase>(GetWidgetFromName(FName(TEXT("GamePlayUI"))));
 
 	// Multi Set
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
@@ -89,6 +88,14 @@ void UMainHUDBase::SetScoreText(FString ScoreText)
 {
 	mScoreBase->SetVisibility(ESlateVisibility::Visible);
 	mScoreBase->SetScoreText(ScoreText);
+}
+
+void UMainHUDBase::SetScoreTextVisible(bool visible)
+{
+	if (visible)
+		mScoreBase->SetVisibility(ESlateVisibility::Visible);
+	else
+		mScoreBase->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UMainHUDBase::SetConcedeTextVisible(bool visible)
@@ -154,27 +161,27 @@ void UMainHUDBase::SetPlayerNameText(FString name, bool isDetail)
 		mPlaySimpleInfoBase->SetPlayerNameText(name);
 }
 
-void UMainHUDBase::SetShotNumText(int shot, bool isDetail)
+void UMainHUDBase::SetPlayerShotNumText(int shot, bool isDetail)
 {
 	if (isDetail)
-		mPlayInfoBase->SetShotNumText(shot);
+		mPlayInfoBase->SetPlayerShotNumText(shot);
 
 	else
-		mPlaySimpleInfoBase->SetShotNumText(shot);
+		mPlaySimpleInfoBase->SetPlayerShotNumText(shot);
 }
 
-void UMainHUDBase::SetScoreText(int score, bool isDetail)
+void UMainHUDBase::SetPlayerScoreText(int score, bool isDetail)
 {
 	if (isDetail)
-		mPlayInfoBase->SetScoreText(score);
+		mPlayInfoBase->SetPlayerScoreText(score);
 
 	else
-		mPlaySimpleInfoBase->SetScoreText(score);
+		mPlaySimpleInfoBase->SetPlayerScoreText(score);
 }
 
-void UMainHUDBase::SetTargetDistanceText(float dis)
+void UMainHUDBase::SetPlayerTargetDistanceText(float dis)
 {
-	mPlayInfoBase->SetTargetDistanceText(dis);
+	mPlayInfoBase->SetPlayerTargetDistanceText(dis);
 }
 
 void UMainHUDBase::SetPlayInfoVisible(bool visible)
@@ -183,6 +190,14 @@ void UMainHUDBase::SetPlayInfoVisible(bool visible)
 		mPlayInfoBase->SetVisibility(ESlateVisibility::Visible);
 	else
 		mPlayInfoBase->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UMainHUDBase::SetPlaySimpleInfoVisible(bool visible)
+{
+	if (visible)
+		mPlaySimpleInfoBase->SetVisibility(ESlateVisibility::Visible);
+	else
+		mPlaySimpleInfoBase->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UMainHUDBase::SetMiniMapBallCurrent(/*FVector loc*/)
@@ -216,6 +231,21 @@ void UMainHUDBase::SetTotalScoreVisible(bool visible)
 		mTotalScoreBase->SetVisibility(ESlateVisibility::Hidden);
 }
 
+void UMainHUDBase::SetPlayerRankingText(EPlayer player, int ranking)
+{
+	mTotalScoreBase->SetPlayerRankingText(player, ranking);
+}
+
+void UMainHUDBase::SetPlayerScoreText(EPlayer player, int idx, int score)
+{
+	mTotalScoreBase->SetPlayerScoreText(player, idx, score);
+}
+
+void UMainHUDBase::SetPlayerTotalScoreText(EPlayer player, int score)
+{
+	mTotalScoreBase->SetPlayerTotalScoreText(player, score);
+}
+
 void UMainHUDBase::SetBallInfoVisible(bool visible)
 {
 	if (visible)
@@ -231,4 +261,12 @@ void UMainHUDBase::SetBallInfoVisible(bool visible)
 		mBallSpinBase->SetVisibility(ESlateVisibility::Hidden);
 		mGolfClubBase->SetVisibility(ESlateVisibility::Hidden);
 	}
+}
+
+void UMainHUDBase::SetGamePlayVisible(bool visible)
+{
+	if (visible)
+		mGamePlayBase->SetVisibility(ESlateVisibility::Visible);
+	else
+		mGamePlayBase->SetVisibility(ESlateVisibility::Hidden);
 }
