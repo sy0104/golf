@@ -14,6 +14,7 @@
 #include "TotalScoreBase.h"
 #include "GamePlayBase.h"
 #include "MenuBase.h"
+#include "GoodShotBase.h"
 #include "../GFGameInstance.h"
 #include "../Manager/GameManager.h"
 
@@ -36,6 +37,7 @@ void UMainHUDBase::NativeConstruct()
 	mTotalScoreBase = Cast<UTotalScoreBase>(GetWidgetFromName(FName(TEXT("TotalScoreUI"))));
 	mGamePlayBase = Cast<UGamePlayBase>(GetWidgetFromName(FName(TEXT("GamePlayUI"))));
 	mMenuBase = Cast<UMenuBase>(GetWidgetFromName(FName(TEXT("MenuUI"))));
+	mGoodShotBase = Cast<UGoodShotBase>(GetWidgetFromName(FName(TEXT("GoodShotUI"))));
 
 	// Multi Set
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
@@ -297,4 +299,12 @@ bool UMainHUDBase::GetIsShowMenu() const
 		return true;
 
 	return false;
+}
+
+void UMainHUDBase::SetGoodShotVisible(bool visible)
+{
+	if (visible)
+		mGoodShotBase->SetVisibility(ESlateVisibility::Visible);
+	else
+		mGoodShotBase->SetVisibility(ESlateVisibility::Hidden);
 }

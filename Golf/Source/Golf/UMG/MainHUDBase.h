@@ -35,6 +35,7 @@ private:
 	class UTotalScoreBase*		mTotalScoreBase;
 	class UGamePlayBase*		mGamePlayBase;
 	class UMenuBase*			mMenuBase;
+	class UGoodShotBase*		mGoodShotBase;
 	
 public:
 	class UDistanceBase* GetDistanceBase()
@@ -100,4 +101,7 @@ public:
 	// Menu
 	void ShowMenu(bool visible);
 	bool GetIsShowMenu() const;
+
+	// GoodShot
+	void SetGoodShotVisible(bool visible);
 };

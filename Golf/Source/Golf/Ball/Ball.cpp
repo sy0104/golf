@@ -91,6 +91,9 @@ ABall::ABall()
 	mTurn = 0;
 	mIsStart = false;
 	mIsEnd = false;
+	
+	mMovingDis = 0.f;
+	mIsGoodShot = false;
 
 	mGolfClubType = EGolfClub::Driver;
 	mHitMaterialType = EMaterialType::Tee;
@@ -342,13 +345,13 @@ void ABall::AddBallPower(float scale)
 
 void ABall::ShowDistance()
 {
-	float dis = FVector::Dist(mBallInfo.StartPos, GetActorLocation());
+	mMovingDis = FVector::Dist(mBallInfo.StartPos, GetActorLocation());
 	float leftDis = FVector::Dist(GetActorLocation(), mBallInfo.DestPos);
 
 	if (IsValid(mMainHUD))
 	{
 		// Distance UI
-		mMainHUD->SetDistanceText(dis / 100.f);
+		mMainHUD->SetDistanceText(mMovingDis / 100.f);
 		mMainHUD->SetLeftDistanceText(leftDis / 100.f);
 
 		// Player Info UI
@@ -543,27 +546,33 @@ void ABall::CheckBallStopped()
 		mIsBallStopped = true;
 		mTrailer->Deactivate();
 
-		if (IsValid(mMainHUD) && mIsEnableSwing)
+		if (IsValid(mMainHUD))
 		{
-			mMainHUD->SetDistanceText(0.f);
-			mMainHUD->SetBallStateVisible(true);
-			//mMainHUD->SetShotNumText(mBallInfo.ShotNum);
-			
-			UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
-			UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
-			EPlayer CurPlayer = GameManager->GetCurPlayer();
-			FPlayerInfo CurPlayerInfo = GameManager->GetPlayerInfo(CurPlayer);
-			mMainHUD->SetMiniMapBallCurrent(CurPlayerInfo.BallPos);
-			mMainHUD->SetMiniMapBallTarget(CurPlayerInfo.BallPos, mMainCamera->GetForwardVector(), mGolfClubType);
-			if(FVector::Dist(CurPlayerInfo.BallPos, mBallInfo.DestPos) > 3000)
-				mMainHUD->SetMiniMapVisible(true);
-			mMainHUD->SetBallDistance(mGolfClubType);
-			mMainHUD->SetHoleMark(CurPlayerInfo.BallPos, mBallInfo.DestPos);
-		}
+			if (mIsEnableSwing)
+			{
+				mMainHUD->SetDistanceText(0.f);
+				mMainHUD->SetBallStateVisible(true);
 
-		//// Score UI
-		//if (mIsConcede)
-		//	ShowScoreUI();
+				UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
+				UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
+				EPlayer CurPlayer = GameManager->GetCurPlayer();
+				FPlayerInfo CurPlayerInfo = GameManager->GetPlayerInfo(CurPlayer);
+				mMainHUD->SetMiniMapBallCurrent(CurPlayerInfo.BallPos);
+				mMainHUD->SetMiniMapBallTarget(CurPlayerInfo.BallPos, mMainCamera->GetForwardVector(), mGolfClubType);
+				if (FVector::Dist(CurPlayerInfo.BallPos, mBallInfo.DestPos) > 3000)
+					mMainHUD->SetMiniMapVisible(true);
+				mMainHUD->SetBallDistance(mGolfClubType);
+				mMainHUD->SetHoleMark(CurPlayerInfo.BallPos, mBallInfo.DestPos);
+			}
+
+			else
+			{
+				// Good Shot
+				CheckGoodShot();
+				if (mIsGoodShot)
+					mMainHUD->SetGoodShotVisible(true);
+			}
+		}
 	}
 
 	else
@@ -759,6 +768,8 @@ void ABall::ChangeTurn()
 	mIsEnableSwing = true;
 	mIsChangeTurn = false;
 	mChangeTurnTime = 0.f;
+	mMovingDis = 0.f;
+	mIsGoodShot = false;
 
 	// Hole 방향 바라보도록
 	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -775,6 +786,7 @@ void ABall::ChangeTurn()
 		mMainHUD->SetBallInfoVisible(true);
 		mMainHUD->SetScoreTextVisible(false);
 		mMainHUD->SetConcedeTextVisible(false);
+		mMainHUD->SetGoodShotVisible(false);
 	}
 }
 
@@ -863,6 +875,29 @@ void ABall::Init(bool isEnd)
 	}
 }
 
+void ABall::CheckGoodShot()
+{
+	switch (mGolfClubType)
+	{
+	case EGolfClub::Driver:
+		if (mMovingDis >= 250.f && mHitMaterialType == EMaterialType::Fairway)
+			mIsGoodShot = true;
+		break;
+	case EGolfClub::Wood:
+		if (mMovingDis >= 150.f && mHitMaterialType == EMaterialType::Fairway)
+			mIsGoodShot = true;
+		break;
+	case EGolfClub::Iron:
+	case EGolfClub::Wedge:
+		if (mHitMaterialType == EMaterialType::Green)
+			mIsGoodShot = true;
+		break;
+	case EGolfClub::Putter:
+
+		break;
+	}
+}
+
 void ABall::TestKey()
 {
 	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -888,7 +923,9 @@ void ABall::TestKey()
 	//	}
 	//}
 
-	SetActorLocation(FVector(0.0, 0.0, 13.5));
+	//SetActorLocation(FVector(0.0, 0.0, 13.5));
+
+	mMainHUD->SetGoodShotVisible(true);
 }
 
 void ABall::NextGame()

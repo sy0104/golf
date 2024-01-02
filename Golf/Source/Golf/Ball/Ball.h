@@ -60,15 +60,18 @@ private:
 	void SetPlayerInfoUI(EPlayer player, bool isDetail);
 	void CheckChangeTurn(float DeltaTime);
 	void ChangeTurn();
+	void NextGame();
 
 	// UI
 	void ShowTotalScore(float scale);
 	void CloseTotalScore();
 	void ShowMenu();
 
+	// Good Shot
+	void CheckGoodShot();
+
 	void TestKey();
 
-	void NextGame();
 
 public:
 	void Init(bool isEnd);
@@ -154,6 +157,9 @@ private:
 	bool		mIsStart;
 	bool		mIsEnd;
 	bool		mIsMultiEnd;
+
+	float		mMovingDis;
+	bool		mIsGoodShot;
 
 	class UMainHUDBase*		mMainHUD;
 	class AFixedCamera*		mFixedCamera;
