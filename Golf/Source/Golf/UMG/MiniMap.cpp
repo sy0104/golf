@@ -43,10 +43,18 @@ int32 UMiniMap::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 	UWidgetBlueprintLibrary::DrawLine(Context, FVector2D(mCurrentPos) + mCurrentBallSize / 2, FVector2D(mTargetPos) + mTargetBallSize / 2, FLinearColor::Yellow, false, 1.5f);
 	
 	// target ~ hole dashed line
-	//UWidgetBlueprintLibrary::DrawLine(Context, FVector2D(mTargetPos) + mTargetBallSize / 2, FVector2D(mHolePos) + mHoleSize / 2, FLinearColor::White, false, 2.0f);
+	//UWidgetBlueprintLibrary::DrawLine(Context, FVector2D(mTargetPos) + mTargetBallSize / 2, FVector2D(mHolePos) + mHoleSize / 2, FLinearColor::Red, false, 1.0f);
 
-	FVector2D newHolePos = FVector2D(mHolePos);
-	UWidgetBlueprintLibrary::DrawLine(Context, FVector2D(mTargetPos) + mTargetBallSize / 2, newHolePos + mHoleSize / 2, FLinearColor::White, false, 2.0f);
+	FVector2D holeDir = FVector2D(mHolePos) + mHoleSize / 2 - FVector2D(mTargetPos) - mTargetBallSize / 2;
+	FVector2D startPos, endPos;
+	int dotNum = 15;
+
+	for (int dot = 0; dot < dotNum; dot = dot + 2)
+	{
+		startPos = FVector2D(mTargetPos) + mTargetBallSize / 2 + holeDir * dot / dotNum;
+		endPos = FVector2D(mTargetPos) + mTargetBallSize / 2 + holeDir * (dot + 1) / dotNum;
+		UWidgetBlueprintLibrary::DrawLine(Context, startPos, endPos, FLinearColor::White, false, 2.0f);
+	}
 
 	return int32();
 }
