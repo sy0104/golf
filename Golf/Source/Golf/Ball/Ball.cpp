@@ -554,7 +554,10 @@ void ABall::CheckBallStopped()
 			FPlayerInfo CurPlayerInfo = GameManager->GetPlayerInfo(CurPlayer);
 			mMainHUD->SetMiniMapBallCurrent(CurPlayerInfo.BallPos);
 			mMainHUD->SetMiniMapBallTarget(CurPlayerInfo.BallPos, mMainCamera->GetForwardVector(), mGolfClubType);
-			mMainHUD->SetMiniMapVisible(true);
+			if(FVector::Dist(CurPlayerInfo.BallPos, mBallInfo.DestPos) > 3000)
+				mMainHUD->SetMiniMapVisible(true);
+			mMainHUD->SetBallDistance(mGolfClubType);
+			mMainHUD->SetHoleMark(CurPlayerInfo.BallPos, mBallInfo.DestPos);
 		}
 
 		//// Score UI
@@ -1094,4 +1097,9 @@ void ABall::BallBounced(const FHitResult& Hit, const FVector& ImpactVelocity)
 void ABall::BallStopped(const FHitResult& ImpactResult)
 {
 	PrintViewport(1.f, FColor::Blue, TEXT("Stopped"));
+}
+
+void ABall::SetGolfClubType(EGolfClub GolfClub)
+{
+	mGolfClubType = GolfClub;
 }

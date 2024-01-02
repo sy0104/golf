@@ -48,6 +48,8 @@ public:
 
 	// Ball Detail
 	void SetBallPower(float ratio);
+	void SetBallDistance(EGolfClub club);
+	void SetHoleMark(FVector ballPos, FVector destPos);
 
 	// Score UI
 	void SetScoreText(FString ScoreText);

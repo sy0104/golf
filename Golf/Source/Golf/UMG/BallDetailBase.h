@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Components\ProgressBar.h>
+#include <Components/TextBlock.h>
+#include <Components/Image.h>
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
@@ -18,6 +20,16 @@ protected:
 private:
 	UProgressBar*	mBallPowerBar;
 
+	UTextBlock* mDistanceText;
+	UTextBlock* mHalfDistanceText;
+
+	UImage* mHoleMarkImage;
+
 public:
 	void SetBallPower(float ratio);
+	void SetBallDistance(EGolfClub club);
+	void SetHoleMark(FVector ballPos, FVector destPos);
+
+private:
+	double progressDis;
 };

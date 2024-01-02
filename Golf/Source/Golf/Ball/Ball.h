@@ -159,10 +159,7 @@ private:
 	class AFixedCamera*		mFixedCamera;
 
 public:
-	void SetGolfClubType(EGolfClub GolfClub)
-	{
-		mGolfClubType = GolfClub;
-	}
+	void SetGolfClubType(EGolfClub GolfClub);
 
 	void SetBallSwingType(EBallSwingType SwingType)
 	{

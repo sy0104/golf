@@ -86,6 +86,16 @@ void UMainHUDBase::SetBallPower(float ratio)
 	mBallDetailBase->SetBallPower(ratio);
 }
 
+void UMainHUDBase::SetBallDistance(EGolfClub club)
+{
+	mBallDetailBase->SetBallDistance(club);
+}
+
+void UMainHUDBase::SetHoleMark(FVector ballPos, FVector destPos)
+{
+	mBallDetailBase->SetHoleMark(ballPos, destPos);
+}
+
 void UMainHUDBase::SetScoreText(FString ScoreText)
 {
 	mScoreBase->SetVisibility(ESlateVisibility::Visible);
