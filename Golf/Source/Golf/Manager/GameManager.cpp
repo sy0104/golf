@@ -32,8 +32,9 @@ void UGameManager::CreatePlayers(EPlayType PlayType)
 	player.Name = L"Player 1";
 	player.ImagePath = L"/Script/Engine.Texture2D'/Game/UMG/UI_IMAGE/Player1Image.Player1Image'";
 	player.Score = 0;
+	player.TotalShot = 0;
 	player.Shot = 0;
-	player.LeftDistance = FVector::Dist(FVector(0.0, 0.0, 13.0), FVector(37303.0, -998.0, 0.0));
+	player.LeftDistance = FVector::Dist(FVector(0.0, 0.0, 13.5), FVector(37303.0, -998.0, 0.0));
 	player.TurnEnd = false;
 
 	mPlayers.Add(player);
@@ -50,16 +51,25 @@ void UGameManager::CreatePlayers(EPlayType PlayType)
 	mIsCreatePlayer = true;
 }
 
+void UGameManager::ClearPlayers()
+{
+	mTurn = 1;
+	mIsCreatePlayer = false;
+	mPlayType = EPlayType::Single;
+
+	mPlayers.Reset();
+}
+
 void UGameManager::Init()
 {
 	int PlayerSize = mPlayers.Num();
 	
 	for (int i = 0; i < PlayerSize; ++i)
 	{
-		mPlayers[i].BallPos = FVector(0.0, 0.0, 0.0);
+		mPlayers[i].BallPos = FVector(0.0, 0.0, 13.5);
 		mPlayers[i].Score = mPlayers[i].Shot - 4;
 		mPlayers[i].Shot = 0;
-		mPlayers[i].LeftDistance = FVector::Dist(FVector(0.0, 0.0, 13.0), FVector(37303.0, -998.0, 0.0));
+		mPlayers[i].LeftDistance = FVector::Dist(FVector(0.0, 0.0, 13.5), FVector(37303.0, -998.0, 0.0));
 		mPlayers[i].TurnEnd = false;
 	}
 }

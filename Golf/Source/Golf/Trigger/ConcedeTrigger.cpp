@@ -37,8 +37,6 @@ void AConcedeTrigger::Tick(float DeltaTime)
 
 void AConcedeTrigger::TriggerBegin(const FHitResult& SweepResult)
 {
-	PrintViewport(1.f, FColor::Red, TEXT("Concede Trigger Begin"));
-
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	if (IsValid(Ball))
 		Ball->SetConcede(true);
@@ -46,8 +44,6 @@ void AConcedeTrigger::TriggerBegin(const FHitResult& SweepResult)
 
 void AConcedeTrigger::TriggerEnd()
 {
-	PrintViewport(1.f, FColor::Red, TEXT("Concede Trigger End"));
-	
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	if (IsValid(Ball))
 		Ball->SetConcede(false);

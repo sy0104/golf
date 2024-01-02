@@ -34,8 +34,6 @@ void AHoleTrigger::Tick(float DeltaTime)
 
 void AHoleTrigger::TriggerBegin(const FHitResult& SweepResult)
 {
-	PrintViewport(5.f, FColor::Red, TEXT("Hole Trigger Begin"));
-
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
 	if (IsValid(Ball))
@@ -44,8 +42,6 @@ void AHoleTrigger::TriggerBegin(const FHitResult& SweepResult)
 
 void AHoleTrigger::TriggerEnd()
 {
-	PrintViewport(5.f, FColor::Red, TEXT("Hole Trigger Begin"));
-
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
 	if (IsValid(Ball))

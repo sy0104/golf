@@ -36,5 +36,5 @@ private:
 public:
 	void SetPlayerRankingText(EPlayer player, int ranking);
 	void SetPlayerScoreText(EPlayer player, int idx, int score);
-	void SetPlayerTotalScoreText(EPlayer player, int score);
+	void SetPlayerTotalScoreText(EPlayer player, int TotatlShot, int score);
 };

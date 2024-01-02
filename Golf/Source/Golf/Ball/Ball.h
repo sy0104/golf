@@ -64,13 +64,14 @@ private:
 	// UI
 	void ShowTotalScore(float scale);
 	void CloseTotalScore();
+	void ShowMenu();
 
 	void TestKey();
 
 	void NextGame();
 
 public:
-	void Init();
+	void Init(bool isEnd);
 
 public:
 	UFUNCTION()
@@ -152,6 +153,7 @@ private:
 	int			mTurn;
 	bool		mIsStart;
 	bool		mIsEnd;
+	bool		mIsMultiEnd;
 
 	class UMainHUDBase*		mMainHUD;
 	class AFixedCamera*		mFixedCamera;

@@ -34,6 +34,7 @@ private:
 	class UPlaySimpleInfoBase*	mPlaySimpleInfoBase;
 	class UTotalScoreBase*		mTotalScoreBase;
 	class UGamePlayBase*		mGamePlayBase;
+	class UMenuBase*			mMenuBase;
 	
 public:
 	class UDistanceBase* GetDistanceBase()
@@ -86,11 +87,15 @@ public:
 	void SetTotalScoreVisible(bool visible);
 	void SetPlayerRankingText(EPlayer player, int ranking);
 	void SetPlayerScoreText(EPlayer player, int idx, int score);
-	void SetPlayerTotalScoreText(EPlayer player, int score);
+	void SetPlayerTotalScoreText(EPlayer player, int TotalShot, int score);
 
 	// Ball Power, Ball Spin, Ball Club
 	void SetBallInfoVisible(bool visible);
 
 	// GmaePlay
 	void SetGamePlayVisible(bool visible);
+
+	// Menu
+	void ShowMenu(bool visible);
+	bool GetIsShowMenu() const;
 };

@@ -74,23 +74,16 @@ void UTotalScoreBase::SetPlayerScoreText(EPlayer player, int idx, int score)
 		mPlayer2ScoreTexts[idx]->SetText(FText::FromString(FString::Printf(TEXT("%d"), score)));
 }
 
-void UTotalScoreBase::SetPlayerTotalScoreText(EPlayer player, int score)
+void UTotalScoreBase::SetPlayerTotalScoreText(EPlayer player, int TotalShot, int score)
 {
-	int detail = score - 4;
 	FString scoreText;
 	//mLeftDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), dis) + TEXT("m")));
 
-	FString symbol = "";
-	if (detail < 0)
-		symbol = "-";
-	else if (detail > 0)
-		symbol = "+";
-
-	scoreText = FString::Printf(TEXT("%d"), score);
+	scoreText = FString::FromInt(TotalShot) + TEXT("(") + FString::FromInt(score) + TEXT(")");
 
 	if (player == EPlayer::Player1)
-		mPlayer1TotalScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), score)));
+		mPlayer1TotalScoreText->SetText(FText::FromString(scoreText));
 
 	else
-		mPlayer2TotalScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), score)));
+		mPlayer2TotalScoreText->SetText(FText::FromString(scoreText));
 }

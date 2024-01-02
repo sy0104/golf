@@ -13,6 +13,7 @@
 #include "PlaySimpleInfoBase.h"
 #include "TotalScoreBase.h"
 #include "GamePlayBase.h"
+#include "MenuBase.h"
 #include "../GFGameInstance.h"
 #include "../Manager/GameManager.h"
 
@@ -34,6 +35,7 @@ void UMainHUDBase::NativeConstruct()
 	mPlaySimpleInfoBase = Cast<UPlaySimpleInfoBase>(GetWidgetFromName(FName(TEXT("PlaySimpleInfoUI"))));
 	mTotalScoreBase = Cast<UTotalScoreBase>(GetWidgetFromName(FName(TEXT("TotalScoreUI"))));
 	mGamePlayBase = Cast<UGamePlayBase>(GetWidgetFromName(FName(TEXT("GamePlayUI"))));
+	mMenuBase = Cast<UMenuBase>(GetWidgetFromName(FName(TEXT("MenuUI"))));
 
 	// Multi Set
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
@@ -241,9 +243,9 @@ void UMainHUDBase::SetPlayerScoreText(EPlayer player, int idx, int score)
 	mTotalScoreBase->SetPlayerScoreText(player, idx, score);
 }
 
-void UMainHUDBase::SetPlayerTotalScoreText(EPlayer player, int score)
+void UMainHUDBase::SetPlayerTotalScoreText(EPlayer player, int TotalShot, int score)
 {
-	mTotalScoreBase->SetPlayerTotalScoreText(player, score);
+	mTotalScoreBase->SetPlayerTotalScoreText(player, TotalShot, score);
 }
 
 void UMainHUDBase::SetBallInfoVisible(bool visible)
@@ -269,4 +271,20 @@ void UMainHUDBase::SetGamePlayVisible(bool visible)
 		mGamePlayBase->SetVisibility(ESlateVisibility::Visible);
 	else
 		mGamePlayBase->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UMainHUDBase::ShowMenu(bool visible)
+{
+	if (visible)
+		mMenuBase->SetVisibility(ESlateVisibility::Visible);
+	else
+		mMenuBase->SetVisibility(ESlateVisibility::Hidden);
+}
+
+bool UMainHUDBase::GetIsShowMenu() const
+{
+	if (mMenuBase->IsVisible())
+		return true;
+
+	return false;
 }

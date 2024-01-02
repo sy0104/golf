@@ -20,8 +20,9 @@ public:
 	virtual void Deinitialize() override;
 
 public:
-	void CreatePlayers(EPlayType PlayType);
 	void Init();
+	void CreatePlayers(EPlayType PlayType);
+	void ClearPlayers();
 
 public:
 	void SetPlayType(EPlayType PlayType)

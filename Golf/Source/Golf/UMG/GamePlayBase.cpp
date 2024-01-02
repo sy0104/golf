@@ -39,19 +39,31 @@ void UGamePlayBase::OnNextButtonClicked()
 
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	if (IsValid(Ball))
-		Ball->Init();
+		Ball->Init(false);
 
 	SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UGamePlayBase::OnHomeButtonClicked()
 {
-	SetVisibility(ESlateVisibility::Hidden);
+	// 플레이어 초기화
+	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
+	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
 
+	if (IsValid(GameManager))
+		GameManager->ClearPlayers();
 
+	// 공 초기화
+	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (IsValid(Ball))
+		Ball->Init(true);
+
+	// Lobby로 돌아가기
+	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Lobby"));
 }
 
 void UGamePlayBase::OnExitButtonClicked()
 {
-
+	// 언리얼 에디터 종료
+	FGenericPlatformMisc::RequestExit(false);
 }

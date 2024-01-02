@@ -86,6 +86,7 @@ ABall::ABall()
 	mIsConcede = false;
 	mIsInHole = false;
 
+	mIsMultiEnd = false;
 	mTurn = 0;
 	mIsStart = false;
 	mIsEnd = false;
@@ -209,6 +210,7 @@ void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction<ABall>(TEXT("SwingStraight"), EInputEvent::IE_Pressed, this, &ABall::Swing);
 	PlayerInputComponent->BindAction<ABall>(TEXT("Test"), EInputEvent::IE_Pressed, this, &ABall::TestKey);
 	PlayerInputComponent->BindAction<ABall>(TEXT("CloseTotalScore"), EInputEvent::IE_Released, this, &ABall::CloseTotalScore);
+	PlayerInputComponent->BindAction<ABall>(TEXT("Menu"), EInputEvent::IE_Pressed, this, &ABall::ShowMenu);
 
 	// 축 매핑
 	PlayerInputComponent->BindAxis<ABall>(TEXT("BallDir"), this, &ABall::SetSwingDir);
@@ -549,7 +551,7 @@ void ABall::CheckBallStopped()
 			UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
 			UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
 			EPlayer CurPlayer = GameManager->GetCurPlayer();
-			FPlayerInfo CurPlayerInfo = GameManager->GetPlayer(CurPlayer);
+			FPlayerInfo CurPlayerInfo = GameManager->GetPlayerInfo(CurPlayer);
 			mMainHUD->SetMiniMapBallCurrent(CurPlayerInfo.BallPos);
 			mMainHUD->SetMiniMapBallTarget(CurPlayerInfo.BallPos, mMainCamera->GetForwardVector(), mGolfClubType);
 			mMainHUD->SetMiniMapVisible(true);
@@ -686,20 +688,10 @@ void ABall::ChangeTurn()
 				float dis2 = GameManager->GetPlayerLeftDis(EPlayer::Player2);
 
 				if (dis1 >= dis2)	// player1 먼저
-				{
 					GameManager->SetCurPlayer((int)EPlayer::Player1);
-				}
 
 				else	// player2 먼저
-				{
 					GameManager->SetCurPlayer((int)EPlayer::Player2);
-				}
-
-				//if (CurPlayerInfo.LeftDistance >= NextPlayerInfo.LeftDistance)
-				//	GameManager->SetCurPlayer((int)CurPlayer);
-
-				//else
-				//	GameManager->SetCurPlayer((int)NextPlayer);
 			}
 
 			else
@@ -719,13 +711,6 @@ void ABall::ChangeTurn()
 			mPlayType = EPlayType::Single;
 		}
 
-		// 2명 둘다 홀에 공을 넣었을 경우: 게임 종료
-		else if (CurPlayerInfo.TurnEnd && NextPlayerInfo.TurnEnd)
-		{
-			mIsEnd = true;
-			NextGame();
-		}
-
 		// Multi인 경우에만 다음 플레이어의 UI 갱신(현재 플레이어: Simple UI, 다음 플레이어: Detail UI)
 		SetPlayerInfoUI(GameManager->GetNextPlayer(), false);
 	}
@@ -733,14 +718,31 @@ void ABall::ChangeTurn()
 	// [ Single ] 현재 플레이어 정보 갱신
 	else
 	{
-		CurPlayerInfo.BallPos = GetActorLocation();
-		GameManager->SetPlayerInfo(CurPlayerInfo, (int)CurPlayer);
-
-		// 게임 종료 확인
-		if (CurPlayerInfo.TurnEnd)
+		// 멀티에서 2명 다 홀에 넣었을 경우: 게임 종료6
+		if (GameManager->GetPlayType() == EPlayType::Multi)
 		{
-			mIsEnd = true;
-			NextGame();
+			NextPlayer = GameManager->GetNextPlayer();
+			NextPlayerInfo = GameManager->GetPlayerInfo(NextPlayer);
+
+			if (CurPlayerInfo.TurnEnd && NextPlayerInfo.TurnEnd)
+			{
+				mIsEnd = true;
+				NextGame();
+			}
+		}
+
+		// 싱글
+		else
+		{
+			CurPlayerInfo.BallPos = GetActorLocation();
+			GameManager->SetPlayerInfo(CurPlayerInfo, (int)CurPlayer);
+
+			// 게임 종료 확인
+			if (CurPlayerInfo.TurnEnd)
+			{
+				mIsEnd = true;
+				NextGame();
+			}
 		}
 	}
 
@@ -800,11 +802,20 @@ void ABall::CloseTotalScore()
 	}
 }
 
-void ABall::Init()
+void ABall::ShowMenu()
+{
+	if (IsValid(mMainHUD))
+	{
+		bool isVisible = mMainHUD->GetIsShowMenu();
+		mMainHUD->ShowMenu(!isVisible);
+	}
+}
+
+void ABall::Init(bool isEnd)
 {
 	// 공 위치 초기화
 	mSpringArm->CameraLagSpeed = 0.f;
-	SetActorLocation(FVector(0, 0, 13.5));
+	SetActorLocation(FVector(0.0, 0.0, 13.5));
 
 	// 플레이어 정보 초기화
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
@@ -821,7 +832,7 @@ void ABall::Init()
 	GameManager->Init();
 
 	// Ball Info 초기화
-	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
+	mBallInfo.StartPos = FVector(0.0, 0.0, 13.5);
 	mBallInfo.BallDis = 0.f;
 	mBallInfo.BallPower = 0.f;
 	mBallInfo.BallArc = 0.4f;
@@ -842,28 +853,28 @@ void ABall::Init()
 	mIsStart = false;
 	mIsEnd = false;
 
-	// camera lag speed 초기화
-	mSpringArm->CameraLagSpeed = mCameraLagSpeed;
-
-	// Player Info UI 초기화
-	SetPlayerInfoUI(EPlayer::Player1, true);
-	SetPlayerInfoUI(EPlayer::Player2, false);
-
-	// Total Score UI 갱신 & GamePlay UI 활성화
-	if (IsValid(mMainHUD))
+	if (!isEnd)
 	{
-		mMainHUD->SetCourseText(TEXT("Tee"));
+		// Player Info UI 초기화
+		SetPlayerInfoUI(EPlayer::Player1, true);
+		SetPlayerInfoUI(EPlayer::Player2, false);
 
-		// Total Score UI
-		EPlayType PlayType = GameManager->GetPlayType();
-		if (PlayType == EPlayType::Multi)
+		// Total Score UI 갱신 & GamePlay UI 활성화
+		if (IsValid(mMainHUD))
 		{
-			// 랭킹 계산
+			mMainHUD->SetCourseText(TEXT("Tee"));
 
+			//// Total Score UI
+			//EPlayType PlayType = GameManager->GetPlayType();
+			//if (PlayType == EPlayType::Multi)
+			//{
+			//	// 랭킹 계산
+
+			//}
+
+			// Game Play UI
+			mMainHUD->SetGamePlayVisible(true);
 		}
-
-		// Game Play UI
-		mMainHUD->SetGamePlayVisible(true);
 	}
 }
 
@@ -899,8 +910,7 @@ void ABall::NextGame()
 {
 	PrintViewport(2.f, FColor::Red, TEXT("Next Game"));
 
-	mMainHUD->SetVisibility(ESlateVisibility::Hidden);
-	mMainHUD->SetTotalScoreVisible(true);
+	//mMainHUD->SetVisibility(ESlateVisibility::Hidden);
 
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
 	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
@@ -912,10 +922,10 @@ void ABall::NextGame()
 	}
 
 	// Total Score 갱신
-	EPlayType PlayType = GameManager->GetPlayType();
+	mPlayType = GameManager->GetPlayType();
 	FPlayerInfo Player1Info = GameManager->GetPlayerInfo(EPlayer::Player1);
 
-	if (PlayType == EPlayType::Multi)
+	if (mPlayType == EPlayType::Multi)
 	{
 		FPlayerInfo Player2Info = GameManager->GetPlayerInfo(EPlayer::Player2);
 		
@@ -941,12 +951,36 @@ void ABall::NextGame()
 		// Player2 Score & Shot
 		// 여태까지 친 총 shot 저장
 		Player2Info.TotalShot += Player2Info.Shot;
+		int score = Player2Info.Shot - 4;
+		Player2Info.Score += score;
+
 		GameManager->SetPlayerInfo(Player2Info, (int)EPlayer::Player2);
 
+		// 현재 홀에서 친 shot UI 갱신
+		int turn = GameManager->GetTurn();
+		mMainHUD->SetPlayerScoreText(EPlayer::Player2, turn - 1, Player2Info.Shot);
+
+		// 여태까지 친 shot UI 갱신
 		FString scoreText = "";
-
-
+		mMainHUD->SetPlayerTotalScoreText(EPlayer::Player2, Player2Info.TotalShot, Player2Info.Score);
 	}
+
+	// Player1 Score & Shot
+	Player1Info.TotalShot += Player1Info.Shot;
+	int score = Player1Info.Shot - 4;
+	Player1Info.Score += score;
+
+	GameManager->SetPlayerInfo(Player1Info, (int)EPlayer::Player1);
+
+	int turn = GameManager->GetTurn();
+	mMainHUD->SetPlayerScoreText(EPlayer::Player1, turn - 1, Player1Info.Shot);
+
+	FString scoreText = "";
+	mMainHUD->SetPlayerTotalScoreText(EPlayer::Player1, Player1Info.TotalShot, Player1Info.Score);
+
+	// Total Score UI
+	mMainHUD->SetTotalScoreVisible(true);
+	mMainHUD->SetGamePlayVisible(true);
 }
 
 void ABall::CheckPlayerGoal()
