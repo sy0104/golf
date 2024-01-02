@@ -32,6 +32,7 @@ ABall::ABall()
 	mStaticMesh->SetAngularDamping(50.f);
 	mStaticMesh->SetUseCCD(true);
 	mStaticMesh->SetCollisionProfileName(TEXT("Ball"));
+	
 
 	//// Sphere Component (Collision)
 	mSphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
@@ -759,20 +760,10 @@ void ABall::ChangeTurn()
 	mIsChangeTurn = false;
 	mChangeTurnTime = 0.f;
 
-	//// Hole 방향 바라보도록
-	//FVector dir = mBallInfo.DestPos - GetActorLocation();
-	//dir.Z = 0.f;
-	//dir.Normalize();
-	//FRotator rot = GetActorRotation();
-	//SetActorRotation(FRotator(0.f, dir.Rotation().Yaw, 0.f));
-	//FRotator crot = mMainCamera->GetRelativeRotation();
-	//mMainCamera->SetRelativeRotation(FRotator(0.f, dir.Rotation().Yaw, 0.f));
-	//crot = mMainCamera->GetRelativeRotation();
-	//rot = GetActorRotation();
-
-	//FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), mBallInfo.DestPos);
-	//mMainCamera->SetRelativeRotation(FRotator(0.f, 0.f, Rotator.Pitch));
-	//mMainCamera->SetRelativeRotation(Rotator);
+	// Hole 방향 바라보도록
+	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), mBallInfo.DestPos);
+	BallController->SetControlRotation(Rotator);
 
 	// 바람
 	UpdateWind();
