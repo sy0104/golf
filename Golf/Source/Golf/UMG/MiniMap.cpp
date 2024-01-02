@@ -43,7 +43,10 @@ int32 UMiniMap::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 	UWidgetBlueprintLibrary::DrawLine(Context, FVector2D(mCurrentPos) + mCurrentBallSize / 2, FVector2D(mTargetPos) + mTargetBallSize / 2, FLinearColor::Yellow, false, 1.5f);
 	
 	// target ~ hole dashed line
-	UWidgetBlueprintLibrary::DrawLine(Context, FVector2D(mTargetPos) + mTargetBallSize / 2, FVector2D(mHolePos) + mHoleSize / 2, FLinearColor::White, false, 2.0f);
+	//UWidgetBlueprintLibrary::DrawLine(Context, FVector2D(mTargetPos) + mTargetBallSize / 2, FVector2D(mHolePos) + mHoleSize / 2, FLinearColor::White, false, 2.0f);
+
+	FVector2D newHolePos = FVector2D(mHolePos);
+	UWidgetBlueprintLibrary::DrawLine(Context, FVector2D(mTargetPos) + mTargetBallSize / 2, newHolePos + mHoleSize / 2, FLinearColor::White, false, 2.0f);
 
 	return int32();
 }
@@ -62,18 +65,23 @@ void UMiniMap::SetBallTarget(FVector position, FVector direction, EGolfClub club
 	{
 	case EGolfClub::Driver:
 		distance = 22000;
+		//distance = 23000;
 		break;
 	case EGolfClub::Wood:
 		distance = 18000;
+		//distance = 16000;
 		break;
 	case EGolfClub::Iron:
 		distance = 15000;
+		//distance = 14000;
 		break;
 	case EGolfClub::Wedge:
 		distance = 8000;
+		//distance = 5500;
 		break;
 	case EGolfClub::Putter:
-		distance = 300;
+		distance = 3000;
+		//distance = 5000;
 		break;
 	}
 

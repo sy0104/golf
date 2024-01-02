@@ -576,7 +576,10 @@ void ABall::CheckBallStopped()
 			FPlayerInfo CurPlayerInfo = GameManager->GetPlayer(CurPlayer);
 			mMainHUD->SetMiniMapBallCurrent(CurPlayerInfo.BallPos);
 			mMainHUD->SetMiniMapBallTarget(CurPlayerInfo.BallPos, mMainCamera->GetForwardVector(), mGolfClubType);
-			mMainHUD->SetMiniMapVisible(true);
+			if(FVector::Dist(CurPlayerInfo.BallPos, mBallInfo.DestPos) > 3000)
+				mMainHUD->SetMiniMapVisible(true);
+			mMainHUD->SetBallDistance(mGolfClubType);
+			mMainHUD->SetHoleMark(CurPlayerInfo.BallPos, mBallInfo.DestPos);
 		}
 	}
 
@@ -939,4 +942,9 @@ void ABall::SetStaticMesh(const FString& path)
 
 	if (IsValid(StaticMesh))
 		mStaticMesh->SetStaticMesh(StaticMesh);
+}
+
+void ABall::SetGolfClubType(EGolfClub GolfClub)
+{
+	mGolfClubType = GolfClub;
 }

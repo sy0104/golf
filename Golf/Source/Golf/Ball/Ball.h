@@ -146,10 +146,7 @@ private:
 
 public:
 	void SetStaticMesh(const FString& path);
-	void SetGolfClubType(EGolfClub GolfClub)
-	{
-		mGolfClubType = GolfClub;
-	}
+	void SetGolfClubType(EGolfClub GolfClub);
 
 	void SetBallSwingType(EBallSwingType SwingType)
 	{
