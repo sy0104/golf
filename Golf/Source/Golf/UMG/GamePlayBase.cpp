@@ -22,9 +22,13 @@ void UGamePlayBase::OnNextButtonClicked()
 {
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
 	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
+	FPlayerInfo PlayerInfo;
 
 	if (IsValid(GameManager))
+	{
 		GameManager->AddTurn(1);
+		PlayerInfo = GameManager->GetPlayerInfo(EPlayer::Player1);
+	}
 
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode))
@@ -34,6 +38,13 @@ void UGamePlayBase::OnNextButtonClicked()
 		{
 			MainHUD->SetTotalScoreVisible(false);
 			MainHUD->SetVisibility(ESlateVisibility::Visible);
+			MainHUD->SetPlayerScoreText(PlayerInfo.Score, true);	// player 1 score
+
+			if (GameManager->GetPlayType() == EPlayType::Multi)
+			{
+				PlayerInfo = GameManager->GetPlayerInfo(EPlayer::Player2);
+				MainHUD->SetPlayerScoreText(PlayerInfo.Score, false);	// player 2 score
+			}
 		}
 	}
 

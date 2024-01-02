@@ -57,7 +57,7 @@ ABall::ABall()
 	// main camera
 	mMainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("MainCamera"));
 	mMainCamera->SetupAttachment(mSpringArm);
-	mMainCamera->SetRelativeLocation(FVector(250.0, 0.0, 50.0));
+	mMainCamera->SetRelativeLocation(FVector(240.0, 0.0, 50.0));
 	mMainCamera->SetRelativeRotation(FRotator(-5.0, 0.0, 0.0));
 	mMainCamera->bConstrainAspectRatio = true;
 	mMainCamera->SetAutoActivate(true);
@@ -626,6 +626,7 @@ void ABall::SetPlayerInfoUI(EPlayer player, bool isDetail)
 		mMainHUD->SetPlayerImage(PlayerInfo.ImagePath, isDetail);
 		mMainHUD->SetPlayerNameText(PlayerInfo.Name, isDetail);
 		mMainHUD->SetPlayerShotNumText(PlayerInfo.Shot, isDetail);
+		//mMainHUD->SetPlayerScoreText(PlayerInfo.Score, isDetail);
 	}
 }
 
@@ -862,21 +863,11 @@ void ABall::Init(bool isEnd)
 		SetPlayerInfoUI(EPlayer::Player1, true);
 		SetPlayerInfoUI(EPlayer::Player2, false);
 
-		// Total Score UI 갱신 & GamePlay UI 활성화
+		// Course Text UI 초기화
 		if (IsValid(mMainHUD))
 		{
 			mMainHUD->SetCourseText(TEXT("Tee"));
 
-			//// Total Score UI
-			//EPlayType PlayType = GameManager->GetPlayType();
-			//if (PlayType == EPlayType::Multi)
-			//{
-			//	// 랭킹 계산
-
-			//}
-
-			// Game Play UI
-			mMainHUD->SetGamePlayVisible(true);
 		}
 	}
 }
@@ -911,8 +902,6 @@ void ABall::TestKey()
 
 void ABall::NextGame()
 {
-	PrintViewport(2.f, FColor::Red, TEXT("Next Game"));
-
 	//mMainHUD->SetVisibility(ESlateVisibility::Hidden);
 
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
