@@ -33,7 +33,7 @@ public:
 	void SetPlayerImage(const FString& path);
 
 	void SetPlayerNameText(FString name);
-	void SetTargetDistanceText(float dis);
-	void SetShotNumText(int32 shot);
-	void SetScoreText(int32 score);
+	void SetPlayerTargetDistanceText(float dis);
+	void SetPlayerShotNumText(int32 shot);
+	void SetPlayerScoreText(int32 score);
 };

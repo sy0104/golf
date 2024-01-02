@@ -1,5 +1,4 @@
 #include "HoleTrigger.h"
-#include "../GFGameModeBase.h"
 #include "../Ball/Ball.h"
 
 AHoleTrigger::AHoleTrigger()
@@ -35,28 +34,22 @@ void AHoleTrigger::Tick(float DeltaTime)
 
 void AHoleTrigger::TriggerBegin(const FHitResult& SweepResult)
 {
-	PrintViewport(1.f, FColor::Red, TEXT("Hole Trigger Begin"));
+	PrintViewport(5.f, FColor::Red, TEXT("Hole Trigger Begin"));
 
-	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode))
-	{
-		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
-		if (IsValid(Ball))
-			Ball->SetInHole(true);
-	}
+	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
+
+	if (IsValid(Ball))
+		Ball->SetInHole(true);
 }
 
 void AHoleTrigger::TriggerEnd()
 {
-	PrintViewport(1.f, FColor::Red, TEXT("Hole Trigger Begin"));
+	PrintViewport(5.f, FColor::Red, TEXT("Hole Trigger Begin"));
 
-	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode))
-	{
-		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
-		if (IsValid(Ball))
-			Ball->SetInHole(false);
-	}
+	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
+
+	if (IsValid(Ball))
+		Ball->SetInHole(false);
 }
 
 void AHoleTrigger::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 

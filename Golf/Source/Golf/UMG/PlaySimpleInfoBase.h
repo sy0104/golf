@@ -28,6 +28,6 @@ private:
 public:
 	void SetPlayerImage(const FString& path);
 	void SetPlayerNameText(FString name);
-	void SetShotNumText(int ShotNum);
-	void SetScoreText(int score);
+	void SetPlayerShotNumText(int ShotNum);
+	void SetPlayerScoreText(int score);
 };

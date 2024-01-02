@@ -7,6 +7,7 @@
 #include "EngineGlobals.h"
 #include "Engine.h"
 #include "LandscapeInfo.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include "UObject/NoExportTypes.h"
 #include "GameInfo.generated.h"
@@ -63,10 +64,10 @@ public:
 	int32		Score;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	int32		ScoreDetail;
+	int32		Shot;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	int32		Shot;
+	int32		TotalShot;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	float		LeftDistance;

@@ -26,15 +26,12 @@ void ULobbySceneBase::OnStartButtonClicked()
 	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
 
 	if (IsValid(GameManager))
-	{
 		GameManager->CreatePlayers(mPlayType);
-	}
 
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
+
 	if (IsValid(Ball))
-	{
 		Ball->SetPlayType(mPlayType);
-	}
 
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Main"));
 }

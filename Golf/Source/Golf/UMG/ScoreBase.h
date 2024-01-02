@@ -20,6 +20,7 @@ protected:
 private:
 	UTextBlock*		mScoreText;
 	UTextBlock*		mConcedeText;
+	bool			mIsConcede;
 
 public:
 	void SetScoreText(FString ScoreText);

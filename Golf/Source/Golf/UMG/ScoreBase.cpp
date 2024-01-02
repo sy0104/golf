@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "ScoreBase.h"
 
 void UScoreBase::NativeConstruct()
@@ -8,6 +5,7 @@ void UScoreBase::NativeConstruct()
 	Super::NativeConstruct();
 
 	mScoreText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("ScoreText"))));
+	mConcedeText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("ConcedeText"))));
 }
 
 void UScoreBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -17,6 +15,7 @@ void UScoreBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 void UScoreBase::SetScoreText(FString ScoreText)
 {
+	mScoreText->SetVisibility(ESlateVisibility::Visible);
 	mScoreText->SetText(FText::FromString(ScoreText));
 }
 

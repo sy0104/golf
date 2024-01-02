@@ -24,7 +24,7 @@ void UPlaySimpleInfoBase::SetPlayerNameText(FString name)
 	mPlayerNameText->SetText(FText::FromString(name));
 }
 
-void UPlaySimpleInfoBase::SetShotNumText(int ShotNum)
+void UPlaySimpleInfoBase::SetPlayerShotNumText(int ShotNum)
 {
 	FString ShotNumText;
 
@@ -47,7 +47,7 @@ void UPlaySimpleInfoBase::SetShotNumText(int ShotNum)
 	mShotNumText->SetText(FText::FromString(FString::Printf(TEXT("%d"), ShotNum) + ShotNumText + TEXT(" shot")));
 }
 
-void UPlaySimpleInfoBase::SetScoreText(int score)
+void UPlaySimpleInfoBase::SetPlayerScoreText(int score)
 {
 	mScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), score)));
 

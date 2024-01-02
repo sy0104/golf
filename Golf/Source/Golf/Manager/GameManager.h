@@ -15,13 +15,13 @@ public:
 	UGameManager();
 	~UGameManager();
 
-
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
 public:
 	void CreatePlayers(EPlayType PlayType);
+	void Init();
 
 public:
 	void SetPlayType(EPlayType PlayType)
@@ -34,7 +34,7 @@ public:
 		mTurn += turn;
 	}
 
-	void SetPlayer(FPlayerInfo player, int idx)
+	void SetPlayerInfo(FPlayerInfo player, int idx)
 	{
 		mPlayers[idx] = player;
 	}
@@ -44,13 +44,23 @@ public:
 		mCurPlayer = (EPlayer)CurPlayer;
 	}
 
+	void SetCurPlayerEnd()
+	{
+		mPlayers[(int)mCurPlayer].TurnEnd = true;
+	}
+
+	void SetCurPlayerLeftDis(float dis)
+	{
+		mPlayers[(int)mCurPlayer].LeftDistance = dis;
+	}
+
 public:
 	TArray<FPlayerInfo> GetPlayers() const
 	{
 		return mPlayers;
 	}
 
-	FPlayerInfo GetPlayer(EPlayer player) const
+	FPlayerInfo GetPlayerInfo(EPlayer player) const
 	{
 		return mPlayers[(int)player];
 	}
@@ -89,6 +99,21 @@ public:
 	bool GetIsCreatePlayer() const
 	{
 		return mIsCreatePlayer;
+	}
+
+	bool GetIsCurPlayerEnd() const
+	{
+		return mPlayers[(int)mCurPlayer].TurnEnd;
+	}
+
+	float GetPlayerLeftDis(EPlayer player) const
+	{
+		return mPlayers[(int)player].LeftDistance;
+	}
+
+	int GetTurn() const
+	{
+		return mTurn;
 	}
 
 private:

@@ -56,41 +56,41 @@ void UTotalScoreBase::NativeConstruct()
 	}
 }
 
-void UTotalScoreBase::SetPlayerRankingText(EPlayer player, int score)
+void UTotalScoreBase::SetPlayerRankingText(EPlayer player, int ranking)
 {
 	if (player == EPlayer::Player1)
-	{
-		mPlayer1LankingText->SetText(FText::FromString(FString::Printf(TEXT("%d"), score)));
-	}
+		mPlayer1LankingText->SetText(FText::FromString(FString::Printf(TEXT("%d"), ranking)));
 
 	else
-	{
-		mPlayer2LankingText->SetText(FText::FromString(FString::Printf(TEXT("%d"), score)));
-	}
+		mPlayer2LankingText->SetText(FText::FromString(FString::Printf(TEXT("%d"), ranking)));
 }
 
 void UTotalScoreBase::SetPlayerScoreText(EPlayer player, int idx, int score)
 {
 	if (player == EPlayer::Player1)
-	{
 		mPlayer1ScoreTexts[idx]->SetText(FText::FromString(FString::Printf(TEXT("%d"), score)));
-	}
 
 	else
-	{
 		mPlayer2ScoreTexts[idx]->SetText(FText::FromString(FString::Printf(TEXT("%d"), score)));
-	}
 }
 
 void UTotalScoreBase::SetPlayerTotalScoreText(EPlayer player, int score)
 {
+	int detail = score - 4;
+	FString scoreText;
+	//mLeftDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), dis) + TEXT("m")));
+
+	FString symbol = "";
+	if (detail < 0)
+		symbol = "-";
+	else if (detail > 0)
+		symbol = "+";
+
+	scoreText = FString::Printf(TEXT("%d"), score);
+
 	if (player == EPlayer::Player1)
-	{
 		mPlayer1TotalScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), score)));
-	}
 
 	else
-	{
 		mPlayer2TotalScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), score)));
-	}
 }

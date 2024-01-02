@@ -1,6 +1,4 @@
 #include "BallSpinBase.h"
-#include "../GFGameModeBase.h"
-#include "../Ball/BallController.h"
 #include "../Ball/Ball.h"
 
 void UBallSpinBase::NativeConstruct()
@@ -24,41 +22,24 @@ void UBallSpinBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 void UBallSpinBase::OnSwingLeftButtonClicked()
 {
-	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode))
-	{
-		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
-		if (IsValid(Ball))
-		{
-			Ball->SetBallSwingType(EBallSwingType::Left);
-			PrintViewport(1.f, FColor::Red, TEXT("Left Button"));
-		}
-	}
+	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
+
+	if (IsValid(Ball))
+		Ball->SetBallSwingType(EBallSwingType::Left);
 }
 
 void UBallSpinBase::OnSwingStraightButtonClicked()
 {
-	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode))
-	{
-		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
-		if (IsValid(Ball))
-		{
-			Ball->SetBallSwingType(EBallSwingType::Straight);
-		}
-	}
+	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
+
+	if (IsValid(Ball))
+		Ball->SetBallSwingType(EBallSwingType::Straight);
 }
 
 void UBallSpinBase::OnSwingRightButtonClicked()
 {
-	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode))
-	{
-		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
-		if (IsValid(Ball))
-		{
-			Ball->SetBallSwingType(EBallSwingType::Right);
-			PrintViewport(1.f, FColor::Red, TEXT("Right Button"));
-		}
-	}
+	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
+
+	if (IsValid(Ball))
+		Ball->SetBallSwingType(EBallSwingType::Right);
 }

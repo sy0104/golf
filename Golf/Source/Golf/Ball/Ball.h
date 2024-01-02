@@ -48,20 +48,16 @@ private:
 	// Club
 	void SetBallInfoByClub(EGolfClub club);
 
-	// Camera
-	void ChangeCamera();
-	void CameraMove();
-
 	// Score
 	void CheckPlayerGoal();
-	void CalculateScore();
+	void ShowScoreUI();
 
 	// Wind
 	void Wind();
 	void UpdateWind();
 
 	// Turn (Multi)
-	void SetPlayerInfoUI(EPlayType PlayType, bool isNextPlayerEnd = false);
+	void SetPlayerInfoUI(EPlayer player, bool isDetail);
 	void CheckChangeTurn(float DeltaTime);
 	void ChangeTurn();
 
@@ -70,6 +66,11 @@ private:
 	void CloseTotalScore();
 
 	void TestKey();
+
+	void NextGame();
+
+public:
+	void Init();
 
 public:
 	UFUNCTION()
@@ -97,28 +98,35 @@ protected:
 	UCameraComponent*			mMainCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	EGolfClub			mGolfClubType;
+	EGolfClub					mGolfClubType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	EBallSwingType		mBallSwingType;
+	EBallSwingType				mBallSwingType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	EMaterialType		mHitMaterialType;
+	EMaterialType				mHitMaterialType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	//UParticleSystemComponent*	mTrailer;
-	UNiagaraComponent* mTrailer;
+	UNiagaraComponent*			mTrailer;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	USpringArmComponent*		mMinimapSpringArm;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	USceneCaptureComponent2D*	mMinimapCapture;
+
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	//UPaperSpriteComponent*		mMinimapCurrentBall;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	EWindType			mWindType;
+	EWindType					mWindType;
 
 	FBallInfo	mBallInfo;
 	EPlayType	mPlayType;
 
 private:
 	bool		mIsEnableSwing;
-	bool		mIsSwingLeft;
-	bool		mIsSwingRight;
 
 	bool		mIsPowerUp;
 	bool		mIsBallStopped;
@@ -133,19 +141,22 @@ private:
 	float		mWindPowerMax;
 	bool		mIsWindBlow;
 
-	float		mCameraBlendTime;
+	float		mCameraLagSpeed;
 
 	float		mChangeTurnTime;
 	bool		mIsChangeTurn;
 
 	bool		mIsConcede;
 	bool		mIsInHole;
+	
+	int			mTurn;
+	bool		mIsStart;
+	bool		mIsEnd;
 
 	class UMainHUDBase*		mMainHUD;
 	class AFixedCamera*		mFixedCamera;
 
 public:
-	void SetStaticMesh(const FString& path);
 	void SetGolfClubType(EGolfClub GolfClub);
 
 	void SetBallSwingType(EBallSwingType SwingType)
@@ -166,5 +177,10 @@ public:
 	void SetInHole(bool InHole)
 	{
 		mIsInHole = InHole;
+	}
+
+	void SetStart(bool start)
+	{
+		mIsStart = start;
 	}
 };
