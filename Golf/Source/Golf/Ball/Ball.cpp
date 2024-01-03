@@ -58,7 +58,7 @@ ABall::ABall()
 	// main camera
 	mMainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("MainCamera"));
 	mMainCamera->SetupAttachment(mSpringArm);
-	mMainCamera->SetRelativeLocation(FVector(240.0, 0.0, 50.0));
+	mMainCamera->SetRelativeLocation(FVector(220.0, 0.0, 60.0));
 	mMainCamera->SetRelativeRotation(FRotator(-5.0, 0.0, 0.0));
 	mMainCamera->bConstrainAspectRatio = true;
 	mMainCamera->SetAutoActivate(true);
@@ -94,14 +94,15 @@ ABall::ABall()
 	
 	mMovingDis = 0.f;
 	mIsGoodShot = false;
+	mIsOnGreen = false;
 
 	mGolfClubType = EGolfClub::Driver;
 	mHitMaterialType = EMaterialType::Tee;
 
 	// wind
 	mWindType = EWindType(FMath::RandRange(0, 3));
-	mWindPowerMin = 100.f;
-	mWindPowerMax = 300.f;
+	mWindPowerMin = 10.f;
+	mWindPowerMax = 60.f;
 	mWindPower = FMath::RandRange(mWindPowerMin, mWindPowerMax);
 	mIsWindBlow = false;
 
@@ -190,9 +191,13 @@ void ABall::Tick(float DeltaTime)
 
 	FindResetPos(DeltaTime);
 
-	// Wind();
+	//Wind();
 
 	CheckPlayerGoal();
+
+	//FVector loc = GetActorLocation();
+	//loc.Z += 10.f;
+	//SetActorLocation(loc);
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -243,11 +248,14 @@ void ABall::Swing()
 		UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 			this, OutVelocity, mBallInfo.StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.BallArc);
 
-	mStaticMesh->AddImpulse(OutVelocity);
+	// Bunker
+	if (mHitMaterialType == EMaterialType::Bunker)
+	{
+		OutVelocity *= 0.6;
+		mBallInfo.BallArc *= 0.5;
+	}
 
-	//// spin
-	//if (mBallSwingType != EBallSwingType::Straight)
-	//	AddForceToSide();
+	mStaticMesh->AddImpulse(OutVelocity);
 
 	// Ball Info 초기화
 	mBallInfo.BallPower = 0.f;
@@ -446,24 +454,24 @@ void ABall::SetBallDetailsByMaterial()
 	case EMaterialType::Green:
 		// CalculateScore();
 		break;
-	case EMaterialType::Rough:
-	{
-		FVector curPos = GetActorLocation();
-		mResetPos = FVector(curPos.X, 0.0, curPos.Z);
-	}
-		break;
 	case EMaterialType::Water:
+		mSpringArm->CameraLagSpeed = 0.f;
 		mIsResetPos = true;
-		mResetPos = FVector(28280.0, 820.0, -230.0);
+		mResetPos = FVector(28280.0, 820, 200);
 		break;
 	case EMaterialType::Bunker:
 
 		break;
 	case EMaterialType::Road:
-		mIsResetPos = true;
+		//mIsResetPos = true;
 		break;
 	case EMaterialType::OB:
-
+	{
+		mSpringArm->CameraLagSpeed = 0.f;
+		mIsResetPos = true;
+		FVector curPos = GetActorLocation();
+		mResetPos = FVector(curPos.X, 0.0, curPos.Z + 200);
+	}
 		break;
 	}
 }
@@ -475,7 +483,7 @@ void ABall::ResetBallPos(float DeltaTime)
 
 	mResetTime += DeltaTime;
 
-	if (mResetTime > 2.f)
+	if (mResetTime > 5.f)
 	{
 		if (mHitMaterialType == EMaterialType::Road)
 		{
@@ -483,9 +491,7 @@ void ABall::ResetBallPos(float DeltaTime)
 		}
 
 		else
-		{
 			SetActorLocation(mResetPos);
-		}
 
 		mResetTime = 0.f;
 		mIsResetPos = false;
@@ -725,7 +731,7 @@ void ABall::ChangeTurn()
 	// [ Single ] 현재 플레이어 정보 갱신
 	else
 	{
-		// 멀티에서 2명 다 홀에 넣었을 경우: 게임 종료6
+		// 멀티에서 2명 다 홀에 넣었을 경우: 게임 종료
 		if (GameManager->GetPlayType() == EPlayType::Multi)
 		{
 			NextPlayer = GameManager->GetNextPlayer();
@@ -767,6 +773,7 @@ void ABall::ChangeTurn()
 	// Hole 방향 바라보도록
 	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), mBallInfo.DestPos);
+	Rotator.Pitch = 0.f;
 	BallController->SetControlRotation(Rotator);
 
 	// 바람
@@ -882,8 +889,11 @@ void ABall::CheckGoodShot()
 		break;
 	case EGolfClub::Iron:
 	case EGolfClub::Wedge:
-		if (mHitMaterialType == EMaterialType::Green)
+		if (mHitMaterialType == EMaterialType::Green && !mIsOnGreen)
+		{
 			mIsGoodShot = true;
+			mIsOnGreen = true;
+		}
 		break;
 	case EGolfClub::Putter:
 
@@ -1055,29 +1065,30 @@ void ABall::ShowScoreUI()
 
 void ABall::Wind()
 {
-	if (!mIsWindBlow)
-		return;
+	float vel = mStaticMesh->GetComponentVelocity().Size();
 
-	FVector dirVec;
-	PrintViewport(1.f, FColor::Red, TEXT("Wind"));
-
-	switch (mWindType)
+	if (!mIsEnableSwing && vel > 10.f)
 	{
-	case EWindType::Left:
-		dirVec = -mMainCamera->GetRightVector();
-		break;
-	case EWindType::Right:
-		dirVec = mMainCamera->GetRightVector();
-		break;
-	case EWindType::Forward:
-		dirVec = mMainCamera->GetForwardVector();
-		break;
-	case EWindType::Back:
-		dirVec = -mMainCamera->GetForwardVector();
-		break;
-	}
+		FVector dirVec;
 
-	mStaticMesh->AddForce(dirVec * mWindPower);
+		switch (mWindType)
+		{
+		case EWindType::Left:
+			dirVec = -mMainCamera->GetRightVector();
+			break;
+		case EWindType::Right:
+			dirVec = mMainCamera->GetRightVector();
+			break;
+		case EWindType::Forward:
+			dirVec = mMainCamera->GetForwardVector();
+			break;
+		case EWindType::Back:
+			dirVec = -mMainCamera->GetForwardVector();
+			break;
+		}
+
+		mStaticMesh->AddForce(dirVec * mWindPower);
+	}
 }
 
 void ABall::UpdateWind()

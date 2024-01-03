@@ -160,6 +160,7 @@ private:
 
 	float		mMovingDis;
 	bool		mIsGoodShot;
+	bool		mIsOnGreen;
 
 	class UMainHUDBase*		mMainHUD;
 	class AFixedCamera*		mFixedCamera;
