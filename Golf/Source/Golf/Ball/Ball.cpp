@@ -193,17 +193,6 @@ void ABall::Tick(float DeltaTime)
 	// Wind();
 
 	CheckPlayerGoal();
-
-	//FVector vel = mStaticMesh->GetComponentVelocity();
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel X: %f"), vel.X));
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel Y: %f"), vel.Y));
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel Z: %f"), vel.Z));
-
-	//mBallInfo.BallDis = 300.f;
-	//FVector TargetPos = GetActorLocation() + (mMainCamera->GetForwardVector() * mBallInfo.BallDis);
-	//FVector force = mMainCamera->GetForwardVector()* FVector(1.0, 1.0, 1.0) * mBallInfo.BallDis;
-	////mStaticMesh->AddForceAtLocation(force, TargetPos);
-	//mStaticMesh->AddForce(force);
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -248,16 +237,17 @@ void ABall::Swing()
 	FVector OutVelocity = FVector::ZeroVector;
 
 	if (mGolfClubType == EGolfClub::Putter)
-	{
 		OutVelocity = mMainCamera->GetForwardVector() * FVector(1.0, 1.0, 1.0) * (mBallInfo.BallDis * mBallInfo.BallPower);
-		// OutVelocity = mMainCamera->GetForwardVector() * FVector(50, 0, 0);
-	}
 
 	else
 		UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 			this, OutVelocity, mBallInfo.StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.BallArc);
 
 	mStaticMesh->AddImpulse(OutVelocity);
+
+	//// spin
+	//if (mBallSwingType != EBallSwingType::Straight)
+	//	AddForceToSide();
 
 	// Ball Info ÃÊ±âÈ­
 	mBallInfo.BallPower = 0.f;
@@ -299,21 +289,25 @@ void ABall::SetSwingDir(float scale)
 
 void ABall::AddForceToSide()
 {
-	if (mIsEnableSwing)
-		return;
+	double vel = mStaticMesh->GetComponentVelocity().Size();
 
-	FVector forwardVec = mBallInfo.DestPos;
-	forwardVec.Normalize();
+	if (!mIsEnableSwing && vel > 10.f)
+	{
+		PrintViewport(1.f, FColor::Red, TEXT("Add Force To Side"));
 
-	FVector leftVec = FVector(GetActorLocation().X, GetActorLocation().Y - 90.0, GetActorLocation().Z);
-	leftVec.Normalize();
+		FVector forwardVec = mBallInfo.DestPos;
+		forwardVec.Normalize();
 
-	FVector CrossVec = FVector::CrossProduct(forwardVec, leftVec);
+		FVector leftVec = FVector(GetActorLocation().X, GetActorLocation().Y - 90.0, GetActorLocation().Z);
+		leftVec.Normalize();
 
-	if (mBallSwingType == EBallSwingType::Right)
-		CrossVec.Y *= -1.0;
+		FVector CrossVec = FVector::CrossProduct(forwardVec, leftVec);
 
-	mStaticMesh->AddForce(CrossVec * mBallInfo.SpinForce);
+		if (mBallSwingType == EBallSwingType::Right)
+			CrossVec.Y *= -1.0;
+
+		mStaticMesh->AddForce(CrossVec * mBallInfo.SpinForce);
+	}
 }
 
 void ABall::AddBallPower(float scale)
@@ -542,8 +536,8 @@ void ABall::CheckBallStopped()
 
 	if (vel < 1.0)
 	{
-		mStaticMesh->ComponentVelocity = FVector(0.0, 0.0, 0.0);
 		mIsBallStopped = true;
+		mStaticMesh->ComponentVelocity = FVector(0.0, 0.0, 0.0);
 		mTrailer->Deactivate();
 
 		if (IsValid(mMainHUD))
@@ -552,7 +546,6 @@ void ABall::CheckBallStopped()
 			{
 				mMainHUD->SetDistanceText(0.f);
 				mMainHUD->SetBallStateVisible(true);
-
 				UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
 				UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
 				EPlayer CurPlayer = GameManager->GetCurPlayer();
@@ -880,11 +873,11 @@ void ABall::CheckGoodShot()
 	switch (mGolfClubType)
 	{
 	case EGolfClub::Driver:
-		if (mMovingDis >= 250.f && mHitMaterialType == EMaterialType::Fairway)
+		if (mMovingDis / 100.f >= 250.f && mHitMaterialType == EMaterialType::Fairway)
 			mIsGoodShot = true;
 		break;
 	case EGolfClub::Wood:
-		if (mMovingDis >= 150.f && mHitMaterialType == EMaterialType::Fairway)
+		if (mMovingDis / 100.f >= 150.f && mHitMaterialType == EMaterialType::Fairway)
 			mIsGoodShot = true;
 		break;
 	case EGolfClub::Iron:
