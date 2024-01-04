@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include <Components\Image.h>
@@ -24,10 +22,12 @@ private:
 	UTextBlock*		mPlayerNameText;
 	UTextBlock*		mShotNumText;
 	UTextBlock*		mScoreText;
+	UTextBlock*		mTargetDistanceText;
 
 public:
 	void SetPlayerImage(const FString& path);
 	void SetPlayerNameText(FString name);
 	void SetPlayerShotNumText(int ShotNum);
 	void SetPlayerScoreText(int score);
+	void SetPlayerTargetDistanceText(float dis);
 };

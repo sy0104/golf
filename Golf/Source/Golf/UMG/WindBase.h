@@ -24,9 +24,12 @@ private:
 	UTextBlock*			mForwardWindText;
 	UTextBlock*			mBackWindText;
 
+	UTextBlock*			mWindVelText;
+
 public:
 	void SetLeftWindTextVisible(bool visible);
 	void SetRightWindTextVisible(bool visible);
 	void SetForwardWindTextVisible(bool visible);
 	void SetBackWindTextVisible(bool visible);
+	void SetWindVelText(float vel);
 };

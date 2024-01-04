@@ -29,7 +29,7 @@ ABall::ABall()
 
 	SetRootComponent(mStaticMesh);
 	mStaticMesh->SetSimulatePhysics(true);
-	mStaticMesh->SetAngularDamping(50.f);
+	mStaticMesh->SetAngularDamping(30.f);
 	mStaticMesh->SetUseCCD(true);
 	mStaticMesh->SetCollisionProfileName(TEXT("Ball"));
 	
@@ -52,7 +52,7 @@ ABall::ABall()
 	mSpringArm->TargetArmLength = 400.f;
 	mSpringArm->bUsePawnControlRotation = true;
 	mSpringArm->bEnableCameraLag = true;
-	mCameraLagSpeed = 1.f;
+	mCameraLagSpeed = 1.2f;
 	mSpringArm->CameraLagSpeed = mCameraLagSpeed;
 
 	// main camera
@@ -96,15 +96,15 @@ ABall::ABall()
 	mIsGoodShot = false;
 	mIsOnGreen = false;
 
-	mGolfClubType = EGolfClub::Driver;
+	mGolfClubType = EGolfClub::Driver; 
 	mHitMaterialType = EMaterialType::Tee;
 
 	// wind
-	mWindType = EWindType(FMath::RandRange(0, 3));
+	mWindType = EWindType(FMath::RandRange(0, 3)); 
 	mWindPowerMin = 10.f;
 	mWindPowerMax = 60.f;
 	mWindPower = FMath::RandRange(mWindPowerMin, mWindPowerMax);
-	mIsWindBlow = false;
+	mIsWindBlow = true;
 
 	// Trailer
 	mTrailer = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Trailer"));
@@ -125,7 +125,7 @@ ABall::ABall()
 void ABall::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode))
 	{
@@ -135,13 +135,13 @@ void ABall::BeginPlay()
 		{
 			// Distance
 			mMainHUD->SetDistanceText(0.f);
-			//mMainHUD->SetShotNumText(mBallInfo.ShotNum);
 
 			// Minimap
 			mMainHUD->SetMiniMapHoleImage(mBallInfo.DestPos);
 
 			// Wind
 			mMainHUD->SetWindTextVisible(mWindType, true);
+			mMainHUD->SetWindVelText(mWindPower / 10.f);
 		}
 	}
 
@@ -160,6 +160,9 @@ void ABall::BeginPlay()
 			FPlayerInfo PlayerInfo = GameManager->GetPlayerInfo(EPlayer::Player2);
 			PlayerInfo.BallPos = GetActorLocation();
 			GameManager->SetPlayerInfo(PlayerInfo, (int)(EPlayer::Player2));
+
+			if (IsValid(mMainHUD))
+				mMainHUD->SetPlayerTargetDistanceText(PlayerInfo.LeftDistance / 100.f, false);
 		}
 	}
 }
@@ -198,6 +201,9 @@ void ABall::Tick(float DeltaTime)
 	//FVector loc = GetActorLocation();
 	//loc.Z += 10.f;
 	//SetActorLocation(loc);
+
+	// test
+	//mTrailer->Deactivate();
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -225,11 +231,8 @@ void ABall::Swing()
 		mIsStart = true;
 
 	mIsEnableSwing = false;
-	mIsWindBlow = true;
 	mTrailer->Activate();
 	mSpringArm->CameraLagSpeed = mCameraLagSpeed;
-
-	//mMainHUD->SetBallStateVisible(false);
 
 	// Club에 따라 볼 정보(dis, arc) 설정
 	SetBallInfoByClub(mGolfClubType);
@@ -242,11 +245,19 @@ void ABall::Swing()
 	FVector OutVelocity = FVector::ZeroVector;
 
 	if (mGolfClubType == EGolfClub::Putter)
-		OutVelocity = mMainCamera->GetForwardVector() * FVector(1.0, 1.0, 1.0) * (mBallInfo.BallDis * mBallInfo.BallPower);
+	{
+		OutVelocity = mMainCamera->GetForwardVector() * (mBallInfo.BallDis * mBallInfo.BallPower);
+		mSpringArm->CameraLagSpeed = 1.f;
+		//mStaticMesh->SetLinearDamping(0.1);
+		mStaticMesh->AddImpulse(OutVelocity, NAME_None, true);
+	}
 
 	else
+	{
 		UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 			this, OutVelocity, mBallInfo.StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.BallArc);
+		mStaticMesh->AddImpulse(OutVelocity);
+	}
 
 	// Bunker
 	if (mHitMaterialType == EMaterialType::Bunker)
@@ -255,7 +266,6 @@ void ABall::Swing()
 		mBallInfo.BallArc *= 0.5;
 	}
 
-	mStaticMesh->AddImpulse(OutVelocity);
 
 	// Ball Info 초기화
 	mBallInfo.BallPower = 0.f;
@@ -301,8 +311,6 @@ void ABall::AddForceToSide()
 
 	if (!mIsEnableSwing && vel > 10.f)
 	{
-		PrintViewport(1.f, FColor::Red, TEXT("Add Force To Side"));
-
 		FVector forwardVec = mBallInfo.DestPos;
 		forwardVec.Normalize();
 
@@ -357,7 +365,7 @@ void ABall::ShowDistance()
 		mMainHUD->SetLeftDistanceText(leftDis / 100.f);
 
 		// Player Info UI
-		mMainHUD->SetPlayerTargetDistanceText(leftDis / 100.f);
+		mMainHUD->SetPlayerTargetDistanceText(leftDis / 100.f, true);
 	}
 }
 
@@ -534,12 +542,6 @@ void ABall::CheckBallStopped()
 {
 	double vel = mStaticMesh->GetComponentVelocity().Size();
 
-	if (vel < 5.0)
-	{
-		mIsWindBlow = false;
-		// mTrailer->Deactivate();
-	}
-
 	if (vel < 1.0)
 	{
 		mIsBallStopped = true;
@@ -552,14 +554,19 @@ void ABall::CheckBallStopped()
 			{
 				mMainHUD->SetDistanceText(0.f);
 				mMainHUD->SetBallStateVisible(true);
+
 				UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
 				UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
+
 				EPlayer CurPlayer = GameManager->GetCurPlayer();
 				FPlayerInfo CurPlayerInfo = GameManager->GetPlayerInfo(CurPlayer);
+
 				mMainHUD->SetMiniMapBallCurrent(CurPlayerInfo.BallPos);
 				mMainHUD->SetMiniMapBallTarget(CurPlayerInfo.BallPos, mMainCamera->GetForwardVector(), mGolfClubType);
+
 				if (FVector::Dist(CurPlayerInfo.BallPos, mBallInfo.DestPos) > 3000)
 					mMainHUD->SetMiniMapVisible(true);
+
 				mMainHUD->SetBallDistance(mGolfClubType);
 				mMainHUD->SetHoleMark(CurPlayerInfo.BallPos, mBallInfo.DestPos);
 			}
@@ -570,6 +577,9 @@ void ABall::CheckBallStopped()
 				CheckGoodShot();
 				if (mIsGoodShot)
 					mMainHUD->SetGoodShotVisible(true);
+
+				if (mHitMaterialType == EMaterialType::Green)
+					mIsWindBlow = false;
 			}
 		}
 	}
@@ -581,13 +591,10 @@ void ABall::CheckBallStopped()
 		if (mIsStart)
 			mTrailer->Activate();
 
-		// mIsWindBlow = false;
-
 		if (IsValid(mMainHUD))
 		{
 			mMainHUD->SetBallStateVisible(false);
 			mMainHUD->SetMiniMapVisible(false);
-			//mTrailer->Activate();
 		}
 	}
 }
@@ -599,7 +606,6 @@ void ABall::SetBallInfoByClub(EGolfClub club)
 	case EGolfClub::Driver:	// 최대 300m 정도
 		mBallInfo.BallDis = 2300.f;
 		mBallInfo.BallArc = 0.6f;
-		//mBallInfo.BallArc = 1.0f;
 		break;
 	case EGolfClub::Wood:	// 최대 215m 정도
 		mBallInfo.BallDis = 1600.f;
@@ -614,8 +620,8 @@ void ABall::SetBallInfoByClub(EGolfClub club)
 		mBallInfo.BallArc = 0.5f;
 		break;
 	case EGolfClub::Putter:	// 최대 20m 정도
-		mBallInfo.BallDis = 300.f;
-		mBallInfo.BallArc = 0.99f;
+		mBallInfo.BallDis = 1000.f;
+		mBallInfo.BallArc = 1.f;
 		break;
 	}
 }
@@ -695,20 +701,20 @@ void ABall::ChangeTurn()
 		if (!CurPlayerInfo.TurnEnd && !NextPlayerInfo.TurnEnd)
 		{
 			// 남은 거리가 더 먼 사람부터 친다 (두 플레이어 모두 한번씩 친 이후부터)
-			if (mTurn >= 2 && mTurn % 2 == 0)
+			float dis1 = GameManager->GetPlayerLeftDis(EPlayer::Player1);
+			float dis2 = GameManager->GetPlayerLeftDis(EPlayer::Player2);
+
+			if (dis1 >= dis2)	// player1 먼저
 			{
-				float dis1 = GameManager->GetPlayerLeftDis(EPlayer::Player1);
-				float dis2 = GameManager->GetPlayerLeftDis(EPlayer::Player2);
-
-				if (dis1 >= dis2)	// player1 먼저
-					GameManager->SetCurPlayer((int)EPlayer::Player1);
-
-				else	// player2 먼저
-					GameManager->SetCurPlayer((int)EPlayer::Player2);
+				GameManager->SetCurPlayer((int)EPlayer::Player1);
+				mMainHUD->SetPlayerTargetDistanceText(dis2 / 100.f, false);
 			}
 
-			else
-				GameManager->SetCurPlayer((int)NextPlayer);
+			else	// player2 먼저
+			{
+				GameManager->SetCurPlayer((int)EPlayer::Player2);
+				mMainHUD->SetPlayerTargetDistanceText(dis1 / 100.f, false);
+			}
 
 			mSpringArm->CameraLagSpeed = 0.f;
 			SetActorLocation(GameManager->GetCurPlayerInfo().BallPos);
@@ -763,7 +769,6 @@ void ABall::ChangeTurn()
 	SetPlayerInfoUI(GameManager->GetCurPlayer(), true);
 
 	// 턴 넘어갈 때 변수들 초기화
-	mIsWindBlow = false;
 	mIsEnableSwing = true;
 	mIsChangeTurn = false;
 	mChangeTurnTime = 0.f;
@@ -860,11 +865,18 @@ void ABall::Init(bool isEnd)
 	mIsStart = false;
 	mIsEnd = false;
 
+	// 홀 방향 바라보도록 설정
+	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), mBallInfo.DestPos);
+	Rotator.Pitch = 0.f;
+	BallController->SetControlRotation(Rotator);
+
 	if (!isEnd)
 	{
 		// Player Info UI 초기화
 		SetPlayerInfoUI(EPlayer::Player1, true);
-		SetPlayerInfoUI(EPlayer::Player2, false);
+		if (GameManager->GetPlayType() == EPlayType::Multi)
+			SetPlayerInfoUI(EPlayer::Player2, false);
 
 		// Course Text UI 초기화
 		if (IsValid(mMainHUD))
@@ -1101,6 +1113,7 @@ void ABall::UpdateWind()
 		mWindPower = FMath::RandRange(mWindPowerMin, mWindPowerMax);
 
 		mMainHUD->SetWindTextVisible(mWindType, true);
+		mMainHUD->SetWindVelText(mWindPower / 10.f);
 	}
 }
 

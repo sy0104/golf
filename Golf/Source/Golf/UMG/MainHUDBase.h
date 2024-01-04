@@ -66,15 +66,16 @@ public:
 
 	// Wind
 	void SetWindTextVisible(EWindType WindType, bool visible);
+	void SetWindVelText(float vel);
 
 	// Play Info & Play Simple Info
 	void SetPlayerImage(const FString& path, bool isDetail = true);
 	void SetPlayerNameText(FString name, bool isDetail = true);
 	void SetPlayerShotNumText(int shot, bool isDetail = true);
 	void SetPlayerScoreText(int score, bool isDetail = true);
+	void SetPlayerTargetDistanceText(float dis, bool isDetail = true);
 
 	// Play Info
-	void SetPlayerTargetDistanceText(float dis);
 	void SetPlayInfoVisible(bool visible);
 
 	// Play Simple Info

@@ -157,6 +157,11 @@ void UMainHUDBase::SetWindTextVisible(EWindType WindType, bool visible)
 	}
 }
 
+void UMainHUDBase::SetWindVelText(float vel)
+{
+	mWindBase->SetWindVelText(vel);
+}
+
 void UMainHUDBase::SetPlayerImage(const FString& path, bool isDetail)
 {
 	if (isDetail)
@@ -193,9 +198,13 @@ void UMainHUDBase::SetPlayerScoreText(int score, bool isDetail)
 		mPlaySimpleInfoBase->SetPlayerScoreText(score);
 }
 
-void UMainHUDBase::SetPlayerTargetDistanceText(float dis)
+void UMainHUDBase::SetPlayerTargetDistanceText(float dis, bool isDetail)
 {
-	mPlayInfoBase->SetPlayerTargetDistanceText(dis);
+	if (isDetail)
+		mPlayInfoBase->SetPlayerTargetDistanceText(dis);
+
+	else
+		mPlaySimpleInfoBase->SetPlayerTargetDistanceText(dis);
 }
 
 void UMainHUDBase::SetPlayInfoVisible(bool visible)

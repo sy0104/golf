@@ -11,6 +11,7 @@ void UWindBase::NativeConstruct()
 	mRightWindText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("RightWindText"))));
 	mForwardWindText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("ForwardWindText"))));
 	mBackWindText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("BackWindText"))));
+	mWindVelText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("WindVelText"))));
 }
 
 void UWindBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -49,4 +50,9 @@ void UWindBase::SetBackWindTextVisible(bool visible)
 		mBackWindText->SetVisibility(ESlateVisibility::Visible);
 	else
 		mBackWindText->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UWindBase::SetWindVelText(float vel)
+{
+	mWindVelText->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), vel) + TEXT("m/s")));
 }

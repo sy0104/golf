@@ -9,6 +9,7 @@ void UPlaySimpleInfoBase::NativeConstruct()
 	mPlayerNameText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("PlayerNameText"))));
 	mShotNumText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("ShotNumText"))));
 	mScoreText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("ScoreText"))));
+	mTargetDistanceText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("TargetDistanceText"))));
 }
 
 void UPlaySimpleInfoBase::SetPlayerImage(const FString& path)
@@ -51,5 +52,10 @@ void UPlaySimpleInfoBase::SetPlayerScoreText(int score)
 {
 	mScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), score)));
 
+}
+
+void UPlaySimpleInfoBase::SetPlayerTargetDistanceText(float dis)
+{
+	mTargetDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), dis) + TEXT("m")));
 }
 
