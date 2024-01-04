@@ -350,6 +350,35 @@ void ABall::ShowDistance()
 	mMovingDis = FVector::Dist(mBallInfo.StartPos, GetActorLocation());
 	float leftDis = FVector::Dist(GetActorLocation(), mBallInfo.DestPos);
 
+	double targetDis = 0.0;
+	switch (mGolfClubType)
+	{
+	case EGolfClub::Driver:
+		targetDis = 27000;
+		//distance = 23000;
+		break;
+	case EGolfClub::Wood:
+		targetDis = 26000;
+		//distance = 16000;
+		break;
+	case EGolfClub::Iron:
+		targetDis = 25000;
+		//distance = 14000;
+		break;
+	case EGolfClub::Wedge:
+		targetDis = 7000;
+		//distance = 5500;
+		break;
+	case EGolfClub::Putter:
+		targetDis = 700;
+		//distance = 5000;
+		break;
+	}
+
+	FVector targetPos = GetActorLocation() + (targetDis * mMainCamera->GetForwardVector());
+	targetPos.Z = 0.0;
+	float holeDis = FVector::Dist(targetPos, mBallInfo.DestPos);
+
 	if (IsValid(mMainHUD))
 	{
 		// Distance UI
@@ -358,6 +387,12 @@ void ABall::ShowDistance()
 
 		// Player Info UI
 		mMainHUD->SetPlayerTargetDistanceText(leftDis / 100.f);
+
+		// MiniMap UI
+		mMainHUD->SetMiniMapBallCurrent(GetActorLocation());
+		mMainHUD->SetMiniMapBallTarget(GetActorLocation(), mMainCamera->GetForwardVector(), targetDis);
+		mMainHUD->SetMiniMapTargetDistanceText(targetDis / 100.f);
+		mMainHUD->SetMiniMapHoleDistanceText(holeDis / 100.f);
 	}
 }
 
@@ -552,16 +587,10 @@ void ABall::CheckBallStopped()
 			{
 				mMainHUD->SetDistanceText(0.f);
 				mMainHUD->SetBallStateVisible(true);
-				UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
-				UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
-				EPlayer CurPlayer = GameManager->GetCurPlayer();
-				FPlayerInfo CurPlayerInfo = GameManager->GetPlayerInfo(CurPlayer);
-				mMainHUD->SetMiniMapBallCurrent(CurPlayerInfo.BallPos);
-				mMainHUD->SetMiniMapBallTarget(CurPlayerInfo.BallPos, mMainCamera->GetForwardVector(), mGolfClubType);
-				if (FVector::Dist(CurPlayerInfo.BallPos, mBallInfo.DestPos) > 3000)
+				if (FVector::Dist(GetActorLocation(), mBallInfo.DestPos) > 3000)
 					mMainHUD->SetMiniMapVisible(true);
 				mMainHUD->SetBallDistance(mGolfClubType);
-				mMainHUD->SetHoleMark(CurPlayerInfo.BallPos, mBallInfo.DestPos);
+				mMainHUD->SetHoleMark(GetActorLocation(), mBallInfo.DestPos);
 			}
 
 			else

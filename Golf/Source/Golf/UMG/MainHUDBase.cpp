@@ -219,9 +219,9 @@ void UMainHUDBase::SetMiniMapBallCurrent(FVector position)
 	mMiniMap->SetBallCurrent(position);
 }
 
-void UMainHUDBase::SetMiniMapBallTarget(FVector position, FVector direction, EGolfClub club)
+void UMainHUDBase::SetMiniMapBallTarget(FVector position, FVector direction, double targetDis)
 {
-	mMiniMap->SetBallTarget(position, direction, club);
+	mMiniMap->SetBallTarget(position, direction, targetDis);
 }
 
 void UMainHUDBase::SetMiniMapHoleImage(FVector position)
@@ -235,6 +235,16 @@ void UMainHUDBase::SetMiniMapVisible(bool visible)
 		mMiniMap->SetVisibility(ESlateVisibility::Visible);
 	else
 		mMiniMap->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UMainHUDBase::SetMiniMapTargetDistanceText(float dis)
+{
+	mMiniMap->SetTargetDistanceText(dis);
+}
+
+void UMainHUDBase::SetMiniMapHoleDistanceText(float dis)
+{
+	mMiniMap->SetHoleDistanceText(dis);
 }
 
 void UMainHUDBase::SetTotalScoreVisible(bool visible)
