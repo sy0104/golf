@@ -590,15 +590,6 @@ void ABall::CheckBallStopped()
 				mMainHUD->SetDistanceText(0.f);
 				mMainHUD->SetBallStateVisible(true);
 
-				UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
-				UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
-
-				EPlayer CurPlayer = GameManager->GetCurPlayer();
-				FPlayerInfo CurPlayerInfo = GameManager->GetPlayerInfo(CurPlayer);
-
-				mMainHUD->SetMiniMapBallCurrent(CurPlayerInfo.BallPos);
-				mMainHUD->SetMiniMapBallTarget(CurPlayerInfo.BallPos, mMainCamera->GetForwardVector(), mGolfClubType);
-
 				if (FVector::Dist(GetActorLocation(), mBallInfo.DestPos) > 3000)
 					mMainHUD->SetMiniMapVisible(true);
 
