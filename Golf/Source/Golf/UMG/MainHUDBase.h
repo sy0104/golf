@@ -83,9 +83,11 @@ public:
 
 	// MiniMap
 	void SetMiniMapBallCurrent(FVector position);
-	void SetMiniMapBallTarget(FVector position, FVector direction, EGolfClub club);
+	void SetMiniMapBallTarget(FVector position, FVector direction, double targetDis);
 	void SetMiniMapHoleImage(FVector position);
 	void SetMiniMapVisible(bool visible);
+	void SetMiniMapTargetDistanceText(float dis);
+	void SetMiniMapHoleDistanceText(float dis);
 
 	// Total Score
 	void SetTotalScoreVisible(bool visible);

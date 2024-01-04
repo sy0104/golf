@@ -49,6 +49,8 @@ private:
 
 public:
 	void SetBallCurrent(FVector position);
-	void SetBallTarget(FVector position, FVector direction, EGolfClub club);
+	void SetBallTarget(FVector position, FVector direction, double targetDis);
 	void SetHoleImage(FVector position);
+	void SetTargetDistanceText(float dis);
+	void SetHoleDistanceText(float dis);
 };

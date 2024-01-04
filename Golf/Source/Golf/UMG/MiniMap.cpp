@@ -66,34 +66,9 @@ void UMiniMap::SetBallCurrent(FVector position)
 	mCurrentBallImage->SetRenderTranslation(FVector2D(mCurrentPos));
 }
 
-void UMiniMap::SetBallTarget(FVector position, FVector direction, EGolfClub club)
+void UMiniMap::SetBallTarget(FVector position, FVector direction, double targetDis)
 {
-	double distance = 0.0;
-	switch (club)
-	{
-	case EGolfClub::Driver:
-		distance = 22000;
-		//distance = 23000;
-		break;
-	case EGolfClub::Wood:
-		distance = 18000;
-		//distance = 16000;
-		break;
-	case EGolfClub::Iron:
-		distance = 15000;
-		//distance = 14000;
-		break;
-	case EGolfClub::Wedge:
-		distance = 8000;
-		//distance = 5500;
-		break;
-	case EGolfClub::Putter:
-		distance = 3000;
-		//distance = 5000;
-		break;
-	}
-
-	position = position + (distance * direction);
+	position = position + (targetDis * direction);
 
 	mTargetPos.X = position.Y * 3 / 500 + 150 - mTargetBallSize.X / 2;
 	mTargetPos.Y = -position.X / 125 + 376 - mTargetBallSize.Y / 2;
@@ -113,10 +88,7 @@ void UMiniMap::SetBallTarget(FVector position, FVector direction, EGolfClub club
 	leftdistanceCavasPos.X = miniMapHolePos.X - mLeftDistanceCanvasSize.X - 30.0;
 	leftdistanceCavasPos.Y = miniMapHolePos.Y - mLeftDistanceCanvasSize.Y / 2;
 
-	mDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), FVector::Dist(miniMapCurrentPos, miniMapTargetPos)) + TEXT("m")));
 	mDistanceCanvas->SetRenderTranslation(distanceCanvasPos);
-
-	mLeftDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), FVector::Dist(miniMapTargetPos, miniMapHolePos)) + TEXT("m")));
 	mLeftDistanceCanvas->SetRenderTranslation(leftdistanceCavasPos);
 }
 
@@ -125,4 +97,14 @@ void UMiniMap::SetHoleImage(FVector position)
 	mHolePos.X = position.Y * 3 / 500 + 150 - mHoleSize.X / 2;
 	mHolePos.Y = -position.X / 125 + 376 - mHoleSize.Y / 2;
 	mHoleImage->SetRenderTranslation(FVector2D(mHolePos));
+}
+
+void UMiniMap::SetTargetDistanceText(/*EGolfClub club, */float dis)
+{
+	mDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), dis) + TEXT("m")));
+}
+
+void UMiniMap::SetHoleDistanceText(float dis)
+{
+	mLeftDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), dis) + TEXT("m")));
 }
