@@ -70,6 +70,9 @@ private:
 	// Good Shot
 	void CheckGoodShot();
 
+	// Putting
+	void SetPuttingMode(bool isPutting);
+
 	void TestKey();
 
 
@@ -166,7 +169,10 @@ private:
 	class AFixedCamera*		mFixedCamera;
 
 public:
-	void SetGolfClubType(EGolfClub GolfClub);
+	void SetGolfClubType(EGolfClub GolfClub)
+	{
+		mGolfClubType = GolfClub;
+	}
 
 	void SetBallSwingType(EBallSwingType SwingType)
 	{

@@ -62,3 +62,29 @@ void UGolfClubBase::OnPutterButtonClicked()
 	if (IsValid(Ball))
 		Ball->SetGolfClubType(EGolfClub::Putter);
 }
+
+void UGolfClubBase::SetPuttingClub(bool isPutting)
+{
+	if (isPutting)
+	{
+		mDriverButton->SetVisibility(ESlateVisibility::Hidden);
+		mWoodButton->SetVisibility(ESlateVisibility::Hidden);
+		mIronButton->SetVisibility(ESlateVisibility::Hidden);
+		mWedgeButton->SetVisibility(ESlateVisibility::Hidden);
+
+		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
+		if (IsValid(Ball))
+			Ball->SetGolfClubType(EGolfClub::Putter);
+	}
+	else
+	{
+		mDriverButton->SetVisibility(ESlateVisibility::Visible);
+		mWoodButton->SetVisibility(ESlateVisibility::Visible);
+		mIronButton->SetVisibility(ESlateVisibility::Visible);
+		mWedgeButton->SetVisibility(ESlateVisibility::Visible);
+	}
+
+
+
+
+}

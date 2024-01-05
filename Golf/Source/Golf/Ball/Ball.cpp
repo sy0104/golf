@@ -366,11 +366,11 @@ void ABall::ShowDistance()
 		//distance = 23000;
 		break;
 	case EGolfClub::Wood:
-		targetDis = 26000;
+		targetDis = 25000;
 		//distance = 16000;
 		break;
 	case EGolfClub::Iron:
-		targetDis = 25000;
+		targetDis = 22000;
 		//distance = 14000;
 		break;
 	case EGolfClub::Wedge:
@@ -378,7 +378,7 @@ void ABall::ShowDistance()
 		//distance = 5500;
 		break;
 	case EGolfClub::Putter:
-		targetDis = 700;
+		targetDis = 800;
 		//distance = 5000;
 		break;
 	}
@@ -589,12 +589,14 @@ void ABall::CheckBallStopped()
 			{
 				mMainHUD->SetDistanceText(0.f);
 				mMainHUD->SetBallStateVisible(true);
-
-				if (FVector::Dist(GetActorLocation(), mBallInfo.DestPos) > 3000)
-					mMainHUD->SetMiniMapVisible(true);
-
+				mMainHUD->SetMiniMapVisible(true);
 				mMainHUD->SetBallDistance(mGolfClubType);
 				mMainHUD->SetHoleMark(GetActorLocation(), mBallInfo.DestPos);
+
+				if (mHitMaterialType == EMaterialType::Green)
+					SetPuttingMode(true);
+				else
+					SetPuttingMode(false);
 			}
 
 			else
@@ -939,6 +941,43 @@ void ABall::CheckGoodShot()
 	}
 }
 
+void ABall::SetPuttingMode(bool isPutting)
+{
+	if (isPutting)
+	{
+		// MiniMap
+		mMainHUD->SetMiniMapVisible(false);
+		
+		// Club
+		mMainHUD->SetPuttingClub(true);
+		
+		// Trailer
+		if (mTrailer->GetAsset()->GetEmitterHandle(1).IsValid() && mTrailer->GetAsset()->GetEmitterHandle(1).GetName() == "Ribbon" &&
+			mTrailer->GetAsset()->GetEmitterHandle(2).IsValid() && mTrailer->GetAsset()->GetEmitterHandle(2).GetName() == "Fire")
+		{	
+			mTrailer->GetAsset()->GetEmitterHandle(2).SetIsEnabled(false, *mTrailer->GetAsset(), true);
+			mTrailer->GetAsset()->GetEmitterHandle(1).SetIsEnabled(true, *mTrailer->GetAsset(), true);
+		}
+	}
+	else
+	{
+		// MiniMap
+		mMainHUD->SetMiniMapVisible(true);
+		
+		// Club
+		mMainHUD->SetPuttingClub(false);
+	
+		// Trailer
+		if (mTrailer->GetAsset()->GetEmitterHandle(1).IsValid() && mTrailer->GetAsset()->GetEmitterHandle(1).GetName() == "Ribbon" &&
+			mTrailer->GetAsset()->GetEmitterHandle(2).IsValid() && mTrailer->GetAsset()->GetEmitterHandle(2).GetName() == "Fire")
+		{
+			mTrailer->GetAsset()->GetEmitterHandle(2).SetIsEnabled(true, *mTrailer->GetAsset(), true);
+			//mTrailer->GetAsset()->GetEmitterHandle(1).SetIsEnabled(true, *mTrailer->GetAsset(), true);
+		}
+	}
+
+}
+
 void ABall::TestKey()
 {
 	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -1157,9 +1196,4 @@ void ABall::BallBounced(const FHitResult& Hit, const FVector& ImpactVelocity)
 void ABall::BallStopped(const FHitResult& ImpactResult)
 {
 	PrintViewport(1.f, FColor::Blue, TEXT("Stopped"));
-}
-
-void ABall::SetGolfClubType(EGolfClub GolfClub)
-{
-	mGolfClubType = GolfClub;
 }

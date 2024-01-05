@@ -31,11 +31,11 @@ void UBallDetailBase::SetBallDistance(EGolfClub club)
 		//progressDis = 180;
 		break;
 	case EGolfClub::Wood:
-		progressDis = 260;
+		progressDis = 250;
 		//progressDis = 150;
 		break;
 	case EGolfClub::Iron:
-		progressDis = 250;
+		progressDis = 220;
 		//progressDis = 120;
 		break;
 	case EGolfClub::Wedge:
@@ -43,7 +43,7 @@ void UBallDetailBase::SetBallDistance(EGolfClub club)
 		//progressDis = 70;
 		break;
 	case EGolfClub::Putter:
-		progressDis = 7;
+		progressDis = 8;
 		//progressDis = 30;
 		break;
 	}
