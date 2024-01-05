@@ -79,7 +79,11 @@ void UTotalScoreBase::SetPlayerTotalScoreText(EPlayer player, int TotalShot, int
 	FString scoreText;
 	//mLeftDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), dis) + TEXT("m")));
 
-	scoreText = FString::FromInt(TotalShot) + TEXT("(") + FString::FromInt(score) + TEXT(")");
+	if (score > 0)
+		scoreText = FString::FromInt(TotalShot) + TEXT("(+") + FString::FromInt(score) + TEXT(")");
+
+	else
+		scoreText = FString::FromInt(TotalShot) + TEXT("(") + FString::FromInt(score) + TEXT(")");
 
 	if (player == EPlayer::Player1)
 		mPlayer1TotalScoreText->SetText(FText::FromString(scoreText));

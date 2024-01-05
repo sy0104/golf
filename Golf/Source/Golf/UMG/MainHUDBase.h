@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include <Blueprint\UserWidget.h>
@@ -22,12 +20,13 @@ protected:
 private:
 	class UDistanceBase*		mDistanceBase;
 	class UBallDetailBase*		mBallDetailBase;
+	class UBallPowerBase*		mBallPowerBase;
+	class UBallSpinBase*		mBallSpinBase;
 	class UGolfClubBase*		mGolfClubBase;
 	class UScoreBase*			mScoreBase;
 	class UBallStateBase*		mBallStateBase;
 	class UCourseBase*			mCourseBase;
 	class UMiniMap*				mMiniMap;
-	class UBallSpinBase*		mBallSpinBase;
 	class UWindBase*			mWindBase;
 	class UHoleInfoBase*		mHoleInfoBase;
 	class UPlayInfoBase*		mPlayInfoBase;
@@ -49,6 +48,10 @@ public:
 
 	// Ball Detail
 	void SetBallPower(float ratio);
+	void SetBallSpin(float ratio);
+	void SetSpinButtonsEnable();
+	void SetPowerCheckBoxChecked(bool IsChecked);
+	void SetSpinCheckBoxChecked(bool IsChecked);
 	void SetBallDistance(EGolfClub club);
 	void SetHoleMark(FVector ballPos, FVector destPos);
 

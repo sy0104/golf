@@ -1,8 +1,6 @@
 #pragma once
 
-#include <Components\ProgressBar.h>
-#include <Components/TextBlock.h>
-#include <Components/Image.h>
+#include <Components/CheckBox.h>
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
@@ -15,21 +13,19 @@ class GOLF_API UBallDetailBase : public UUserWidget
 	
 protected:
 	virtual void NativeConstruct();
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:
-	UProgressBar*	mBallPowerBar;
-
-	UTextBlock* mDistanceText;
-	UTextBlock* mHalfDistanceText;
-
-	UImage* mHoleMarkImage;
+	UCheckBox*	mPowerCheckBox;
+	UCheckBox*	mSpinCheckBox;
 
 public:
-	void SetBallPower(float ratio);
-	void SetBallDistance(EGolfClub club);
-	void SetHoleMark(FVector ballPos, FVector destPos);
+	UFUNCTION()
+	void OnPowerCheckBoxChanged(bool IsChecked);
 
-private:
-	double progressDis;
+	UFUNCTION()
+	void OnSpinCheckBoxChanged(bool IsChecked);
+
+public:
+	void SetPowerCheckBoxChecked(bool IsChecked);
+	void SetSpinCheckBoxChecked(bool IsChecked);
 };

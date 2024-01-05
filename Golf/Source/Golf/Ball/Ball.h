@@ -25,7 +25,9 @@ public:
 
 private:
 	// Swing
+	void SetBallDetail(float scale);
 	void AddBallPower(float scale);
+	void AddBallSpin(float scale);
 	void SetSwingDir(float scale);
 	void Swing();
 
@@ -70,8 +72,9 @@ private:
 	// Good Shot
 	void CheckGoodShot();
 
+	// Test
 	void TestKey();
-
+	void Cheat();
 
 public:
 	void Init(bool isEnd);
@@ -111,7 +114,6 @@ protected:
 	EMaterialType				mHitMaterialType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	//UParticleSystemComponent*	mTrailer;
 	UNiagaraComponent*			mTrailer;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
@@ -131,9 +133,11 @@ protected:
 
 private:
 	bool		mIsEnableSwing;
-
-	bool		mIsPowerUp;
 	bool		mIsBallStopped;
+
+	bool		mIsAddPower;
+	bool		mIsPowerUp;
+	bool		mIsSpinUp;
 
 	float		mResetTime;
 	bool		mIsResetPos;
@@ -163,7 +167,6 @@ private:
 	bool		mIsOnGreen;
 
 	class UMainHUDBase*		mMainHUD;
-	class AFixedCamera*		mFixedCamera;
 
 public:
 	void SetGolfClubType(EGolfClub GolfClub);
@@ -191,5 +194,10 @@ public:
 	void SetStart(bool start)
 	{
 		mIsStart = start;
+	}
+
+	void SetIsAddPower(bool power)
+	{
+		mIsAddPower = power;
 	}
 };

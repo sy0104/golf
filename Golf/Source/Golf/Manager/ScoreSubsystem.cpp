@@ -24,11 +24,12 @@ const FString UScoreSubsystem::GetScoreText(int score)
 
 	switch (score)
 	{
-	case -4:
-		ScoreText = L"Hole In One";
-		break;
+	//case -4:
+	//	ScoreText = L"Hole In One";
+	//	break;
 	case -3:
-		ScoreText = L"Albatross";
+		//ScoreText = L"Albatross";
+		ScoreText = L"Hole In One";
 		break;
 	case -2:
 		ScoreText = L"Eagle";
@@ -48,7 +49,10 @@ const FString UScoreSubsystem::GetScoreText(int score)
 	case 3:
 		ScoreText = L"Triple Bogey";
 		break;
-	case 4:
+	//case 4:
+	//	ScoreText = L"Double Par";
+	//	break;
+	default:
 		ScoreText = L"Double Par";
 		break;
 	}

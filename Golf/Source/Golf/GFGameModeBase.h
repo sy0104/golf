@@ -30,17 +30,9 @@ private:
 	TSubclassOf<UUserWidget>	mLobbySceneUIClass;
 	class ULobbySceneBase*		mLobbySceneUI;
 
-	TSubclassOf<AActor>			mFixedCameraClass;
-	class AFixedCamera*			mFixedCamera;
-
 public:
 	UMainHUDBase* GetMainHUD()
 	{
 		return mMainHUD;
-	}
-
-	AFixedCamera* GetFixedCamera()
-	{
-		return mFixedCamera;
 	}
 };

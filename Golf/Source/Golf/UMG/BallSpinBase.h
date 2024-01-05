@@ -1,6 +1,7 @@
 #pragma once
 
-#include <Components\Button.h>
+#include <Components/Button.h>
+#include <Components/ProgressBar.h>
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
@@ -13,12 +14,13 @@ class GOLF_API UBallSpinBase : public UUserWidget
 	
 protected:
 	virtual void NativeConstruct();
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:
 	UButton*		mSwingLeftButton;
 	UButton*		mSwingStraightButton;
 	UButton*		mSwingRightButton;
+
+	UProgressBar*	mBallSpinPowerBar;
 
 public:
 	UFUNCTION()
@@ -29,4 +31,8 @@ public:
 
 	UFUNCTION()
 	void OnSwingRightButtonClicked();
+
+public:
+	void SetBallSpin(float ratio);
+	void SetSpinButtonsEnable();
 };

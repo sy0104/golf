@@ -1,6 +1,8 @@
 #include "MainHUDBase.h"
 #include "DistanceBase.h"
 #include "BallDetailBase.h"
+#include "BallPowerBase.h"
+#include "BallSpinBase.h"
 #include "GolfClubBase.h"
 #include "ScoreBase.h"
 #include "BallStateBase.h"
@@ -24,6 +26,7 @@ void UMainHUDBase::NativeConstruct()
 
 	mDistanceBase = Cast<UDistanceBase>(GetWidgetFromName(FName(TEXT("DistanceUI"))));
 	mBallDetailBase = Cast<UBallDetailBase>(GetWidgetFromName(FName(TEXT("BallDetailUI"))));
+	mBallPowerBase = Cast<UBallPowerBase>(GetWidgetFromName(FName(TEXT("BallPowerUI"))));
 	mGolfClubBase = Cast<UGolfClubBase>(GetWidgetFromName(FName(TEXT("GolfClubUI"))));
 	mScoreBase = Cast<UScoreBase>(GetWidgetFromName(FName(TEXT("ScoreUI"))));
 	mBallStateBase = Cast<UBallStateBase>(GetWidgetFromName(FName(TEXT("BallStateUI"))));
@@ -85,17 +88,37 @@ void UMainHUDBase::SetDistanceText(float dis)
 
 void UMainHUDBase::SetBallPower(float ratio)
 {
-	mBallDetailBase->SetBallPower(ratio);
+	mBallPowerBase->SetBallPower(ratio);
+}
+
+void UMainHUDBase::SetBallSpin(float ratio)
+{
+	mBallSpinBase->SetBallSpin(ratio);
+}
+
+void UMainHUDBase::SetSpinButtonsEnable()
+{
+	mBallSpinBase->SetSpinButtonsEnable();
+}
+
+void UMainHUDBase::SetPowerCheckBoxChecked(bool IsChecked)
+{
+	mBallDetailBase->SetPowerCheckBoxChecked(IsChecked);
+}
+
+void UMainHUDBase::SetSpinCheckBoxChecked(bool IsChecked)
+{
+	mBallDetailBase->SetSpinCheckBoxChecked(IsChecked);
 }
 
 void UMainHUDBase::SetBallDistance(EGolfClub club)
 {
-	mBallDetailBase->SetBallDistance(club);
+	mBallPowerBase->SetBallDistance(club);
 }
 
 void UMainHUDBase::SetHoleMark(FVector ballPos, FVector destPos)
 {
-	mBallDetailBase->SetHoleMark(ballPos, destPos);
+	mBallPowerBase->SetHoleMark(ballPos, destPos);
 }
 
 void UMainHUDBase::SetScoreText(FString ScoreText)
@@ -283,16 +306,18 @@ void UMainHUDBase::SetBallInfoVisible(bool visible)
 {
 	if (visible)
 	{
-		mBallDetailBase->SetVisibility(ESlateVisibility::Visible);
+		mBallPowerBase->SetVisibility(ESlateVisibility::Visible);
 		mBallSpinBase->SetVisibility(ESlateVisibility::Visible);
 		mGolfClubBase->SetVisibility(ESlateVisibility::Visible);
+		mBallDetailBase->SetVisibility(ESlateVisibility::Visible);
 	}
 
 	else
 	{
-		mBallDetailBase->SetVisibility(ESlateVisibility::Hidden);
+		mBallPowerBase->SetVisibility(ESlateVisibility::Hidden);
 		mBallSpinBase->SetVisibility(ESlateVisibility::Hidden);
 		mGolfClubBase->SetVisibility(ESlateVisibility::Hidden);
+		mBallDetailBase->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 

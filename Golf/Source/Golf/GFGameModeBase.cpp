@@ -1,13 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "GFGameModeBase.h"
 #include "Ball/Ball.h"
 #include "Ball/BallController.h"
 #include "UMG/StartSceneBase.h"
 #include "UMG/MainHUDBase.h"
 #include "UMG/LobbySceneBase.h"
-#include "Camera/FixedCamera.h"
 
 AGFGameModeBase::AGFGameModeBase()
 {
@@ -41,9 +37,6 @@ AGFGameModeBase::AGFGameModeBase()
 		LobbyFinder(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UMG/UI_LobbyScene.UI_LobbyScene_C'"));
 	if (LobbyFinder.Succeeded())
 		mLobbySceneUIClass = LobbyFinder.Class;
-
-	// Fixed Camera
-	mFixedCameraClass = AFixedCamera::StaticClass();
 }
 
 void AGFGameModeBase::BeginPlay()
@@ -73,9 +66,4 @@ void AGFGameModeBase::BeginPlay()
 		if (IsValid(mLobbySceneUI))
 			mLobbySceneUI->AddToViewport();
 	}
-
-	// Fixed Camera
-	mFixedCamera = NewObject<AFixedCamera>();
-	mFixedCamera->SetActorLocation(FVector(-1500.0, 0.0, 1050.0));
-	mFixedCamera->SetActorRotation(FRotator(-5.0, 0.0, 0.0));
 }

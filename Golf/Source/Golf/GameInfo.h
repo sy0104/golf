@@ -36,16 +36,19 @@ public:
 	FVector		DestPos;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	float		BallDis;
+	float		BallPower;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	float		BallPower;
+	float		BallRatio;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	float		BallArc;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	float		SpinForce;
+	float		SpinPower;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float		SpinRatio;
 };
 
 USTRUCT(BlueprintType)

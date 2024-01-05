@@ -8,7 +8,6 @@
 #include "../GFGameInstance.h"
 #include "../Manager/ScoreSubsystem.h"
 #include "NiagaraSystem.h"
-#include "../Camera/FixedCamera.h"
 #include "../Manager/GameManager.h"
 
 ABall::ABall()
@@ -67,16 +66,18 @@ ABall::ABall()
 	//// Ball Info
 	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
 	mBallInfo.DestPos = FVector(37303.0, -998.0, 0.0);
-	mBallInfo.BallDis = 0.f;
-	mBallInfo.BallPower = 0.0;
+	mBallInfo.BallPower = 0.f;
+	mBallInfo.BallRatio = 0.0;
 	mBallInfo.BallArc = 0.4f;
-	mBallInfo.SpinForce = 200.f;
+	mBallInfo.SpinPower = 300.f;
 
 	// spin
 	mIsEnableSwing = true;
 
-	// power
+	// detail
+	mIsAddPower = true;
 	mIsPowerUp = true;
+	mIsSpinUp = true;
 
 	mResetTime = 0.f;
 	mIsResetPos = false;
@@ -204,6 +205,9 @@ void ABall::Tick(float DeltaTime)
 
 	// test
 	//mTrailer->Deactivate();
+
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel Z: %f"), vel.Z));
+
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -212,13 +216,14 @@ void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	// 액션 매핑
 	PlayerInputComponent->BindAction<ABall>(TEXT("SwingStraight"), EInputEvent::IE_Pressed, this, &ABall::Swing);
+	PlayerInputComponent->BindAction<ABall>(TEXT("Cheat"), EInputEvent::IE_Pressed, this, &ABall::Cheat);
 	PlayerInputComponent->BindAction<ABall>(TEXT("Test"), EInputEvent::IE_Pressed, this, &ABall::TestKey);
 	PlayerInputComponent->BindAction<ABall>(TEXT("CloseTotalScore"), EInputEvent::IE_Released, this, &ABall::CloseTotalScore);
 	PlayerInputComponent->BindAction<ABall>(TEXT("Menu"), EInputEvent::IE_Pressed, this, &ABall::ShowMenu);
 
 	// 축 매핑
 	PlayerInputComponent->BindAxis<ABall>(TEXT("BallDir"), this, &ABall::SetSwingDir);
-	PlayerInputComponent->BindAxis<ABall>(TEXT("BallPower"), this, &ABall::AddBallPower);
+	PlayerInputComponent->BindAxis<ABall>(TEXT("BallDetail"), this, &ABall::SetBallDetail);
 	PlayerInputComponent->BindAxis<ABall>(TEXT("ShowTotalScore"), this, &ABall::ShowTotalScore);
 }
 
@@ -241,12 +246,12 @@ void ABall::Swing()
 	mBallInfo.StartPos = GetActorLocation();
 
 	// Swing
-	FVector TargetPos = mBallInfo.StartPos + (mMainCamera->GetForwardVector() * (mBallInfo.BallDis * mBallInfo.BallPower));
+	FVector TargetPos = mBallInfo.StartPos + (mMainCamera->GetForwardVector() * (mBallInfo.BallPower * mBallInfo.BallRatio));
 	FVector OutVelocity = FVector::ZeroVector;
 
 	if (mGolfClubType == EGolfClub::Putter)
 	{
-		OutVelocity = mMainCamera->GetForwardVector() * (mBallInfo.BallDis * mBallInfo.BallPower);
+		OutVelocity = mMainCamera->GetForwardVector() * (mBallInfo.BallPower * mBallInfo.BallRatio);
 		mSpringArm->CameraLagSpeed = 1.f;
 		//mStaticMesh->SetLinearDamping(0.1);
 		mStaticMesh->AddImpulse(OutVelocity, NAME_None, true);
@@ -256,22 +261,20 @@ void ABall::Swing()
 	{
 		UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 			this, OutVelocity, mBallInfo.StartPos, TargetPos, GetWorld()->GetGravityZ(), mBallInfo.BallArc);
+
+		// Bunker
+		if (mHitMaterialType == EMaterialType::Bunker)
+		{
+			OutVelocity *= 0.6;
+			mBallInfo.BallArc *= 0.5;
+		}
+
 		mStaticMesh->AddImpulse(OutVelocity);
 	}
 
-	// Bunker
-	if (mHitMaterialType == EMaterialType::Bunker)
-	{
-		OutVelocity *= 0.6;
-		mBallInfo.BallArc *= 0.5;
-	}
-
-
 	// Ball Info 초기화
+	mBallInfo.BallRatio = 0.f;
 	mBallInfo.BallPower = 0.f;
-	mBallInfo.BallDis = 0.0;
-	mMainHUD->SetBallPower(0.f);
-	mMainHUD->SetMiniMapVisible(false);
 
 	// Player UI 업데이트 (Shot)
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
@@ -292,7 +295,14 @@ void ABall::Swing()
 
 	// UI Update
 	if (IsValid(mMainHUD))
+	{
 		mMainHUD->SetBallInfoVisible(false);
+		mMainHUD->SetBallPower(0.f);
+		mMainHUD->SetBallSpin(0.f);
+		mMainHUD->SetPowerCheckBoxChecked(true);
+		mMainHUD->SetSpinCheckBoxChecked(false);
+		mMainHUD->SetMiniMapVisible(false);
+	}
 
 	mTurn++;
 }
@@ -322,41 +332,78 @@ void ABall::AddForceToSide()
 		if (mBallSwingType == EBallSwingType::Right)
 			CrossVec.Y *= -1.0;
 
-		mStaticMesh->AddForce(CrossVec * mBallInfo.SpinForce);
+		mStaticMesh->AddForce(CrossVec * mBallInfo.SpinPower * mBallInfo.SpinRatio);
 	}
 }
 
-void ABall::AddBallPower(float scale)
+void ABall::SetBallDetail(float scale)
 {
 	if (scale == 0.f || !mIsEnableSwing)
 		return;
 
+	if (mIsAddPower)
+		AddBallPower(scale);
+
+	else
+		AddBallSpin(scale);
+}
+
+void ABall::AddBallPower(float scale)
+{
 	if (mIsPowerUp)
 	{
-		mBallInfo.BallPower += 0.01f;
+		mBallInfo.BallRatio += 0.01f;
 
-		if (mBallInfo.BallPower >= 1.f)
+		if (mBallInfo.BallRatio >= 1.f)
 			mIsPowerUp = false;
 	}
 
 	else
 	{
-		mBallInfo.BallPower -= 0.01f;
+		mBallInfo.BallRatio -= 0.01f;
 
-		if (mBallInfo.BallPower <= 0.f)
+		if (mBallInfo.BallRatio <= 0.f)
 			mIsPowerUp = true;
 	}
 
 	if (IsValid(mMainHUD))
 	{
-		mMainHUD->SetBallPower(mBallInfo.BallPower);
+		mMainHUD->SetBallPower(mBallInfo.BallRatio);
 	}
+}
+
+void ABall::AddBallSpin(float scale)
+{
+	if (mIsSpinUp)
+	{
+		mBallInfo.SpinRatio += 0.01f;
+
+		if (mBallInfo.SpinRatio >= 1.f)
+			mIsSpinUp = false;
+	}
+
+	else
+	{
+		mBallInfo.SpinRatio -= 0.01f;
+
+		if (mBallInfo.SpinRatio <= 0.f)
+			mIsSpinUp = true;
+	}
+
+	if (IsValid(mMainHUD))
+		mMainHUD->SetBallSpin(mBallInfo.SpinRatio);
 }
 
 void ABall::ShowDistance()
 {
 	mMovingDis = FVector::Dist(mBallInfo.StartPos, GetActorLocation());
-	float leftDis = FVector::Dist(GetActorLocation(), mBallInfo.DestPos);
+	float leftDis = 0.f;
+
+	if (mIsInHole)
+		leftDis = 0.f;
+
+	else
+		leftDis = FVector::Dist(GetActorLocation(), mBallInfo.DestPos);
 
 	double targetDis = 0.0;
 	switch (mGolfClubType)
@@ -581,6 +628,7 @@ void ABall::CheckBallStopped()
 	{
 		mIsBallStopped = true;
 		mStaticMesh->ComponentVelocity = FVector(0.0, 0.0, 0.0);
+
 		mTrailer->Deactivate();
 
 		if (IsValid(mMainHUD))
@@ -601,7 +649,7 @@ void ABall::CheckBallStopped()
 			{
 				// Good Shot
 				CheckGoodShot();
-				if (mIsGoodShot)
+				if (mIsGoodShot && !mIsConcede)
 					mMainHUD->SetGoodShotVisible(true);
 
 				if (mHitMaterialType == EMaterialType::Green)
@@ -617,6 +665,9 @@ void ABall::CheckBallStopped()
 		if (mIsStart)
 			mTrailer->Activate();
 
+		if (mIsEnableSwing)
+			mTrailer->Deactivate();
+
 		if (IsValid(mMainHUD))
 		{
 			mMainHUD->SetBallStateVisible(false);
@@ -630,23 +681,23 @@ void ABall::SetBallInfoByClub(EGolfClub club)
 	switch (club)
 	{
 	case EGolfClub::Driver:	// 최대 300m 정도
-		mBallInfo.BallDis = 2300.f;
+		mBallInfo.BallPower = 2300.f;
 		mBallInfo.BallArc = 0.6f;
 		break;
 	case EGolfClub::Wood:	// 최대 215m 정도
-		mBallInfo.BallDis = 1600.f;
+		mBallInfo.BallPower = 1600.f;
 		mBallInfo.BallArc = 0.7f;
 		break;
 	case EGolfClub::Iron:	// 최대 180m 정도
-		mBallInfo.BallDis = 1400.f;
+		mBallInfo.BallPower = 1400.f;
 		mBallInfo.BallArc = 0.7f;
 		break;
 	case EGolfClub::Wedge:	// 최대 70m 정도
-		mBallInfo.BallDis = 550.f;
+		mBallInfo.BallPower = 550.f;
 		mBallInfo.BallArc = 0.5f;
 		break;
 	case EGolfClub::Putter:	// 최대 20m 정도
-		mBallInfo.BallDis = 1000.f;
+		mBallInfo.BallPower = 1000.f;
 		mBallInfo.BallArc = 1.f;
 		break;
 	}
@@ -749,6 +800,9 @@ void ABall::ChangeTurn()
 		// 2명 중 1명이 먼저 홀에 공을 넣은 경우: 플레이어 순서 바꾸지 않음
 		else if (CurPlayerInfo.TurnEnd)
 		{
+			CurPlayerInfo.LeftDistance = 0.f;
+			GameManager->SetPlayerInfo(CurPlayerInfo, (int)CurPlayer);
+
 			mSpringArm->CameraLagSpeed = 0.f;
 			SetActorLocation(NextPlayerInfo.BallPos);
 
@@ -800,6 +854,8 @@ void ABall::ChangeTurn()
 	mChangeTurnTime = 0.f;
 	mMovingDis = 0.f;
 	mIsGoodShot = false;
+	mIsAddPower = true;
+	mBallInfo.SpinRatio = 0.f;
 
 	// Hole 방향 바라보도록
 	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -818,6 +874,7 @@ void ABall::ChangeTurn()
 		mMainHUD->SetScoreTextVisible(false);
 		mMainHUD->SetConcedeTextVisible(false);
 		mMainHUD->SetGoodShotVisible(false);
+		mMainHUD->SetSpinButtonsEnable();
 	}
 }
 
@@ -871,10 +928,10 @@ void ABall::Init(bool isEnd)
 
 	// Ball Info 초기화
 	mBallInfo.StartPos = FVector(0.0, 0.0, 13.5);
-	mBallInfo.BallDis = 0.f;
 	mBallInfo.BallPower = 0.f;
+	mBallInfo.BallRatio = 0.f;
 	mBallInfo.BallArc = 0.4f;
-	mBallInfo.SpinForce = 200.f;
+	mBallInfo.SpinPower = 200.f;
 
 	// 멤버변수 초기화
 	mGolfClubType = EGolfClub::Driver;
@@ -941,9 +998,6 @@ void ABall::CheckGoodShot()
 
 void ABall::TestKey()
 {
-	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	//BallController->SetViewTargetWithBlend(mFixedCamera, mCameraBlendTime);
-
 	//UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
 	//UScoreSubsystem* SubSystem = GameInst->GetSubsystem<UScoreSubsystem>();
 	//
@@ -969,10 +1023,27 @@ void ABall::TestKey()
 	mMainHUD->SetGoodShotVisible(true);
 }
 
+void ABall::Cheat()
+{
+	//FVector loc = GetActorLocation();
+
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("loc X: %f"), loc.X));
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("loc Y: %f"), loc.Y));
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("loc Z: %f"), loc.Z));
+
+	mSpringArm->CameraLagSpeed = 0.f;
+
+	FVector loc = FVector(37248.8, -1010.9, 2.475);
+	SetActorLocation(loc);
+
+	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), mBallInfo.DestPos);
+	Rotator.Pitch = 0.f;
+	BallController->SetControlRotation(Rotator);
+}
+
 void ABall::NextGame()
 {
-	//mMainHUD->SetVisibility(ESlateVisibility::Hidden);
-
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
 	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
 
@@ -997,7 +1068,7 @@ void ABall::NextGame()
 			mMainHUD->SetPlayerRankingText(EPlayer::Player2, 2);
 		}
 
-		else if (Player1Info.Shot > Player2Info.Shot)
+		else if (Player1Info.Shot > Player2Info.Shot)	// p2
 		{
 			mMainHUD->SetPlayerRankingText(EPlayer::Player1, 2);
 			mMainHUD->SetPlayerRankingText(EPlayer::Player2, 1);
@@ -1046,7 +1117,7 @@ void ABall::NextGame()
 
 void ABall::CheckPlayerGoal()
 {
-	if (!mIsBallStopped || !mIsConcede)
+	if (!mIsBallStopped)
 		return;
 
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
@@ -1055,14 +1126,31 @@ void ABall::CheckPlayerGoal()
 	EPlayer CurPlayer;
 	FPlayerInfo CurPlayerInfo;
 
-	if (IsValid(GameManager))
+	if (IsValid(GameManager) && mIsStart)
 	{
 		CurPlayer = GameManager->GetCurPlayer();
 		CurPlayerInfo = GameManager->GetPlayerInfo(CurPlayer);
-		CurPlayerInfo.TurnEnd = true;
 
-		if (!mIsInHole)	// concede
-			CurPlayerInfo.Shot++;
+		if (mIsConcede)
+		{
+			if (!mIsInHole)
+				CurPlayerInfo.Shot++;
+
+			CurPlayerInfo.TurnEnd = true;
+			mMainHUD->SetPlayerShotNumText(CurPlayerInfo.Shot, true);
+		}
+
+		else if (CurPlayerInfo.Shot >= 8)
+		{
+			CurPlayerInfo.TurnEnd = true;
+
+			UScoreSubsystem* ScoreSub = GameInst->GetSubsystem<UScoreSubsystem>();
+			if (IsValid(ScoreSub))
+			{
+				FString ScoreText = ScoreSub->GetScoreText(CurPlayerInfo.Shot - 4);
+				mMainHUD->SetScoreText(ScoreText);
+			}
+		}
 
 		GameManager->SetPlayerInfo(CurPlayerInfo, (int)CurPlayer);
 	}
@@ -1093,7 +1181,7 @@ void ABall::ShowScoreUI()
 		// 점수 계산
 		if (IsValid(ScoreSub))
 		{
-			FString ScoreText = ScoreSub->GetScoreText(CurPlayerInfo.Shot);
+			FString ScoreText = ScoreSub->GetScoreText(CurPlayerInfo.Shot - 4);
 			mMainHUD->SetScoreText(ScoreText);
 		}
 	}
