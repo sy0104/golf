@@ -19,6 +19,7 @@
 #include "GoodShotBase.h"
 #include "../GFGameInstance.h"
 #include "../Manager/GameManager.h"
+#include "BallInfoBase.h"
 
 void UMainHUDBase::NativeConstruct()
 {
@@ -41,6 +42,7 @@ void UMainHUDBase::NativeConstruct()
 	mGamePlayBase = Cast<UGamePlayBase>(GetWidgetFromName(FName(TEXT("GamePlayUI"))));
 	mMenuBase = Cast<UMenuBase>(GetWidgetFromName(FName(TEXT("MenuUI"))));
 	mGoodShotBase = Cast<UGoodShotBase>(GetWidgetFromName(FName(TEXT("GoodShotUI"))));
+	mBallInfoBase = Cast<UBallInfoBase>(GetWidgetFromName(FName(TEXT("BallInfoUI"))));
 
 	// Multi Set
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
@@ -356,7 +358,17 @@ void UMainHUDBase::SetGoodShotVisible(bool visible)
 void UMainHUDBase::SetPuttingClub(bool isPutting)
 {
 	mGolfClubBase->SetPuttingClub(isPutting);
+}
 
+void UMainHUDBase::SetPuttingInfo(FVector ballPos, FVector destPos)
+{
+	mBallInfoBase->SetPuttingInfo(ballPos, destPos);
+}
 
-
+void UMainHUDBase::SetPuttingInfoVisible(bool visible)
+{
+	if (visible)
+		mBallInfoBase->SetVisibility(ESlateVisibility::Visible);
+	else
+		mBallInfoBase->SetVisibility(ESlateVisibility::Hidden);
 }

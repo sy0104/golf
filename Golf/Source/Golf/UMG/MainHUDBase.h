@@ -35,6 +35,7 @@ private:
 	class UGamePlayBase*		mGamePlayBase;
 	class UMenuBase*			mMenuBase;
 	class UGoodShotBase*		mGoodShotBase;
+	class UBallInfoBase*		mBallInfoBase;
 	
 public:
 	class UDistanceBase* GetDistanceBase()
@@ -113,4 +114,6 @@ public:
 
 	// Putting
 	void SetPuttingClub(bool isPutting);
+	void SetPuttingInfo(FVector ballPos, FVector destPos);
+	void SetPuttingInfoVisible(bool isPutting);
 };
