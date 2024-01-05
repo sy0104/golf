@@ -252,8 +252,6 @@ void ABall::Swing()
 	if (mGolfClubType == EGolfClub::Putter)
 	{
 		OutVelocity = mMainCamera->GetForwardVector() * (mBallInfo.BallPower * mBallInfo.BallRatio);
-		mSpringArm->CameraLagSpeed = 1.f;
-		//mStaticMesh->SetLinearDamping(0.1);
 		mStaticMesh->AddImpulse(OutVelocity, NAME_None, true);
 	}
 
