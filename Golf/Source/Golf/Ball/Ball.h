@@ -72,6 +72,9 @@ private:
 	// Good Shot
 	void CheckGoodShot();
 
+	// Putting
+	void SetPuttingMode(bool isPutting);
+
 	// Test
 	void TestKey();
 	void Cheat();
@@ -169,7 +172,10 @@ private:
 	class UMainHUDBase*		mMainHUD;
 
 public:
-	void SetGolfClubType(EGolfClub GolfClub);
+	void SetGolfClubType(EGolfClub GolfClub)
+	{
+		mGolfClubType = GolfClub;
+	}
 
 	void SetBallSwingType(EBallSwingType SwingType)
 	{

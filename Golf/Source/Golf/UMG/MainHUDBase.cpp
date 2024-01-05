@@ -352,3 +352,11 @@ void UMainHUDBase::SetGoodShotVisible(bool visible)
 	else
 		mGoodShotBase->SetVisibility(ESlateVisibility::Hidden);
 }
+
+void UMainHUDBase::SetPuttingClub(bool isPutting)
+{
+	mGolfClubBase->SetPuttingClub(isPutting);
+
+
+
+}

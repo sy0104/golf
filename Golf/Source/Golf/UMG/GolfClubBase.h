@@ -40,4 +40,7 @@ public:
 
 	UFUNCTION()
 	void OnPutterButtonClicked();
+
+public:
+	void SetPuttingClub(bool isPutting);
 };

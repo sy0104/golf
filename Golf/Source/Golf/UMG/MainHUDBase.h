@@ -110,4 +110,7 @@ public:
 
 	// GoodShot
 	void SetGoodShotVisible(bool visible);
+
+	// Putting
+	void SetPuttingClub(bool isPutting);
 };
