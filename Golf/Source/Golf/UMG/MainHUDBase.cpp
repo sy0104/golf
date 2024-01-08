@@ -88,6 +88,14 @@ void UMainHUDBase::SetDistanceText(float dis)
 	mDistanceBase->SetDistanceText(dis);
 }
 
+void UMainHUDBase::SetDistanceVisible(bool visible)
+{
+	if (visible)
+		mDistanceBase->SetVisibility(ESlateVisibility::Visible);
+	else
+		mDistanceBase->SetVisibility(ESlateVisibility::Hidden);
+}
+
 void UMainHUDBase::SetBallPower(float ratio)
 {
 	mBallPowerBase->SetBallPower(ratio);

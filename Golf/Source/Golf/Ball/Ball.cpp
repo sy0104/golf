@@ -137,6 +137,7 @@ void ABall::BeginPlay()
 		{
 			// Distance
 			mMainHUD->SetDistanceText(0.f);
+			mMainHUD->SetDistanceVisible(false);
 
 			// Minimap
 			mMainHUD->SetMiniMapHoleImage(mBallInfo.DestPos);
@@ -295,6 +296,7 @@ void ABall::Swing()
 	// UI Update
 	if (IsValid(mMainHUD))
 	{
+		mMainHUD->SetDistanceVisible(true);
 		mMainHUD->SetBallInfoVisible(false);
 		mMainHUD->SetBallPower(0.f);
 		mMainHUD->SetBallSpin(0.f);
@@ -635,6 +637,7 @@ void ABall::CheckBallStopped()
 			if (mIsEnableSwing)
 			{
 				mMainHUD->SetDistanceText(0.f);
+				mMainHUD->SetDistanceVisible(false);
 				mMainHUD->SetBallStateVisible(true);
 				mMainHUD->SetMiniMapVisible(true);
 				mMainHUD->SetBallDistance(mGolfClubType);
@@ -871,6 +874,7 @@ void ABall::ChangeTurn()
 	if (IsValid(mMainHUD))
 	{
 		mMainHUD->SetDistanceText(0.f);
+		mMainHUD->SetDistanceVisible(false);
 		mMainHUD->SetBallInfoVisible(true);
 		mMainHUD->SetScoreTextVisible(false);
 		mMainHUD->SetConcedeTextVisible(false);

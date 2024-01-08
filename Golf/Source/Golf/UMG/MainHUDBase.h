@@ -46,6 +46,7 @@ public:
 	// Distance
 	void SetLeftDistanceText(float dis);
 	void SetDistanceText(float dis);
+	void SetDistanceVisible(bool visible);
 
 	// Ball Detail
 	void SetBallPower(float ratio);
