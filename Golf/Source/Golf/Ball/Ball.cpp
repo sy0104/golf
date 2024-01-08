@@ -33,7 +33,6 @@ ABall::ABall()
 	mStaticMesh->SetUseCCD(true);
 	mStaticMesh->SetCollisionProfileName(TEXT("Ball"));
 	
-
 	//// Sphere Component (Collision)
 	mSphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	mSphereComponent->SetSphereRadius(2.25f);
@@ -169,6 +168,9 @@ void ABall::BeginPlay()
 				mMainHUD->SetPlayerTargetDistanceText(PlayerInfo.LeftDistance / 100.f, false);
 		}
 	}
+
+	// Camera
+
 }
 
 void ABall::Tick(float DeltaTime)
@@ -1003,11 +1005,11 @@ void ABall::CheckGoodShot()
 		break;
 	case EGolfClub::Iron:
 	case EGolfClub::Wedge:
-		if (mHitMaterialType == EMaterialType::Green && !mIsOnGreen)
-		{
-			mIsGoodShot = true;
-			mIsOnGreen = true;
-		}
+		//if (mHitMaterialType == EMaterialType::Green && !mIsOnGreen)
+		//{
+		//	mIsGoodShot = true;
+		//	mIsOnGreen = true;
+		//}
 		break;
 	case EGolfClub::Putter:
 
@@ -1100,10 +1102,10 @@ void ABall::Cheat()
 	FVector loc = FVector(37248.8, -1010.9, 2.475);
 	SetActorLocation(loc);
 
-	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), mBallInfo.DestPos);
-	Rotator.Pitch = 0.f;
-	BallController->SetControlRotation(Rotator);
+	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	//FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), mBallInfo.DestPos);
+	//Rotator.Pitch = 0.f;
+	//BallController->SetControlRotation(Rotator);
 }
 
 void ABall::NextGame()
