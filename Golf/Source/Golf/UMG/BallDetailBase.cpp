@@ -18,7 +18,16 @@ void UBallDetailBase::OnPowerCheckBoxChanged(bool IsChecked)
 
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	if (IsValid(Ball))
-		Ball->SetIsAddPower(true);
+	{
+		if (IsChecked)
+		{
+			Ball->SetIsAddPower(true);
+			Ball->SetIsAddSpin(false);
+		}
+
+		else
+			Ball->SetIsAddPower(false);
+	}
 }
 
 void UBallDetailBase::OnSpinCheckBoxChanged(bool IsChecked)
@@ -27,7 +36,16 @@ void UBallDetailBase::OnSpinCheckBoxChanged(bool IsChecked)
 
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	if (IsValid(Ball))
-		Ball->SetIsAddPower(false);
+	{
+		if (IsChecked)
+		{
+			Ball->SetIsAddSpin(true);
+			Ball->SetIsAddPower(false);
+		}
+
+		else
+			Ball->SetIsAddSpin(false);
+	}
 }
 
 void UBallDetailBase::SetPowerCheckBoxChecked(bool IsChecked)

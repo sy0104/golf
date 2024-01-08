@@ -76,6 +76,7 @@ ABall::ABall()
 
 	// detail
 	mIsAddPower = true;
+	mIsAddSpin = false;
 	mIsPowerUp = true;
 	mIsSpinUp = true;
 
@@ -342,7 +343,7 @@ void ABall::SetBallDetail(float scale)
 	if (mIsAddPower)
 		AddBallPower(scale);
 
-	else
+	else if (mIsAddSpin)
 		AddBallSpin(scale);
 }
 
@@ -855,6 +856,7 @@ void ABall::ChangeTurn()
 	mMovingDis = 0.f;
 	mIsGoodShot = false;
 	mIsAddPower = true;
+	mIsAddSpin = false;
 	mBallInfo.SpinRatio = 0.f;
 
 	// Hole 방향 바라보도록

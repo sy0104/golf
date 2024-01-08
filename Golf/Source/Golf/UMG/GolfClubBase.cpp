@@ -83,8 +83,4 @@ void UGolfClubBase::SetPuttingClub(bool isPutting)
 		mIronButton->SetIsEnabled(true);
 		mWedgeButton->SetIsEnabled(true);
 	}
-
-
-
-
 }

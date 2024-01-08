@@ -139,6 +139,7 @@ private:
 	bool		mIsBallStopped;
 
 	bool		mIsAddPower;
+	bool		mIsAddSpin;
 	bool		mIsPowerUp;
 	bool		mIsSpinUp;
 
@@ -205,5 +206,10 @@ public:
 	void SetIsAddPower(bool power)
 	{
 		mIsAddPower = power;
+	}
+
+	void SetIsAddSpin(bool spin)
+	{
+		mIsAddSpin = spin;
 	}
 };
