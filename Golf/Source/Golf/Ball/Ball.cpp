@@ -9,6 +9,7 @@
 #include "../Manager/ScoreSubsystem.h"
 #include "NiagaraSystem.h"
 #include "../Manager/GameManager.h"
+#include "../UMG/BallInfoBase.h"
 
 ABall::ABall()
 {
@@ -137,6 +138,7 @@ void ABall::BeginPlay()
 		{
 			// Distance
 			mMainHUD->SetDistanceText(0.f);
+			mMainHUD->SetDistanceVisible(false);
 
 			// Minimap
 			mMainHUD->SetMiniMapHoleImage(mBallInfo.DestPos);
@@ -295,6 +297,7 @@ void ABall::Swing()
 	// UI Update
 	if (IsValid(mMainHUD))
 	{
+		mMainHUD->SetDistanceVisible(true);
 		mMainHUD->SetBallInfoVisible(false);
 		mMainHUD->SetBallPower(0.f);
 		mMainHUD->SetBallSpin(0.f);
@@ -635,6 +638,7 @@ void ABall::CheckBallStopped()
 			if (mIsEnableSwing)
 			{
 				mMainHUD->SetDistanceText(0.f);
+				mMainHUD->SetDistanceVisible(false);
 				mMainHUD->SetBallStateVisible(true);
 				mMainHUD->SetMiniMapVisible(true);
 				mMainHUD->SetBallDistance(mGolfClubType);
@@ -643,7 +647,7 @@ void ABall::CheckBallStopped()
 				if (mHitMaterialType == EMaterialType::Green)
 					SetPuttingMode(true);
 				else
-					SetPuttingMode(false);
+					SetPuttingMode(false);	
 			}
 
 			else
@@ -662,7 +666,7 @@ void ABall::CheckBallStopped()
 	else
 	{
 		mIsBallStopped = false;
-		
+
 		if (mIsStart)
 			mTrailer->Activate();
 
@@ -872,6 +876,7 @@ void ABall::ChangeTurn()
 	if (IsValid(mMainHUD))
 	{
 		mMainHUD->SetDistanceText(0.f);
+		mMainHUD->SetDistanceVisible(false);
 		mMainHUD->SetBallInfoVisible(true);
 		mMainHUD->SetScoreTextVisible(false);
 		mMainHUD->SetConcedeTextVisible(false);
@@ -1004,26 +1009,30 @@ void ABall::SetPuttingMode(bool isPutting)
 	{
 		// MiniMap
 		mMainHUD->SetMiniMapVisible(false);
-		
+
 		// Club
 		mMainHUD->SetPuttingClub(true);
-		
+
 		// Trailer
 		if (mTrailer->GetAsset()->GetEmitterHandle(1).IsValid() && mTrailer->GetAsset()->GetEmitterHandle(1).GetName() == "Ribbon" &&
 			mTrailer->GetAsset()->GetEmitterHandle(2).IsValid() && mTrailer->GetAsset()->GetEmitterHandle(2).GetName() == "Fire")
-		{	
+		{
 			mTrailer->GetAsset()->GetEmitterHandle(2).SetIsEnabled(false, *mTrailer->GetAsset(), true);
 			mTrailer->GetAsset()->GetEmitterHandle(1).SetIsEnabled(true, *mTrailer->GetAsset(), true);
 		}
+
+		// Ball Info (Distance)
+		mMainHUD->SetPuttingInfo(GetActorLocation(), mBallInfo.DestPos);
+		mMainHUD->SetPuttingInfoVisible(true);
 	}
 	else
 	{
 		// MiniMap
 		mMainHUD->SetMiniMapVisible(true);
-		
+
 		// Club
 		mMainHUD->SetPuttingClub(false);
-	
+
 		// Trailer
 		if (mTrailer->GetAsset()->GetEmitterHandle(1).IsValid() && mTrailer->GetAsset()->GetEmitterHandle(1).GetName() == "Ribbon" &&
 			mTrailer->GetAsset()->GetEmitterHandle(2).IsValid() && mTrailer->GetAsset()->GetEmitterHandle(2).GetName() == "Fire")
@@ -1031,6 +1040,10 @@ void ABall::SetPuttingMode(bool isPutting)
 			mTrailer->GetAsset()->GetEmitterHandle(2).SetIsEnabled(true, *mTrailer->GetAsset(), true);
 			//mTrailer->GetAsset()->GetEmitterHandle(1).SetIsEnabled(true, *mTrailer->GetAsset(), true);
 		}
+
+		// Ball Info (Distance)
+		mMainHUD->SetPuttingInfoVisible(false);
+
 	}
 
 }
