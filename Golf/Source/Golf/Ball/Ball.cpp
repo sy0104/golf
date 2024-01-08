@@ -526,11 +526,12 @@ void ABall::SetBallHitMaterial(FString MaterialName)
 		mMainHUD->SetCourseText(L"OB");
 	}
 
-	else if (MaterialName == L"PM_LandscapeTee")
+	else /*if (MaterialName == L"PM_LandscapeTee")*/
 	{
 		mHitMaterialType = EMaterialType::Tee;
 		mMainHUD->SetCourseText(L"Tee");
 	}
+
 }
 
 void ABall::SetBallDetailsByMaterial()
