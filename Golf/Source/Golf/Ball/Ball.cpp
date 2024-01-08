@@ -635,7 +635,7 @@ void ABall::CheckBallStopped()
 
 		if (IsValid(mMainHUD))
 		{
-			if (mIsEnableSwing)
+			if (mIsEnableSwing && !mIsEnd)
 			{
 				mMainHUD->SetDistanceText(0.f);
 				mMainHUD->SetDistanceVisible(false);
@@ -873,7 +873,7 @@ void ABall::ChangeTurn()
 	UpdateWind();
 
 	// UI 업데이트
-	if (IsValid(mMainHUD))
+	if (IsValid(mMainHUD) && !mIsEnd)
 	{
 		mMainHUD->SetDistanceText(0.f);
 		mMainHUD->SetDistanceVisible(false);
@@ -1163,8 +1163,11 @@ void ABall::NextGame()
 	mMainHUD->SetPlayerTotalScoreText(EPlayer::Player1, Player1Info.TotalShot, Player1Info.Score);
 
 	// Total Score UI
+
+
 	mMainHUD->SetTotalScoreVisible(true);
 	mMainHUD->SetGamePlayVisible(true);
+
 }
 
 void ABall::CheckPlayerGoal()

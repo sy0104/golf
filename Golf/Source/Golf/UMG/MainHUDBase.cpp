@@ -292,9 +292,32 @@ void UMainHUDBase::SetMiniMapHoleDistanceText(float dis)
 void UMainHUDBase::SetTotalScoreVisible(bool visible)
 {
 	if (visible)
+	{
 		mTotalScoreBase->SetVisibility(ESlateVisibility::Visible);
+		mDistanceBase->SetVisibility(ESlateVisibility::Hidden);
+		mCourseBase->SetVisibility(ESlateVisibility::Hidden);
+		mWindBase->SetVisibility(ESlateVisibility::Hidden);
+		mBallPowerBase->SetVisibility(ESlateVisibility::Hidden);
+		mBallSpinBase->SetVisibility(ESlateVisibility::Hidden);
+		mBallDetailBase->SetVisibility(ESlateVisibility::Hidden);
+		mGolfClubBase->SetVisibility(ESlateVisibility::Hidden);
+		mBallStateBase->SetVisibility(ESlateVisibility::Hidden);
+		mScoreBase->SetVisibility(ESlateVisibility::Hidden);
+		mBallInfoBase->SetVisibility(ESlateVisibility::Hidden);
+	}
+
 	else
+	{
 		mTotalScoreBase->SetVisibility(ESlateVisibility::Hidden);
+		mDistanceBase->SetVisibility(ESlateVisibility::Visible);
+		mCourseBase->SetVisibility(ESlateVisibility::Visible);
+		mWindBase->SetVisibility(ESlateVisibility::Visible);
+		mBallPowerBase->SetVisibility(ESlateVisibility::Visible);
+		mBallSpinBase->SetVisibility(ESlateVisibility::Visible);
+		mBallDetailBase->SetVisibility(ESlateVisibility::Visible);
+		mGolfClubBase->SetVisibility(ESlateVisibility::Visible);
+		mBallStateBase->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 void UMainHUDBase::SetPlayerRankingText(EPlayer player, int ranking)
