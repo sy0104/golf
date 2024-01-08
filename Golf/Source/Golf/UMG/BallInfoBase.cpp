@@ -21,8 +21,20 @@ void UBallInfoBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	FVector2D canvasPos;
 	if (PlayerController->ProjectWorldLocationToScreen(mdestPos, canvasPos))
 	{
-		canvasPos.X += mDistanceCanvasSize.X * 0.2;
-		canvasPos.Y += mDistanceCanvasSize.Y * 1.5;
+		float leftDis = FVector::Dist(mballPos, mdestPos);
+		if (leftDis < 1000)
+		{
+			//canvasPos.X += mDistanceCanvasSize.X * 1.3;
+			//canvasPos.Y += mDistanceCanvasSize.Y * 1.7;
+			canvasPos = FVector2D(1050, 550);
+		}
+		else
+		{
+			//canvasPos.X += mDistanceCanvasSize.X * 1.3;
+			//canvasPos.Y += mDistanceCanvasSize.Y * 1.5;
+			canvasPos = FVector2D(1000, 500);
+		}
+
 		mDistanceCanvas->SetRenderTranslation(canvasPos);
 	}
 }

@@ -304,6 +304,7 @@ void ABall::Swing()
 		mMainHUD->SetPowerCheckBoxChecked(true);
 		mMainHUD->SetSpinCheckBoxChecked(false);
 		mMainHUD->SetMiniMapVisible(false);
+		mMainHUD->SetPuttingInfoVisible(false);
 	}
 
 	mTurn++;
@@ -427,7 +428,7 @@ void ABall::ShowDistance()
 		//distance = 5500;
 		break;
 	case EGolfClub::Putter:
-		targetDis = 800;
+		targetDis = 600;
 		//distance = 5000;
 		break;
 	}
