@@ -548,7 +548,7 @@ void ABall::SetBallDetailsByMaterial()
 		// CalculateScore();
 		break;
 	case EMaterialType::Water:
-		mSpringArm->CameraLagSpeed = 0.f;
+		//mSpringArm->CameraLagSpeed = 0.f;
 		mIsResetPos = true;
 		mResetPos = FVector(28280.0, 820, 200);
 		break;
@@ -560,7 +560,7 @@ void ABall::SetBallDetailsByMaterial()
 		break;
 	case EMaterialType::OB:
 	{
-		mSpringArm->CameraLagSpeed = 0.f;
+		//mSpringArm->CameraLagSpeed = 0.f;
 		mIsResetPos = true;
 		FVector curPos = GetActorLocation();
 		mResetPos = FVector(curPos.X, 0.0, curPos.Z + 200);
@@ -584,7 +584,15 @@ void ABall::ResetBallPos(float DeltaTime)
 		}
 
 		else
+		{
+			mSpringArm->CameraLagSpeed = 0.f;
 			SetActorLocation(mResetPos);
+
+			ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+			FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), mBallInfo.DestPos);
+			Rotator.Pitch = 0.f;
+			BallController->SetControlRotation(Rotator);
+		}
 
 		mResetTime = 0.f;
 		mIsResetPos = false;
@@ -865,10 +873,13 @@ void ABall::ChangeTurn()
 	mBallInfo.SpinRatio = 0.f;
 
 	// Hole 방향 바라보도록
-	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), mBallInfo.DestPos);
-	Rotator.Pitch = 0.f;
-	BallController->SetControlRotation(Rotator);
+	if (!mIsResetPos)
+	{
+		ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), mBallInfo.DestPos);
+		Rotator.Pitch = 0.f;
+		BallController->SetControlRotation(Rotator);
+	}
 
 	// 바람
 	UpdateWind();
