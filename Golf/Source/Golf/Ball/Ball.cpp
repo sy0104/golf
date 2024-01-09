@@ -63,6 +63,23 @@ ABall::ABall()
 	mMainCamera->SetAutoActivate(true);
 	mMainCamera->SetActive(true);
 
+	// side spring arm
+	mSideSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SideSpringArm"));
+	mSideSpringArm->SetupAttachment(mStaticMesh);
+	mSideSpringArm->SetRelativeLocation(FVector(150.0, 30.0, 0.0));
+	mSideSpringArm->SetRelativeRotation(FRotator(20.0, -170.0, 0.0));
+	mSideSpringArm->TargetArmLength = 500.f;
+	mSideSpringArm->bEnableCameraLag = true;
+	mSideSpringArm->CameraLagSpeed = 0.f;
+
+	// side camera
+	mSideCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("SideCamera"));
+	mSideCamera->SetupAttachment(mSideSpringArm);
+	mSideCamera->SetRelativeLocation(FVector(220.0, 0.0, 60.0));
+	mSideCamera->SetRelativeRotation(FRotator(-5.0, 0.0, 0.0));
+	mSideCamera->bConstrainAspectRatio = true;
+	mSideCamera->SetAutoActivate(false);
+
 	//// Ball Info
 	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
 	mBallInfo.DestPos = FVector(37303.0, -998.0, 0.0);
@@ -187,6 +204,8 @@ void ABall::Tick(float DeltaTime)
 		AddForceToSide();
 
 	ShowDistance();	
+
+	ChangeCamera(DeltaTime);
 
 	CheckMaterialCollision();
 	
@@ -531,7 +550,6 @@ void ABall::SetBallHitMaterial(FString MaterialName)
 		mHitMaterialType = EMaterialType::Tee;
 		mMainHUD->SetCourseText(L"Tee");
 	}
-
 }
 
 void ABall::SetBallDetailsByMaterial()
@@ -874,6 +892,8 @@ void ABall::ChangeTurn()
 	mIsAddPower = true;
 	mIsAddSpin = false;
 	mBallInfo.SpinRatio = 0.f;
+	mIsChangeCamera = false;
+	mMovingTime = 0.f;
 
 	// Hole 방향 바라보도록
 	if (!mIsResetPos)
@@ -1063,6 +1083,30 @@ void ABall::SetPuttingMode(bool isPutting)
 
 }
 
+void ABall::ChangeCamera(float DeltaTime)
+{
+	if (!mIsEnableSwing && mGolfClubType == EGolfClub::Driver && !mIsChangeCamera)
+	{
+		mMovingTime += DeltaTime;
+
+		// main -> side
+		if (mMainCamera->IsActive() && mMovingTime > 1.5f)
+		{
+			mMainCamera->SetActive(false);
+			mSideCamera->SetActive(true);
+		}
+
+		else if (mSideCamera->IsActive() && mMovingTime > 3.5f)
+		{
+			mMainCamera->SetActive(true);
+			mSideCamera->SetActive(false);
+
+			mIsChangeCamera = true;
+			mMovingTime = 0.f;
+		}
+	}
+}
+
 void ABall::TestKey()
 {
 	//UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
@@ -1087,7 +1131,15 @@ void ABall::TestKey()
 
 	//SetActorLocation(FVector(0.0, 0.0, 13.5));
 
-	mMainHUD->SetGoodShotVisible(true);
+	//mMainHUD->SetGoodShotVisible(true);
+
+	//AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	//ACameraActor* SideCamera = GameMode->GetSideCamera();
+	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	//BallController->SetViewTarget(SideCamera);
+
+	mMainCamera->SetActive(false);
+	mSideCamera->SetActive(true);
 }
 
 void ABall::Cheat()
@@ -1162,6 +1214,9 @@ void ABall::NextGame()
 		// 여태까지 친 shot UI 갱신
 		FString scoreText = "";
 		mMainHUD->SetPlayerTotalScoreText(EPlayer::Player2, Player2Info.TotalShot, Player2Info.Score);
+
+		// 남은 거리 UI 갱신
+		mMainHUD->SetPlayerTargetDistanceText(373.16, false);
 	}
 
 	// Player1 Score & Shot
@@ -1178,8 +1233,6 @@ void ABall::NextGame()
 	mMainHUD->SetPlayerTotalScoreText(EPlayer::Player1, Player1Info.TotalShot, Player1Info.Score);
 
 	// Total Score UI
-
-
 	mMainHUD->SetTotalScoreVisible(true);
 	mMainHUD->SetGamePlayVisible(true);
 

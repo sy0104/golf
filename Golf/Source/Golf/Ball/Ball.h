@@ -75,6 +75,9 @@ private:
 	// Putting
 	void SetPuttingMode(bool isPutting);
 
+	// Camera
+	void ChangeCamera(float DeltaTime);
+
 	// Test
 	void TestKey();
 	void Cheat();
@@ -106,6 +109,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
 	UCameraComponent*			mMainCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	USpringArmComponent*		mSideSpringArm;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
+	UCameraComponent*			mSideCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EGolfClub					mGolfClubType;
@@ -169,6 +178,11 @@ private:
 	float		mMovingDis;
 	bool		mIsGoodShot;
 	bool		mIsOnGreen;
+
+	bool		mIsChangeCamera;
+	float		mMovingTime;
+	float		mSideCameraTime;
+
 
 	class UMainHUDBase*		mMainHUD;
 
