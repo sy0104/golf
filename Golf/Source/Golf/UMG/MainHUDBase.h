@@ -103,7 +103,7 @@ public:
 	// Ball Power, Ball Spin, Ball Club
 	void SetBallInfoVisible(bool visible);
 
-	// GmaePlay
+	// Gmae Play
 	void SetGamePlayVisible(bool visible);
 
 	// Menu
@@ -117,4 +117,7 @@ public:
 	void SetPuttingClub(bool isPutting);
 	void SetPuttingInfo(FVector ballPos, FVector destPos);
 	void SetPuttingInfoVisible(bool isPutting);
+
+	// Hole Info
+	void SetHoleNumText(int num);
 };

@@ -403,3 +403,8 @@ void UMainHUDBase::SetPuttingInfoVisible(bool visible)
 	else
 		mBallInfoBase->SetVisibility(ESlateVisibility::Hidden);
 }
+
+void UMainHUDBase::SetHoleNumText(int num)
+{
+	mHoleInfoBase->SetHoleNumText(num);
+}

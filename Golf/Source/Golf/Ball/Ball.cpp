@@ -106,6 +106,7 @@ ABall::ABall()
 
 	mIsConcede = false;
 	mIsInHole = false;
+	mIsSetScore = false;
 
 	mIsMultiEnd = false;
 	mTurn = 0;
@@ -992,6 +993,7 @@ void ABall::Init(bool isEnd)
 	mTurn = 0;
 	mIsStart = false;
 	mIsEnd = false;
+	mIsSetScore = false;
 
 	// 홀 방향 바라보도록 설정
 	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -1114,11 +1116,12 @@ void ABall::TestKey()
 {
 	//UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
 	//UScoreSubsystem* SubSystem = GameInst->GetSubsystem<UScoreSubsystem>();
-	//
+	//UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
+
 	//if (IsValid(SubSystem))
 	//{
 	//	EPlayer CurPlayer = GameManager->GetCurPlayer();
-	//	EPlayer NextPlayer = GameManager->GetNextPlayer();
+	//	//EPlayer NextPlayer = GameManager->GetNextPlayer();
 
 	//	FPlayerInfo CurPlayerInfo = GameManager->GetPlayerInfo(CurPlayer);
 
@@ -1141,8 +1144,8 @@ void ABall::TestKey()
 	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	//BallController->SetViewTarget(SideCamera);
 
-	mMainCamera->SetActive(false);
-	mSideCamera->SetActive(true);
+	//mMainCamera->SetActive(false);
+	//mSideCamera->SetActive(true);
 }
 
 void ABall::Cheat()
@@ -1238,7 +1241,6 @@ void ABall::NextGame()
 	// Total Score UI
 	mMainHUD->SetTotalScoreVisible(true);
 	mMainHUD->SetGamePlayVisible(true);
-
 }
 
 void ABall::CheckPlayerGoal()
@@ -1266,9 +1268,10 @@ void ABall::CheckPlayerGoal()
 			mMainHUD->SetPlayerShotNumText(CurPlayerInfo.Shot, true);
 		}
 
-		else if (CurPlayerInfo.Shot >= 8)
+		else if (CurPlayerInfo.Shot >= 8 && !mIsSetScore)
 		{
 			CurPlayerInfo.TurnEnd = true;
+			mIsSetScore = true;
 
 			UScoreSubsystem* ScoreSub = GameInst->GetSubsystem<UScoreSubsystem>();
 			if (IsValid(ScoreSub))

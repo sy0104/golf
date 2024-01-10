@@ -167,6 +167,7 @@ private:
 	float		mChangeTurnTime;
 	bool		mIsChangeTurn;
 
+	bool		mIsSetScore;
 	bool		mIsConcede;
 	bool		mIsInHole;
 	

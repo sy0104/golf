@@ -36,6 +36,7 @@ void UGamePlayBase::OnNextButtonClicked()
 		UMainHUDBase* MainHUD = GameMode->GetMainHUD();
 		if (IsValid(MainHUD))
 		{
+			MainHUD->SetHoleNumText(GameManager->GetTurn());
 			MainHUD->SetTotalScoreVisible(false);
 			MainHUD->SetVisibility(ESlateVisibility::Visible);
 			MainHUD->SetPlayerScoreText(PlayerInfo.Score, true);	// player 1 score

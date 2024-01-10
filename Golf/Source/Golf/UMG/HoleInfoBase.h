@@ -16,4 +16,9 @@ class GOLF_API UHoleInfoBase : public UUserWidget
 protected:
 	virtual void NativeConstruct();
 
+private:
+	UTextBlock*		mHoleNumText;
+
+public:
+	void SetHoleNumText(int num);
 };
