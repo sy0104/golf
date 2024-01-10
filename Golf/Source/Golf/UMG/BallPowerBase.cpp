@@ -17,18 +17,38 @@ void UBallPowerBase::SetBallPower(float ratio)
 	mBallPowerBar->SetPercent(ratio);
 }
 
-void UBallPowerBase::SetBallDistance(EGolfClub club)
+void UBallPowerBase::SetBallDistance(EGolfClub club, EIronType ironClub)
 {
 	switch (club)
 	{
 	case EGolfClub::Driver:
-		progressDis = 280;
+		progressDis = 250;
 		break;
 	case EGolfClub::Wood:
-		progressDis = 240;
+		progressDis = 220;
 		break;
 	case EGolfClub::Iron:
-		progressDis = 200;
+		switch (ironClub)
+		{
+		case EIronType::Iron5:
+			progressDis = 160;
+			break;
+		case EIronType::Iron6:
+			progressDis = 150;
+			break;
+		case EIronType::Iron7:
+			progressDis = 140;
+			break;
+		case EIronType::Iron8:
+			progressDis = 130;
+			break;
+		case EIronType::Iron9:
+			progressDis = 120;
+			break;
+		default:
+			progressDis = 160;
+			break;
+		}
 		break;
 	case EGolfClub::Wedge:
 		progressDis = 100;
