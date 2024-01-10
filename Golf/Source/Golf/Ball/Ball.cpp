@@ -435,24 +435,19 @@ void ABall::ShowDistance()
 	switch (mGolfClubType)
 	{
 	case EGolfClub::Driver:
-		targetDis = 27000;
-		//distance = 23000;
+		targetDis = 28000;
 		break;
 	case EGolfClub::Wood:
-		targetDis = 25000;
-		//distance = 16000;
+		targetDis = 24000;
 		break;
 	case EGolfClub::Iron:
-		targetDis = 22000;
-		//distance = 14000;
+		targetDis = 20000;
 		break;
 	case EGolfClub::Wedge:
-		targetDis = 7000;
-		//distance = 5500;
+		targetDis = 10000;
 		break;
 	case EGolfClub::Putter:
 		targetDis = 600;
-		//distance = 5000;
 		break;
 	}
 

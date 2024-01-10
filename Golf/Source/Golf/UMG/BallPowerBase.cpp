@@ -22,24 +22,19 @@ void UBallPowerBase::SetBallDistance(EGolfClub club)
 	switch (club)
 	{
 	case EGolfClub::Driver:
-		progressDis = 270;
-		//progressDis = 180;
+		progressDis = 280;
 		break;
 	case EGolfClub::Wood:
-		progressDis = 250;
-		//progressDis = 150;
+		progressDis = 240;
 		break;
 	case EGolfClub::Iron:
-		progressDis = 220;
-		//progressDis = 120;
+		progressDis = 200;
 		break;
 	case EGolfClub::Wedge:
-		progressDis = 70;
-		//progressDis = 70;
+		progressDis = 100;
 		break;
 	case EGolfClub::Putter:
 		progressDis = 6;
-		//progressDis = 30;
 		break;
 	}
 
