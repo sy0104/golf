@@ -120,6 +120,9 @@ protected:
 	EGolfClub					mGolfClubType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EIronType					mIronType;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EBallSwingType				mBallSwingType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
@@ -226,5 +229,10 @@ public:
 	void SetIsAddSpin(bool spin)
 	{
 		mIsAddSpin = spin;
+	}
+
+	void SetIronType(EIronType IronType)
+	{
+		mIronType = IronType;
 	}
 };

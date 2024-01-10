@@ -16,7 +16,6 @@ class GOLF_API UGolfClubBase : public UUserWidget
 	
 protected:
 	virtual void NativeConstruct();
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:
 	UButton*		mDriverButton;
@@ -24,6 +23,12 @@ private:
 	UButton*		mIronButton;
 	UButton*		mWedgeButton;
 	UButton*		mPutterButton;
+
+	UButton*		mIron5Button;
+	UButton*		mIron6Button;
+	UButton*		mIron7Button;
+	UButton*		mIron8Button;
+	UButton*		mIron9Button;
 
 public:
 	UFUNCTION()
@@ -41,6 +46,22 @@ public:
 	UFUNCTION()
 	void OnPutterButtonClicked();
 
+	UFUNCTION()
+	void OnIron5ButtonClicked();
+
+	UFUNCTION()
+	void OnIron6ButtonClicked();
+
+	UFUNCTION()
+	void OnIron7ButtonClicked();
+
+	UFUNCTION()
+	void OnIron8ButtonClicked();
+
+	UFUNCTION()
+	void OnIron9ButtonClicked();
+
 public:
 	void SetPuttingClub(bool isPutting);
+	void SetIronButtonVisible(bool visible);
 };

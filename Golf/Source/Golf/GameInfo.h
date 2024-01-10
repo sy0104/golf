@@ -93,6 +93,16 @@ enum class EGolfClub : uint8
 };
 
 UENUM(BlueprintType)
+enum class EIronType : uint8
+{
+	Iron5,
+	Iron6,
+	Iron7,
+	Iron8,
+	Iron9,
+};
+
+UENUM(BlueprintType)
 enum class ECameraType : uint8
 {
 	Main,

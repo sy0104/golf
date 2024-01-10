@@ -29,7 +29,7 @@ ABall::ABall()
 
 	SetRootComponent(mStaticMesh);
 	mStaticMesh->SetSimulatePhysics(true);
-	mStaticMesh->SetAngularDamping(30.f);
+	mStaticMesh->SetAngularDamping(40.f);
 	mStaticMesh->SetUseCCD(true);
 	mStaticMesh->SetCollisionProfileName(TEXT("Ball"));
 	
@@ -328,6 +328,7 @@ void ABall::Swing()
 		mMainHUD->SetSpinCheckBoxChecked(false);
 		mMainHUD->SetMiniMapVisible(false);
 		mMainHUD->SetPuttingInfoVisible(false);
+		mMainHUD->SetIronButtonVisible(false);
 	}
 
 	mTurn++;
@@ -720,9 +721,33 @@ void ABall::SetBallInfoByClub(EGolfClub club)
 		mBallInfo.BallPower = 1600.f;
 		mBallInfo.BallArc = 0.7f;
 		break;
-	case EGolfClub::Iron:	// 최대 180m 정도
-		mBallInfo.BallPower = 1400.f;
+	case EGolfClub::Iron:	// 최대 170m 정도
+		//mBallInfo.BallPower = 1400.f;
+		//mBallInfo.BallArc = 0.7f;
 		mBallInfo.BallArc = 0.7f;
+
+		switch (mIronType)
+		{
+		case EIronType::Iron5:	// 160m
+			mBallInfo.BallPower = 1400.f;
+			break;
+		case EIronType::Iron6:	// 150m
+			mBallInfo.BallPower = 1000.f;
+
+			break;
+		case EIronType::Iron7:	// 140m
+			mBallInfo.BallPower = 825.f;
+
+			break;
+		case EIronType::Iron8:	// 130m
+			mBallInfo.BallPower = 760.f;
+
+			break;
+		case EIronType::Iron9:	// 120m
+			mBallInfo.BallPower = 700.f;
+
+			break;
+		}
 		break;
 	case EGolfClub::Wedge:	// 최대 70m 정도
 		mBallInfo.BallPower = 550.f;

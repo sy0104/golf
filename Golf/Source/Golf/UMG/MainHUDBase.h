@@ -120,4 +120,7 @@ public:
 
 	// Hole Info
 	void SetHoleNumText(int num);
+
+	// Club
+	void SetIronButtonVisible(bool visible);
 };

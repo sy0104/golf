@@ -408,3 +408,8 @@ void UMainHUDBase::SetHoleNumText(int num)
 {
 	mHoleInfoBase->SetHoleNumText(num);
 }
+
+void UMainHUDBase::SetIronButtonVisible(bool visible)
+{
+	mGolfClubBase->SetIronButtonVisible(false);
+}
