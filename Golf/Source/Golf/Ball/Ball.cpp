@@ -117,6 +117,8 @@ ABall::ABall()
 	mIsGoodShot = false;
 	mIsOnGreen = false;
 
+	mIsRetry = true;
+
 	mGolfClubType = EGolfClub::Driver; 
 	mHitMaterialType = EMaterialType::Tee;
 
@@ -552,7 +554,7 @@ void ABall::SetBallHitMaterial(FString MaterialName)
 
 void ABall::SetBallDetailsByMaterial()
 {
-	if (!mIsBallStopped)
+	if (!mIsBallStopped/* || mIsEnableSwing*/)
 		return;
 
 	switch (mHitMaterialType)
@@ -564,12 +566,14 @@ void ABall::SetBallDetailsByMaterial()
 		
 		break;
 	case EMaterialType::Green:
-		// CalculateScore();
 		break;
 	case EMaterialType::Water:
-		//mSpringArm->CameraLagSpeed = 0.f;
+	{
 		mIsResetPos = true;
-		mResetPos = FVector(28280.0, 820, 200);
+		FVector curPos = GetActorLocation();
+		mResetPos = FVector(curPos.X, 0.0, curPos.Z + 200);
+		mIsRetry = true;
+	}
 		break;
 	case EMaterialType::Bunker:
 
@@ -579,10 +583,9 @@ void ABall::SetBallDetailsByMaterial()
 		break;
 	case EMaterialType::OB:
 	{
-		//mSpringArm->CameraLagSpeed = 0.f;
 		mIsResetPos = true;
-		FVector curPos = GetActorLocation();
-		mResetPos = FVector(curPos.X, 0.0, curPos.Z + 200);
+		mResetPos = mBallInfo.StartPos;
+		mIsRetry = true;
 	}
 		break;
 	}
@@ -595,7 +598,7 @@ void ABall::ResetBallPos(float DeltaTime)
 
 	mResetTime += DeltaTime;
 
-	if (mResetTime > 5.f)
+	if (mResetTime > 3.f)
 	{
 		if (mHitMaterialType == EMaterialType::Road)
 		{
@@ -611,10 +614,26 @@ void ABall::ResetBallPos(float DeltaTime)
 			FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), mBallInfo.DestPos);
 			Rotator.Pitch = 0.f;
 			BallController->SetControlRotation(Rotator);
+
+			// 샷 추가
+			UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
+			UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
+
+			if (IsValid(GameManager))
+			{
+				EPlayer CurPlayer = GameManager->GetCurPlayer();
+				FPlayerInfo CurPlayerInfo = GameManager->GetCurPlayerInfo();
+				CurPlayerInfo.Shot++;
+				GameManager->SetPlayerInfo(CurPlayerInfo, (int)CurPlayer);
+
+				if (IsValid(mMainHUD))
+					mMainHUD->SetPlayerShotNumText(CurPlayerInfo.Shot);
+			}
 		}
 
 		mResetTime = 0.f;
 		mIsResetPos = false;
+		mIsRetry = false;
 	}
 }
 
@@ -722,8 +741,6 @@ void ABall::SetBallInfoByClub(EGolfClub club)
 		mBallInfo.BallArc = 0.7f;
 		break;
 	case EGolfClub::Iron:	// 최대 170m 정도
-		//mBallInfo.BallPower = 1400.f;
-		//mBallInfo.BallArc = 0.7f;
 		mBallInfo.BallArc = 0.7f;
 
 		switch (mIronType)
@@ -733,19 +750,15 @@ void ABall::SetBallInfoByClub(EGolfClub club)
 			break;
 		case EIronType::Iron6:	// 150m
 			mBallInfo.BallPower = 1000.f;
-
 			break;
 		case EIronType::Iron7:	// 140m
 			mBallInfo.BallPower = 825.f;
-
 			break;
 		case EIronType::Iron8:	// 130m
 			mBallInfo.BallPower = 760.f;
-
 			break;
 		case EIronType::Iron9:	// 120m
 			mBallInfo.BallPower = 700.f;
-
 			break;
 		}
 		break;
@@ -821,83 +834,87 @@ void ABall::ChangeTurn()
 	float leftDis = FVector::Dist(GetActorLocation(), mBallInfo.DestPos);
 	CurPlayerInfo.LeftDistance = leftDis;
 
-	// [ Multi ] 다음 순서인 플레이어 얻어오기(멀티 플레이 && 홀에 공을 아무도 넣지 못했을 경우)
-	if (mPlayType == EPlayType::Multi)
+	if (!mIsRetry)
 	{
-		NextPlayer = GameManager->GetNextPlayer();
-		NextPlayerInfo = GameManager->GetPlayerInfo(NextPlayer);
 
-		// 현재 플레이어의 정보 갱신
-		CurPlayerInfo.BallPos = GetActorLocation();
-		GameManager->SetPlayerInfo(CurPlayerInfo, (int)CurPlayer);
-
-		// 2명 다 공을 홀에 넣지 못했을 경우: 플레이어 순서를 바꾼다
-		if (!CurPlayerInfo.TurnEnd && !NextPlayerInfo.TurnEnd)
-		{
-			// 남은 거리가 더 먼 사람부터 친다 (두 플레이어 모두 한번씩 친 이후부터)
-			float dis1 = GameManager->GetPlayerLeftDis(EPlayer::Player1);
-			float dis2 = GameManager->GetPlayerLeftDis(EPlayer::Player2);
-
-			if (dis1 >= dis2)	// player1 먼저
-			{
-				GameManager->SetCurPlayer((int)EPlayer::Player1);
-				mMainHUD->SetPlayerTargetDistanceText(dis2 / 100.f, false);
-			}
-
-			else	// player2 먼저
-			{
-				GameManager->SetCurPlayer((int)EPlayer::Player2);
-				mMainHUD->SetPlayerTargetDistanceText(dis1 / 100.f, false);
-			}
-
-			mSpringArm->CameraLagSpeed = 0.f;
-			SetActorLocation(GameManager->GetCurPlayerInfo().BallPos);
-		}
-		
-		// 2명 중 1명이 먼저 홀에 공을 넣은 경우: 플레이어 순서 바꾸지 않음
-		else if (CurPlayerInfo.TurnEnd)
-		{
-			CurPlayerInfo.LeftDistance = 0.f;
-			GameManager->SetPlayerInfo(CurPlayerInfo, (int)CurPlayer);
-
-			mSpringArm->CameraLagSpeed = 0.f;
-			SetActorLocation(NextPlayerInfo.BallPos);
-
-			GameManager->SetCurPlayer((int)NextPlayer);
-			mPlayType = EPlayType::Single;
-		}
-
-		// Multi인 경우에만 다음 플레이어의 UI 갱신(현재 플레이어: Simple UI, 다음 플레이어: Detail UI)
-		SetPlayerInfoUI(GameManager->GetNextPlayer(), false);
-	}
-
-	// [ Single ] 현재 플레이어 정보 갱신
-	else
-	{
-		// 멀티에서 2명 다 홀에 넣었을 경우: 게임 종료
-		if (GameManager->GetPlayType() == EPlayType::Multi)
+		// [ Multi ] 다음 순서인 플레이어 얻어오기(멀티 플레이 && 홀에 공을 아무도 넣지 못했을 경우)
+		if (mPlayType == EPlayType::Multi)
 		{
 			NextPlayer = GameManager->GetNextPlayer();
 			NextPlayerInfo = GameManager->GetPlayerInfo(NextPlayer);
 
-			if (CurPlayerInfo.TurnEnd && NextPlayerInfo.TurnEnd)
-			{
-				mIsEnd = true;
-				NextGame();
-			}
-		}
-
-		// 싱글
-		else
-		{
+			// 현재 플레이어의 정보 갱신
 			CurPlayerInfo.BallPos = GetActorLocation();
 			GameManager->SetPlayerInfo(CurPlayerInfo, (int)CurPlayer);
 
-			// 게임 종료 확인
-			if (CurPlayerInfo.TurnEnd)
+			// 2명 다 공을 홀에 넣지 못했을 경우: 플레이어 순서를 바꾼다
+			if (!CurPlayerInfo.TurnEnd && !NextPlayerInfo.TurnEnd)
 			{
-				mIsEnd = true;
-				NextGame();
+				// 남은 거리가 더 먼 사람부터 친다 (두 플레이어 모두 한번씩 친 이후부터)
+				float dis1 = GameManager->GetPlayerLeftDis(EPlayer::Player1);
+				float dis2 = GameManager->GetPlayerLeftDis(EPlayer::Player2);
+
+				if (dis1 >= dis2)	// player1 먼저
+				{
+					GameManager->SetCurPlayer((int)EPlayer::Player1);
+					mMainHUD->SetPlayerTargetDistanceText(dis2 / 100.f, false);
+				}
+
+				else	// player2 먼저
+				{
+					GameManager->SetCurPlayer((int)EPlayer::Player2);
+					mMainHUD->SetPlayerTargetDistanceText(dis1 / 100.f, false);
+				}
+
+				mSpringArm->CameraLagSpeed = 0.f;
+				SetActorLocation(GameManager->GetCurPlayerInfo().BallPos);
+			}
+
+			// 2명 중 1명이 먼저 홀에 공을 넣은 경우: 플레이어 순서 바꾸지 않음
+			else if (CurPlayerInfo.TurnEnd)
+			{
+				CurPlayerInfo.LeftDistance = 0.f;
+				GameManager->SetPlayerInfo(CurPlayerInfo, (int)CurPlayer);
+
+				mSpringArm->CameraLagSpeed = 0.f;
+				SetActorLocation(NextPlayerInfo.BallPos);
+
+				GameManager->SetCurPlayer((int)NextPlayer);
+				mPlayType = EPlayType::Single;
+			}
+
+			// Multi인 경우에만 다음 플레이어의 UI 갱신(현재 플레이어: Simple UI, 다음 플레이어: Detail UI)
+			SetPlayerInfoUI(GameManager->GetNextPlayer(), false);
+		}
+
+		// [ Single ] 현재 플레이어 정보 갱신
+		else
+		{
+			// 멀티에서 2명 다 홀에 넣었을 경우: 게임 종료
+			if (GameManager->GetPlayType() == EPlayType::Multi)
+			{
+				NextPlayer = GameManager->GetNextPlayer();
+				NextPlayerInfo = GameManager->GetPlayerInfo(NextPlayer);
+
+				if (CurPlayerInfo.TurnEnd && NextPlayerInfo.TurnEnd)
+				{
+					mIsEnd = true;
+					NextGame();
+				}
+			}
+
+			// 싱글
+			else
+			{
+				CurPlayerInfo.BallPos = GetActorLocation();
+				GameManager->SetPlayerInfo(CurPlayerInfo, (int)CurPlayer);
+
+				// 게임 종료 확인
+				if (CurPlayerInfo.TurnEnd)
+				{
+					mIsEnd = true;
+					NextGame();
+				}
 			}
 		}
 	}

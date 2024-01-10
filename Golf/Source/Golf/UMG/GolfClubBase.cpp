@@ -33,6 +33,12 @@ void UGolfClubBase::NativeConstruct()
 
 void UGolfClubBase::OnDriverButtonClicked()
 {
+	mDriverButton->SetIsEnabled(false);
+	mWoodButton->SetIsEnabled(true);
+	mIronButton->SetIsEnabled(true);
+	mWedgeButton->SetIsEnabled(true);
+	mPutterButton->SetIsEnabled(true);
+
 	SetIronButtonVisible(false);
 
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
@@ -43,6 +49,12 @@ void UGolfClubBase::OnDriverButtonClicked()
 
 void UGolfClubBase::OnWoodButtonClicked()
 {
+	mWoodButton->SetIsEnabled(false);
+	mDriverButton->SetIsEnabled(true);
+	mIronButton->SetIsEnabled(true);
+	mWedgeButton->SetIsEnabled(true);
+	mPutterButton->SetIsEnabled(true);
+
 	SetIronButtonVisible(false);
 
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
@@ -53,6 +65,12 @@ void UGolfClubBase::OnWoodButtonClicked()
 
 void UGolfClubBase::OnIronButtonClicked()
 {
+	mWoodButton->SetIsEnabled(true);
+	mDriverButton->SetIsEnabled(true);
+	mIronButton->SetIsEnabled(false);
+	mWedgeButton->SetIsEnabled(true);
+	mPutterButton->SetIsEnabled(true);
+
 	SetIronButtonVisible(true);
 
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
@@ -63,6 +81,12 @@ void UGolfClubBase::OnIronButtonClicked()
 
 void UGolfClubBase::OnWedgeButtonClicked()
 {
+	mWoodButton->SetIsEnabled(true);
+	mDriverButton->SetIsEnabled(true);
+	mIronButton->SetIsEnabled(true);
+	mWedgeButton->SetIsEnabled(false);
+	mPutterButton->SetIsEnabled(true);
+
 	SetIronButtonVisible(false);
 
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
@@ -73,6 +97,12 @@ void UGolfClubBase::OnWedgeButtonClicked()
 
 void UGolfClubBase::OnPutterButtonClicked()
 {
+	mWoodButton->SetIsEnabled(true);
+	mDriverButton->SetIsEnabled(true);
+	mIronButton->SetIsEnabled(true);
+	mWedgeButton->SetIsEnabled(true);
+	mPutterButton->SetIsEnabled(false);
+
 	SetIronButtonVisible(false);
 
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
@@ -83,6 +113,13 @@ void UGolfClubBase::OnPutterButtonClicked()
 
 void UGolfClubBase::OnIron5ButtonClicked()
 {
+	mIron5Button->SetIsEnabled(false);
+	mIron6Button->SetIsEnabled(true);
+	mIron7Button->SetIsEnabled(true);
+	mIron8Button->SetIsEnabled(true);
+	mIron9Button->SetIsEnabled(true);
+
+
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
 	if (IsValid(Ball))
@@ -91,6 +128,12 @@ void UGolfClubBase::OnIron5ButtonClicked()
 
 void UGolfClubBase::OnIron6ButtonClicked()
 {
+	mIron5Button->SetIsEnabled(true);
+	mIron6Button->SetIsEnabled(false);
+	mIron7Button->SetIsEnabled(true);
+	mIron8Button->SetIsEnabled(true);
+	mIron9Button->SetIsEnabled(true);
+
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
 	if (IsValid(Ball))
@@ -99,6 +142,12 @@ void UGolfClubBase::OnIron6ButtonClicked()
 
 void UGolfClubBase::OnIron7ButtonClicked()
 {
+	mIron5Button->SetIsEnabled(true);
+	mIron6Button->SetIsEnabled(true);
+	mIron7Button->SetIsEnabled(false);
+	mIron8Button->SetIsEnabled(true);
+	mIron9Button->SetIsEnabled(true);
+
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
 	if (IsValid(Ball))
@@ -107,6 +156,12 @@ void UGolfClubBase::OnIron7ButtonClicked()
 
 void UGolfClubBase::OnIron8ButtonClicked()
 {
+	mIron5Button->SetIsEnabled(true);
+	mIron6Button->SetIsEnabled(true);
+	mIron7Button->SetIsEnabled(true);
+	mIron8Button->SetIsEnabled(false);
+	mIron9Button->SetIsEnabled(true);
+
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
 	if (IsValid(Ball))
@@ -115,6 +170,12 @@ void UGolfClubBase::OnIron8ButtonClicked()
 
 void UGolfClubBase::OnIron9ButtonClicked()
 {
+	mIron5Button->SetIsEnabled(true);
+	mIron6Button->SetIsEnabled(true);
+	mIron7Button->SetIsEnabled(true);
+	mIron8Button->SetIsEnabled(true);
+	mIron9Button->SetIsEnabled(false);
+
 	ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
 	if (IsValid(Ball))
@@ -125,21 +186,23 @@ void UGolfClubBase::SetPuttingClub(bool isPutting)
 {
 	if (isPutting)
 	{
-		mDriverButton->SetIsEnabled(false);
-		mWoodButton->SetIsEnabled(false);
-		mIronButton->SetIsEnabled(false);
-		mWedgeButton->SetIsEnabled(false);
+		mDriverButton->SetVisibility(ESlateVisibility::Hidden);
+		mWoodButton->SetVisibility(ESlateVisibility::Hidden);
+		mIronButton->SetVisibility(ESlateVisibility::Hidden);
+		mWedgeButton->SetVisibility(ESlateVisibility::Hidden);
 
 		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 		if (IsValid(Ball))
 			Ball->SetGolfClubType(EGolfClub::Putter);
+
+		mPutterButton->SetIsEnabled(false);
 	}
 	else
 	{
-		mDriverButton->SetIsEnabled(true);
-		mWoodButton->SetIsEnabled(true);
-		mIronButton->SetIsEnabled(true);
-		mWedgeButton->SetIsEnabled(true);
+		mDriverButton->SetVisibility(ESlateVisibility::Visible);
+		mWoodButton->SetVisibility(ESlateVisibility::Visible);
+		mIronButton->SetVisibility(ESlateVisibility::Visible);
+		mWedgeButton->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 

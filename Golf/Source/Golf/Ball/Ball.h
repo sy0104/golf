@@ -187,6 +187,7 @@ private:
 	float		mMovingTime;
 	float		mSideCameraTime;
 
+	bool		mIsRetry;
 
 	class UMainHUDBase*		mMainHUD;
 
