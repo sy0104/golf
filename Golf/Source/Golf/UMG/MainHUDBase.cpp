@@ -121,9 +121,9 @@ void UMainHUDBase::SetSpinCheckBoxChecked(bool IsChecked)
 	mBallDetailBase->SetSpinCheckBoxChecked(IsChecked);
 }
 
-void UMainHUDBase::SetBallDistance(EGolfClub club)
+void UMainHUDBase::SetBallDistance(EGolfClub club, EIronType ironClub)
 {
-	mBallPowerBase->SetBallDistance(club);
+	mBallPowerBase->SetBallDistance(club, ironClub);
 }
 
 void UMainHUDBase::SetHoleMark(FVector ballPos, FVector destPos)

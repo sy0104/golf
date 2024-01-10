@@ -54,7 +54,7 @@ public:
 	void SetSpinButtonsEnable();
 	void SetPowerCheckBoxChecked(bool IsChecked);
 	void SetSpinCheckBoxChecked(bool IsChecked);
-	void SetBallDistance(EGolfClub club);
+	void SetBallDistance(EGolfClub club, EIronType ironClub);
 	void SetHoleMark(FVector ballPos, FVector destPos);
 
 	// Score UI

@@ -26,7 +26,7 @@ private:
 
 public:
 	void SetBallPower(float ratio);
-	void SetBallDistance(EGolfClub club);
+	void SetBallDistance(EGolfClub club, EIronType ironClub);
 	void SetHoleMark(FVector ballPos, FVector destPos);
 
 private:

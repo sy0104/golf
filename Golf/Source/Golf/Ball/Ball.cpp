@@ -438,13 +438,33 @@ void ABall::ShowDistance()
 	switch (mGolfClubType)
 	{
 	case EGolfClub::Driver:
-		targetDis = 28000;
+		targetDis = 25000;
 		break;
 	case EGolfClub::Wood:
-		targetDis = 24000;
+		targetDis = 22000;
 		break;
 	case EGolfClub::Iron:
-		targetDis = 20000;
+		switch (mIronType)
+		{
+		case EIronType::Iron5:
+			targetDis = 16000;
+			break;
+		case EIronType::Iron6:
+			targetDis = 15000;
+			break;
+		case EIronType::Iron7:
+			targetDis = 14000;
+			break;
+		case EIronType::Iron8:
+			targetDis = 13000;
+			break;
+		case EIronType::Iron9:
+			targetDis = 12000;
+			break;
+		default:
+			targetDis = 16000;
+			break;
+		}
 		break;
 	case EGolfClub::Wedge:
 		targetDis = 10000;
@@ -688,7 +708,7 @@ void ABall::CheckBallStopped()
 				mMainHUD->SetDistanceVisible(false);
 				mMainHUD->SetBallStateVisible(true);
 				mMainHUD->SetMiniMapVisible(true);
-				mMainHUD->SetBallDistance(mGolfClubType);
+				mMainHUD->SetBallDistance(mGolfClubType, mIronType);
 				mMainHUD->SetHoleMark(GetActorLocation(), mBallInfo.DestPos);
 
 				if (mHitMaterialType == EMaterialType::Green)
