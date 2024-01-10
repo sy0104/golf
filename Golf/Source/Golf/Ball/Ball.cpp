@@ -69,6 +69,7 @@ ABall::ABall()
 	mSideSpringArm->SetRelativeLocation(FVector(150.0, 30.0, 0.0));
 	mSideSpringArm->SetRelativeRotation(FRotator(20.0, -170.0, 0.0));
 	mSideSpringArm->TargetArmLength = 500.f;
+	mSideSpringArm->bUsePawnControlRotation = false;
 	mSideSpringArm->bEnableCameraLag = true;
 	mSideSpringArm->CameraLagSpeed = 0.f;
 
@@ -918,6 +919,8 @@ void ABall::ChangeTurn()
 		mMainHUD->SetGoodShotVisible(false);
 		mMainHUD->SetSpinButtonsEnable();
 	}
+
+	SetActorRotation(FRotator(0.0, 0.0, 0.0));
 }
 
 void ABall::ShowTotalScore(float scale)
@@ -1096,7 +1099,7 @@ void ABall::ChangeCamera(float DeltaTime)
 			mSideCamera->SetActive(true);
 		}
 
-		else if (mSideCamera->IsActive() && mMovingTime > 3.5f)
+		else if (mSideCamera->IsActive() && mMovingTime > 4.f)
 		{
 			mMainCamera->SetActive(true);
 			mSideCamera->SetActive(false);
