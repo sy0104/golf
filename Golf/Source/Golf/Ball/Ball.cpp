@@ -1378,15 +1378,7 @@ void ABall::ShowScoreUI()
 void ABall::Wind()
 {
 	if (mHitMaterialType == EMaterialType::Green)
-	{
-		if (IsValid(mMainHUD))
-			mMainHUD->SetWindVisible(false);
-
 		return;
-	}
-
-	if (IsValid(mMainHUD))
-		mMainHUD->SetWindVisible(true);
 
 	float vel = mStaticMesh->GetComponentVelocity().Size();
 
@@ -1418,6 +1410,13 @@ void ABall::UpdateWind()
 {
 	if (IsValid(mMainHUD))
 	{
+		if (mHitMaterialType == EMaterialType::Green)
+		{
+			mMainHUD->SetWindVisible(false);
+			return;
+		}
+
+		mMainHUD->SetWindVisible(true);
 		mMainHUD->SetWindTextVisible(mWindType, false);
 
 		mWindType = EWindType(FMath::RandRange(0, 1));
