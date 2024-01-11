@@ -117,7 +117,7 @@ ABall::ABall()
 	mIsGoodShot = false;
 	mIsOnGreen = false;
 
-	mIsRetry = true;
+	mIsRetry = false;
 
 	mGolfClubType = EGolfClub::Driver; 
 	mHitMaterialType = EMaterialType::Tee;
@@ -223,7 +223,7 @@ void ABall::Tick(float DeltaTime)
 
 	FindResetPos(DeltaTime);
 
-	//Wind();
+	Wind();
 
 	CheckPlayerGoal();
 
@@ -1147,26 +1147,26 @@ void ABall::SetPuttingMode(bool isPutting)
 
 void ABall::ChangeCamera(float DeltaTime)
 {
-	if (!mIsEnableSwing && mGolfClubType == EGolfClub::Driver && !mIsChangeCamera)
-	{
-		mMovingTime += DeltaTime;
+	//if (!mIsEnableSwing && mGolfClubType == EGolfClub::Driver && !mIsChangeCamera)
+	//{
+	//	mMovingTime += DeltaTime;
 
-		// main -> side
-		if (mMainCamera->IsActive() && mMovingTime > 1.5f)
-		{
-			mMainCamera->SetActive(false);
-			mSideCamera->SetActive(true);
-		}
+	//	// main -> side
+	//	if (mMainCamera->IsActive() && mMovingTime > 1.5f)
+	//	{
+	//		mMainCamera->SetActive(false);
+	//		mSideCamera->SetActive(true);
+	//	}
 
-		else if (mSideCamera->IsActive() && mMovingTime > 4.f)
-		{
-			mMainCamera->SetActive(true);
-			mSideCamera->SetActive(false);
+	//	else if (mSideCamera->IsActive() && mMovingTime > 4.f)
+	//	{
+	//		mMainCamera->SetActive(true);
+	//		mSideCamera->SetActive(false);
 
-			mIsChangeCamera = true;
-			mMovingTime = 0.f;
-		}
-	}
+	//		mIsChangeCamera = true;
+	//		mMovingTime = 0.f;
+	//	}
+	//}
 }
 
 void ABall::TestKey()
@@ -1377,6 +1377,17 @@ void ABall::ShowScoreUI()
 
 void ABall::Wind()
 {
+	if (mHitMaterialType == EMaterialType::Green)
+	{
+		if (IsValid(mMainHUD))
+			mMainHUD->SetWindVisible(false);
+
+		return;
+	}
+
+	if (IsValid(mMainHUD))
+		mMainHUD->SetWindVisible(true);
+
 	float vel = mStaticMesh->GetComponentVelocity().Size();
 
 	if (!mIsEnableSwing && vel > 10.f)
@@ -1409,7 +1420,7 @@ void ABall::UpdateWind()
 	{
 		mMainHUD->SetWindTextVisible(mWindType, false);
 
-		mWindType = EWindType(FMath::RandRange(0, 3));
+		mWindType = EWindType(FMath::RandRange(0, 1));
 		mWindPower = FMath::RandRange(mWindPowerMin, mWindPowerMax);
 
 		mMainHUD->SetWindTextVisible(mWindType, true);

@@ -171,6 +171,14 @@ void UMainHUDBase::SetCourseText(FString CourseText)
 	mCourseBase->SetCourseText(CourseText);
 }
 
+void UMainHUDBase::SetWindVisible(bool visible)
+{
+	if (visible)
+		mWindBase->SetVisibility(ESlateVisibility::Visible);
+	else
+		mWindBase->SetVisibility(ESlateVisibility::Hidden);
+}
+
 void UMainHUDBase::SetWindTextVisible(EWindType WindType, bool visible)
 {
 	switch (WindType)

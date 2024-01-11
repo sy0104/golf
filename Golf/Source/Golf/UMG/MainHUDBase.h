@@ -70,6 +70,7 @@ public:
 	void SetCourseText(FString CourseText);
 
 	// Wind
+	void SetWindVisible(bool visible);
 	void SetWindTextVisible(EWindType WindType, bool visible);
 	void SetWindVelText(float vel);
 
