@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Components\TextBlock.h>
+#include <Components/Image.h>
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
@@ -18,6 +19,12 @@ protected:
 private:
 	UTextBlock*		mCourseText;
 
+	UImage* mBorderImage;
+	UImage* mFairwayImage;
+	UImage* mRoughImage;
+	UImage* mBunkerImage;
+
 public:
 	void SetCourseText(FString CourseText);
+	void SetCourseImage(bool visible, EMaterialType CourseImage);
 };

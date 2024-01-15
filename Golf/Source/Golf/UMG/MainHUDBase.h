@@ -68,6 +68,7 @@ public:
 
 	// Course
 	void SetCourseText(FString CourseText);
+	void SetCourseImage(bool visible, EMaterialType CourseImage);
 
 	// Wind
 	void SetWindVisible(bool visible);

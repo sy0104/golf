@@ -335,6 +335,7 @@ void ABall::Swing()
 		mMainHUD->SetMiniMapVisible(false);
 		mMainHUD->SetPuttingInfoVisible(false);
 		mMainHUD->SetIronButtonVisible(false);
+		mMainHUD->SetCourseImage(false, mHitMaterialType);
 	}
 }
 
@@ -704,6 +705,7 @@ void ABall::CheckBallStopped()
 				mMainHUD->SetMiniMapVisible(true);
 				mMainHUD->SetBallDistance(mGolfClubType, mIronType);
 				mMainHUD->SetHoleMark(GetActorLocation(), mBallInfo.DestPos);
+				mMainHUD->SetCourseImage(true, mHitMaterialType);
 
 				if (mHitMaterialType == EMaterialType::Green)
 					SetPuttingMode(true);
@@ -1076,7 +1078,10 @@ void ABall::Init(bool isEnd)
 
 		// Course Text UI ÃÊ±âÈ­
 		if (IsValid(mMainHUD))
+		{
 			mMainHUD->SetCourseText(TEXT("Tee"));
+			mMainHUD->SetCourseImage(true, mHitMaterialType);
+		}
 	}
 }
 
