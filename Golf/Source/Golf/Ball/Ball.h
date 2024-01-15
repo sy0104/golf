@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "../GameInfo.h"
@@ -27,11 +25,11 @@ private:
 	// Swing
 	void SetBallDetail(float scale);
 	void AddBallPower(float scale);
-	void AddBallSpin(float scale);
 	void SetSwingDir(float scale);
 	void Swing();
 
 	// Spin
+	void AddBallSpin(float scale);
 	void AddForceToSide();
 
 	// Distance
@@ -39,10 +37,10 @@ private:
 
 	// Collision
 	void CheckMaterialCollision();
-	void SetBallHitMaterial(FString MaterialName);
 	void CheckBallStopped();
 
-	// 
+	// Material
+	void SetBallHitMaterial(FString MaterialName);
 	void SetBallDetailsByMaterial();
 	void ResetBallPos(float DeltaTime);
 	void FindResetPos(float DeltaTime);
@@ -68,8 +66,6 @@ private:
 	void ShowTotalScore(float scale);
 	void CloseTotalScore();
 	void ShowMenu();
-
-	// Good Shot
 	void CheckGoodShot();
 
 	// Putting
@@ -85,10 +81,6 @@ private:
 public:
 	void Init(bool isEnd);
 
-public:
-	UFUNCTION(BlueprintCallable)
-	void BallBounced(const FHitResult& Hit, const FVector& ImpactVelocity);
-	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
 	USphereComponent*			mSphereComponent;
@@ -168,10 +160,8 @@ private:
 	bool		mIsConcede;
 	bool		mIsInHole;
 	
-	int			mTurn;
 	bool		mIsStart;
 	bool		mIsEnd;
-	bool		mIsMultiEnd;
 
 	float		mMovingDis;
 	bool		mIsGoodShot;
@@ -180,7 +170,6 @@ private:
 
 	bool		mIsChangeCamera;
 	float		mMovingTime;
-	float		mSideCameraTime;
 
 	bool		mIsRetry;
 

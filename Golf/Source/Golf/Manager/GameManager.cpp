@@ -70,7 +70,6 @@ void UGameManager::Init()
 		mPlayers[i].BallPos = FVector(0.0, 0.0, 13.5);
 		mPlayers[i].Score = mPlayers[i].Shot - 4;
 		mPlayers[i].Shot = 0;
-		//mPlayers[i].LeftDistance = FVector::Dist(FVector(0.0, 0.0, 13.5), FVector(37303.0, -998.0, 0.0));
 		mPlayers[i].LeftDistance = 373.16;
 		mPlayers[i].MaterialType = EMaterialType::Tee;
 		mPlayers[i].TurnEnd = false;

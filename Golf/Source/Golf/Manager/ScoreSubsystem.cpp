@@ -13,22 +13,13 @@ void UScoreSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 }
 
-void UScoreSubsystem::Deinitialize()
-{
-	Super::Deinitialize();
-}
-
 const FString UScoreSubsystem::GetScoreText(int score)
 {
 	FString ScoreText;
 
 	switch (score)
 	{
-	//case -4:
-	//	ScoreText = L"Hole In One";
-	//	break;
 	case -3:
-		//ScoreText = L"Albatross";
 		ScoreText = L"Hole In One";
 		break;
 	case -2:
@@ -49,9 +40,6 @@ const FString UScoreSubsystem::GetScoreText(int score)
 	case 3:
 		ScoreText = L"Triple Bogey";
 		break;
-	//case 4:
-	//	ScoreText = L"Double Par";
-	//	break;
 	default:
 		ScoreText = L"Double Par";
 		break;

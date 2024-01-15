@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "BallController.h"
 
 ABallController::ABallController()
@@ -25,14 +23,4 @@ void ABallController::Tick(float DeltaTime)
 void ABallController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-}
-
-void ABallController::OnPossess(APawn* aPawn)
-{
-	Super::OnPossess(aPawn);
-}
-
-void ABallController::OnUnPossess()
-{
-	Super::OnUnPossess();
 }

@@ -84,7 +84,7 @@ ABall::ABall()
 	//// Sound Effect
 	// Swing Sound
 	mSwingSound = CreateDefaultSubobject<USoundBase>(TEXT("SwingSound"));
-	const FString& SwingSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Interface_And_Item_Sounds/WAV/Special_Musical_01.Special_Musical_01'");
+	const FString& SwingSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Assets/Sound/Interface_And_Item_Sounds/WAV/Special_Musical_01.Special_Musical_01'");
 	USoundBase* SwingSoundBase = LoadObject<USoundBase>(nullptr, *SwingSoundPath);
 
 	if (IsValid(SwingSoundBase))
@@ -92,12 +92,11 @@ ABall::ABall()
 
 	// GoodShot Sound
 	mGoodShotSound = CreateDefaultSubobject<USoundBase>(TEXT("GoodShotSound"));
-	const FString& GoodShotSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Interface_And_Item_Sounds/WAV/Special_Powerup_08.Special_Powerup_08'");
+	const FString& GoodShotSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Assets/Sound/Interface_And_Item_Sounds/WAV/Special_Powerup_08.Special_Powerup_08'");
 	USoundBase* GoodShotSoundBase = LoadObject<USoundBase>(nullptr, *GoodShotSoundPath);
 
 	if (IsValid(GoodShotSoundBase))
 		mGoodShotSound = GoodShotSoundBase;
-
 
 	//// Ball Info
 	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
@@ -126,8 +125,6 @@ ABall::ABall()
 	mIsInHole = false;
 	mIsSetScore = false;
 
-	mIsMultiEnd = false;
-	mTurn = 0;
 	mIsStart = false;
 	mIsEnd = false;
 	
@@ -240,16 +237,6 @@ void ABall::Tick(float DeltaTime)
 	Wind();
 
 	CheckPlayerGoal();
-
-	//FVector loc = GetActorLocation();
-	//loc.Z += 10.f;
-	//SetActorLocation(loc);
-
-	// test
-	//mTrailer->Deactivate();
-
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("vel Z: %f"), vel.Z));
-
 }
 
 void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -349,8 +336,6 @@ void ABall::Swing()
 		mMainHUD->SetPuttingInfoVisible(false);
 		mMainHUD->SetIronButtonVisible(false);
 	}
-
-	mTurn++;
 }
 
 void ABall::SetSwingDir(float scale)
@@ -536,8 +521,6 @@ void ABall::CheckMaterialCollision()
 	}
 }
 
-// (X=37306.000000,Y=-999.000000,Z=-33.990000)
-
 void ABall::SetBallHitMaterial(FString MaterialName)
 {
 	//PrintViewport(1.f, FColor::Red, MaterialName);
@@ -676,8 +659,6 @@ void ABall::FindResetPos(float DeltaTime)
 	if (!mIsFindResetPos)
 		return;
 
-	//mStaticMesh->SetVisibility(false);
-
 	FVector loc = GetActorLocation();
 
 	if (loc.Y < 0)
@@ -696,10 +677,9 @@ void ABall::FindResetPos(float DeltaTime)
 			loc.Y -= 1000.0;
 
 		SetActorLocation(loc);
-		//mStaticMesh->SetVisibility(true);
 
 		mIsResetPos = false;
-		mIsFindResetPos = false;
+		mIsSetScore = false;
 	}
 }
 
@@ -826,15 +806,11 @@ void ABall::SetPlayerInfoUI(EPlayer player, bool isDetail)
 		mMainHUD->SetPlayerImage(PlayerInfo.ImagePath, isDetail);
 		mMainHUD->SetPlayerNameText(PlayerInfo.Name, isDetail);
 		mMainHUD->SetPlayerShotNumText(PlayerInfo.Shot, isDetail);
-		//mMainHUD->SetPlayerScoreText(PlayerInfo.Score, isDetail);
 	}
 }
 
 void ABall::CheckChangeTurn(float DeltaTime)
 {
-	//if (mPlayType == EPlayType::Single)
-	//	return;
-
 	if (mIsBallStopped && !mIsEnableSwing)
 		mChangeTurnTime += DeltaTime;
 
@@ -1080,7 +1056,6 @@ void ABall::Init(bool isEnd)
 	mIsBallStopped = true;
 	mIsConcede = false;
 	mIsInHole = false;
-	mTurn = 0;
 	mIsStart = false;
 	mIsEnd = false;
 	mIsSetScore = false;
@@ -1101,10 +1076,7 @@ void ABall::Init(bool isEnd)
 
 		// Course Text UI ÃÊ±âÈ­
 		if (IsValid(mMainHUD))
-		{
 			mMainHUD->SetCourseText(TEXT("Tee"));
-
-		}
 	}
 }
 
@@ -1122,9 +1094,10 @@ void ABall::CheckGoodShot()
 		break;
 	case EGolfClub::Iron:
 	case EGolfClub::Wedge:
+		if (mHitMaterialType == EMaterialType::Green)
+			mIsGoodShot = true;
 		break;
 	case EGolfClub::Putter:
-
 		break;
 	}
 }
@@ -1205,7 +1178,6 @@ void ABall::TestKey()
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("loc X: %f"), loc.X));
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("loc Y: %f"), loc.Y));
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("loc Z: %f"), loc.Z));
-
 }
 
 void ABall::Cheat()
@@ -1419,9 +1391,4 @@ void ABall::UpdateWind()
 		mMainHUD->SetWindTextVisible(mWindType, true);
 		mMainHUD->SetWindVelText(mWindPower / 10.f);
 	}
-}
-
-void ABall::BallBounced(const FHitResult& Hit, const FVector& ImpactVelocity)
-{
-	PrintViewport(1.f, FColor::Blue, TEXT("Bounced"));
 }

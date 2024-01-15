@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "MiniMap.h"
 #include <Components/CanvasPanelSlot.h>
 #include <Blueprint/WidgetLayoutLibrary.h>

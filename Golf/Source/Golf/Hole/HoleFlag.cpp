@@ -20,7 +20,6 @@ AHoleFlag::AHoleFlag()
 
 	mStaticMesh->SetCollisionProfileName(TEXT("IgnoreBall"));
 	mStaticMesh->SetCollisionObjectType(ECC_GameTraceChannel4);
-	//mStaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// Widget Component
 	mWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetCom"));
@@ -49,10 +48,6 @@ void AHoleFlag::Tick(float DeltaTime)
 
 			SetActorRotation(FRotator(0.f, dir.Rotation().Yaw, 0.f));
 		}
-	}
-
-
-	// mWidgetComponent->SetRelativeRotation();
-	
+	}	
 }
 

@@ -15,7 +15,6 @@ public:
 
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
-	virtual void Deinitialize() override;
 
 public:
 	const FString GetScoreText(int score);

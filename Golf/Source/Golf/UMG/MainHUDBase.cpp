@@ -67,9 +67,7 @@ void UMainHUDBase::NativeConstruct()
 
 		// [test] main에서 바로 시작
 		else
-		{
 			GameManager->CreatePlayers(EPlayType::Single);
-		}
 	}
 }
 

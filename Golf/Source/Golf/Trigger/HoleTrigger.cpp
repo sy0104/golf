@@ -38,9 +38,6 @@ void AHoleTrigger::TriggerBegin(const FHitResult& SweepResult)
 
 	if (IsValid(Ball))
 		Ball->SetInHole(true);
-
-	// 남은 거리 0으로 처리
-
 }
 
 void AHoleTrigger::TriggerEnd()
