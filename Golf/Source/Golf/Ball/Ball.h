@@ -86,22 +86,14 @@ public:
 	void Init(bool isEnd);
 
 public:
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
-		FVector NormalImpulse, const FHitResult& Hit);
-
-public:
 	UFUNCTION(BlueprintCallable)
 	void BallBounced(const FHitResult& Hit, const FVector& ImpactVelocity);
 	
-	UFUNCTION(BlueprintCallable)
-	void BallStopped(const FHitResult& ImpactResult);
-
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
 	USphereComponent*			mSphereComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
 	UStaticMeshComponent*		mStaticMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
@@ -137,11 +129,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
 	USceneCaptureComponent2D*	mMinimapCapture;
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	//UPaperSpriteComponent*		mMinimapCurrentBall;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EWindType					mWindType;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	USoundBase*					mSwingSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	USoundBase*					mGoodShotSound;
 
 	FBallInfo	mBallInfo;
 	EPlayType	mPlayType;
@@ -163,7 +158,6 @@ private:
 	float		mWindPower;
 	float		mWindPowerMin;
 	float		mWindPowerMax;
-	bool		mIsWindBlow;
 
 	float		mCameraLagSpeed;
 
@@ -181,6 +175,7 @@ private:
 
 	float		mMovingDis;
 	bool		mIsGoodShot;
+	bool		mIsPlayGoodShotSound;
 	bool		mIsOnGreen;
 
 	bool		mIsChangeCamera;

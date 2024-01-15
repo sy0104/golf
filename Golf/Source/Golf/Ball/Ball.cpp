@@ -81,6 +81,24 @@ ABall::ABall()
 	mSideCamera->bConstrainAspectRatio = true;
 	mSideCamera->SetAutoActivate(false);
 
+	//// Sound Effect
+	// Swing Sound
+	mSwingSound = CreateDefaultSubobject<USoundBase>(TEXT("SwingSound"));
+	const FString& SwingSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Interface_And_Item_Sounds/WAV/Special_Musical_01.Special_Musical_01'");
+	USoundBase* SwingSoundBase = LoadObject<USoundBase>(nullptr, *SwingSoundPath);
+
+	if (IsValid(SwingSoundBase))
+		mSwingSound = SwingSoundBase;
+
+	// GoodShot Sound
+	mGoodShotSound = CreateDefaultSubobject<USoundBase>(TEXT("GoodShotSound"));
+	const FString& GoodShotSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Interface_And_Item_Sounds/WAV/Special_Powerup_08.Special_Powerup_08'");
+	USoundBase* GoodShotSoundBase = LoadObject<USoundBase>(nullptr, *GoodShotSoundPath);
+
+	if (IsValid(GoodShotSoundBase))
+		mGoodShotSound = GoodShotSoundBase;
+
+
 	//// Ball Info
 	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
 	mBallInfo.DestPos = FVector(37303.0, -998.0, 0.0);
@@ -115,6 +133,7 @@ ABall::ABall()
 	
 	mMovingDis = 0.f;
 	mIsGoodShot = false;
+	mIsPlayGoodShotSound = false;
 	mIsOnGreen = false;
 
 	mIsRetry = false;
@@ -123,11 +142,11 @@ ABall::ABall()
 	mHitMaterialType = EMaterialType::Tee;
 
 	// wind
-	mWindType = EWindType(FMath::RandRange(0, 3)); 
+	//mWindType = EWindType(FMath::RandRange(0, 3)); 
+	mWindType = EWindType::Forward;
 	mWindPowerMin = 10.f;
 	mWindPowerMax = 60.f;
 	mWindPower = FMath::RandRange(mWindPowerMin, mWindPowerMax);
-	mIsWindBlow = true;
 
 	// Trailer
 	mTrailer = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Trailer"));
@@ -169,8 +188,6 @@ void ABall::BeginPlay()
 		}
 	}
 
-	mStaticMesh->OnComponentHit.AddDynamic(this, &ABall::OnHit);
-
 	// Play Type 받아오기
 	UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
 	UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
@@ -189,9 +206,6 @@ void ABall::BeginPlay()
 				mMainHUD->SetPlayerTargetDistanceText(PlayerInfo.LeftDistance / 100.f, false);
 		}
 	}
-
-	// Camera
-
 }
 
 void ABall::Tick(float DeltaTime)
@@ -262,6 +276,9 @@ void ABall::Swing()
 
 	if (!mIsStart)
 		mIsStart = true;
+
+	// Sound Effect
+	UGameplayStatics::PlaySound2D(this, mSwingSound, 1.f);
 
 	mIsEnableSwing = false;
 	mTrailer->Activate();
@@ -519,9 +536,11 @@ void ABall::CheckMaterialCollision()
 	}
 }
 
+// (X=37306.000000,Y=-999.000000,Z=-33.990000)
+
 void ABall::SetBallHitMaterial(FString MaterialName)
 {
-	//PrintViewport(1.f, FColor::Red, mHitMaterialName);
+	//PrintViewport(1.f, FColor::Red, MaterialName);
 
 	if (MaterialName == L"PM_LandscapeBase")
 	{
@@ -565,7 +584,7 @@ void ABall::SetBallHitMaterial(FString MaterialName)
 		mMainHUD->SetCourseText(L"OB");
 	}
 
-	else /*if (MaterialName == L"PM_LandscapeTee")*/
+	else if (MaterialName == L"PM_LandscapeTee")
 	{
 		mHitMaterialType = EMaterialType::Tee;
 		mMainHUD->SetCourseText(L"Tee");
@@ -580,10 +599,8 @@ void ABall::SetBallDetailsByMaterial()
 	switch (mHitMaterialType)
 	{
 	case EMaterialType::Tee:
-
 		break;
 	case EMaterialType::Fairway:
-		
 		break;
 	case EMaterialType::Green:
 		break;
@@ -596,17 +613,14 @@ void ABall::SetBallDetailsByMaterial()
 	}
 		break;
 	case EMaterialType::Bunker:
-
 		break;
 	case EMaterialType::Road:
 		//mIsResetPos = true;
 		break;
 	case EMaterialType::OB:
-	{
 		mIsResetPos = true;
 		mResetPos = mBallInfo.StartPos;
 		mIsRetry = true;
-	}
 		break;
 	}
 }
@@ -722,10 +736,14 @@ void ABall::CheckBallStopped()
 				// Good Shot
 				CheckGoodShot();
 				if (mIsGoodShot && !mIsConcede)
+				{
+					if (!mIsPlayGoodShotSound)
+					{
+						UGameplayStatics::PlaySound2D(this, mGoodShotSound, 1.f);
+						mIsPlayGoodShotSound = true;
+					}
 					mMainHUD->SetGoodShotVisible(true);
-
-				if (mHitMaterialType == EMaterialType::Green)
-					mIsWindBlow = false;
+				}
 			}
 		}
 	}
@@ -853,6 +871,7 @@ void ABall::ChangeTurn()
 	
 	float leftDis = FVector::Dist(GetActorLocation(), mBallInfo.DestPos);
 	CurPlayerInfo.LeftDistance = leftDis;
+	CurPlayerInfo.MaterialType = mHitMaterialType;
 
 	if (!mIsRetry)
 	{
@@ -866,6 +885,12 @@ void ABall::ChangeTurn()
 			// 현재 플레이어의 정보 갱신
 			CurPlayerInfo.BallPos = GetActorLocation();
 			GameManager->SetPlayerInfo(CurPlayerInfo, (int)CurPlayer);
+
+			// 바람 업데이트
+			if (NextPlayerInfo.MaterialType == EMaterialType::Green)
+				mIsOnGreen = true;
+			else
+				mIsOnGreen = false;
 
 			// 2명 다 공을 홀에 넣지 못했을 경우: 플레이어 순서를 바꾼다
 			if (!CurPlayerInfo.TurnEnd && !NextPlayerInfo.TurnEnd)
@@ -953,6 +978,7 @@ void ABall::ChangeTurn()
 	mBallInfo.SpinRatio = 0.f;
 	mIsChangeCamera = false;
 	mMovingTime = 0.f;
+	mIsPlayGoodShotSound = false;
 
 	// Hole 방향 바라보도록
 	if (!mIsResetPos)
@@ -964,7 +990,8 @@ void ABall::ChangeTurn()
 	}
 
 	// 바람
-	UpdateWind();
+	if (!mIsEnd)
+		UpdateWind();
 
 	// UI 업데이트
 	if (IsValid(mMainHUD) && !mIsEnd)
@@ -976,6 +1003,12 @@ void ABall::ChangeTurn()
 		mMainHUD->SetConcedeTextVisible(false);
 		mMainHUD->SetGoodShotVisible(false);
 		mMainHUD->SetSpinButtonsEnable();
+		mMainHUD->ResetClubButtons();
+
+		if (mIsOnGreen)
+			mMainHUD->SetWindVisible(false);
+		else
+			mMainHUD->SetWindVisible(true);
 	}
 
 	SetActorRotation(FRotator(0.0, 0.0, 0.0));
@@ -1051,6 +1084,7 @@ void ABall::Init(bool isEnd)
 	mIsStart = false;
 	mIsEnd = false;
 	mIsSetScore = false;
+	mIsOnGreen = false;
 
 	// 홀 방향 바라보도록 설정
 	ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -1088,11 +1122,6 @@ void ABall::CheckGoodShot()
 		break;
 	case EGolfClub::Iron:
 	case EGolfClub::Wedge:
-		//if (mHitMaterialType == EMaterialType::Green && !mIsOnGreen)
-		//{
-		//	mIsGoodShot = true;
-		//	mIsOnGreen = true;
-		//}
 		break;
 	case EGolfClub::Putter:
 
@@ -1147,65 +1176,29 @@ void ABall::SetPuttingMode(bool isPutting)
 
 void ABall::ChangeCamera(float DeltaTime)
 {
-	//if (!mIsEnableSwing && mGolfClubType == EGolfClub::Driver && !mIsChangeCamera)
-	//{
-	//	mMovingTime += DeltaTime;
+	if (!mIsEnableSwing && mGolfClubType == EGolfClub::Driver && !mIsChangeCamera)
+	{
+		mMovingTime += DeltaTime;
 
-	//	// main -> side
-	//	if (mMainCamera->IsActive() && mMovingTime > 1.5f)
-	//	{
-	//		mMainCamera->SetActive(false);
-	//		mSideCamera->SetActive(true);
-	//	}
+		// main -> side
+		if (mMainCamera->IsActive() && mMovingTime > 1.5f)
+		{
+			mMainCamera->SetActive(false);
+			mSideCamera->SetActive(true);
+		}
 
-	//	else if (mSideCamera->IsActive() && mMovingTime > 4.f)
-	//	{
-	//		mMainCamera->SetActive(true);
-	//		mSideCamera->SetActive(false);
+		else if (mSideCamera->IsActive() && mMovingTime > 4.f)
+		{
+			mMainCamera->SetActive(true);
+			mSideCamera->SetActive(false);
 
-	//		mIsChangeCamera = true;
-	//		mMovingTime = 0.f;
-	//	}
-	//}
+			mIsChangeCamera = true;
+			mMovingTime = 0.f;
+		}
+	}
 }
 
 void ABall::TestKey()
-{
-	//UGFGameInstance* GameInst = GetWorld()->GetGameInstance<UGFGameInstance>();
-	//UScoreSubsystem* SubSystem = GameInst->GetSubsystem<UScoreSubsystem>();
-	//UGameManager* GameManager = GameInst->GetSubsystem<UGameManager>();
-
-	//if (IsValid(SubSystem))
-	//{
-	//	EPlayer CurPlayer = GameManager->GetCurPlayer();
-	//	//EPlayer NextPlayer = GameManager->GetNextPlayer();
-
-	//	FPlayerInfo CurPlayerInfo = GameManager->GetPlayerInfo(CurPlayer);
-
-	//	//PrintViewport(3.f, FColor::Red, FString::Printf(TEXT("Next Player: %d"), (int)NextPlayer));
-	//	//PrintViewport(3.f, FColor::Red, FString::Printf(TEXT("Cur Player: %d"), (int)CurPlayer));
-
-	//	if (IsValid(SubSystem))
-	//	{
-	//		FString ScoreText = SubSystem->GetScoreText(CurPlayerInfo.Shot);
-	//		PrintViewport(3.f, FColor::Red, ScoreText);
-	//	}
-	//}
-
-	//SetActorLocation(FVector(0.0, 0.0, 13.5));
-
-	//mMainHUD->SetGoodShotVisible(true);
-
-	//AGFGameModeBase* GameMode = Cast<AGFGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	//ACameraActor* SideCamera = GameMode->GetSideCamera();
-	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	//BallController->SetViewTarget(SideCamera);
-
-	//mMainCamera->SetActive(false);
-	//mSideCamera->SetActive(true);
-}
-
-void ABall::Cheat()
 {
 	//FVector loc = GetActorLocation();
 
@@ -1213,15 +1206,14 @@ void ABall::Cheat()
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("loc Y: %f"), loc.Y));
 	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("loc Z: %f"), loc.Z));
 
+}
+
+void ABall::Cheat()
+{
 	mSpringArm->CameraLagSpeed = 0.f;
 
 	FVector loc = FVector(37248.8, -1010.9, 2.475);
 	SetActorLocation(loc);
-
-	//ABallController* BallController = Cast<ABallController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	//FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), mBallInfo.DestPos);
-	//Rotator.Pitch = 0.f;
-	//BallController->SetControlRotation(Rotator);
 }
 
 void ABall::NextGame()
@@ -1298,6 +1290,9 @@ void ABall::NextGame()
 	// Total Score UI
 	mMainHUD->SetTotalScoreVisible(true);
 	mMainHUD->SetGamePlayVisible(true);
+
+	// Club Buttons
+	mMainHUD->ResetClubButtons();
 }
 
 void ABall::CheckPlayerGoal()
@@ -1337,7 +1332,6 @@ void ABall::CheckPlayerGoal()
 				mMainHUD->SetScoreText(ScoreText);
 			}
 		}
-
 		GameManager->SetPlayerInfo(CurPlayerInfo, (int)CurPlayer);
 	}
 
@@ -1377,7 +1371,7 @@ void ABall::ShowScoreUI()
 
 void ABall::Wind()
 {
-	if (mHitMaterialType == EMaterialType::Green)
+	if (mIsOnGreen)
 		return;
 
 	float vel = mStaticMesh->GetComponentVelocity().Size();
@@ -1410,7 +1404,7 @@ void ABall::UpdateWind()
 {
 	if (IsValid(mMainHUD))
 	{
-		if (mHitMaterialType == EMaterialType::Green)
+		if (mIsOnGreen)
 		{
 			mMainHUD->SetWindVisible(false);
 			return;
@@ -1427,18 +1421,7 @@ void ABall::UpdateWind()
 	}
 }
 
-void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	FVector NormalImpulse, const FHitResult& Hit)
-{
-	PrintViewport(5.f, FColor::Blue, TEXT("OnHit"));
-}
-
 void ABall::BallBounced(const FHitResult& Hit, const FVector& ImpactVelocity)
 {
 	PrintViewport(1.f, FColor::Blue, TEXT("Bounced"));
-}
-
-void ABall::BallStopped(const FHitResult& ImpactResult)
-{
-	PrintViewport(1.f, FColor::Blue, TEXT("Stopped"));
 }

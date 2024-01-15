@@ -64,4 +64,5 @@ public:
 public:
 	void SetPuttingClub(bool isPutting);
 	void SetIronButtonVisible(bool visible);
+	void ResetClubButtons();
 };

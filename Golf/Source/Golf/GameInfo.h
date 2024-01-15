@@ -21,7 +21,18 @@ DECLARE_LOG_CATEGORY_EXTERN(PF, Log, All);
 
 void PrintViewport(float Time, const FColor& Color, const FString& Text);
 
-
+UENUM(BlueprintType)
+enum class EMaterialType : uint8
+{
+	Tee,
+	Fairway,
+	Green,
+	Rough,
+	Water,
+	Bunker,
+	Road,
+	OB
+};
 
 USTRUCT(BlueprintType)
 struct FBallInfo
@@ -79,6 +90,9 @@ public:
 	FVector		BallPos;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EMaterialType		MaterialType;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	bool		TurnEnd;
 };
 
@@ -117,18 +131,7 @@ enum class EBallSwingType : uint8
 	Right
 };
 
-UENUM(BlueprintType)
-enum class EMaterialType : uint8
-{
-	Tee,
-	Fairway,
-	Green,
-	Rough,
-	Water,
-	Bunker,
-	Road,
-	OB
-};
+
 
 UENUM(BlueprintType)
 enum class EWindType : uint8

@@ -421,3 +421,8 @@ void UMainHUDBase::SetIronButtonVisible(bool visible)
 {
 	mGolfClubBase->SetIronButtonVisible(false);
 }
+
+void UMainHUDBase::ResetClubButtons()
+{
+	mGolfClubBase->ResetClubButtons();
+}

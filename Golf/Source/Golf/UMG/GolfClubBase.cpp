@@ -226,3 +226,20 @@ void UGolfClubBase::SetIronButtonVisible(bool visible)
 		mIron9Button->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
+
+void UGolfClubBase::ResetClubButtons()
+{
+	mWoodButton->SetIsEnabled(true);
+	mDriverButton->SetIsEnabled(true);
+	mIronButton->SetIsEnabled(true);
+	mWedgeButton->SetIsEnabled(true);
+	mPutterButton->SetIsEnabled(true);
+
+	mIron5Button->SetIsEnabled(true);
+	mIron6Button->SetIsEnabled(true);
+	mIron7Button->SetIsEnabled(true);
+	mIron8Button->SetIsEnabled(true);
+	mIron9Button->SetIsEnabled(true);
+
+	SetIronButtonVisible(false);
+}

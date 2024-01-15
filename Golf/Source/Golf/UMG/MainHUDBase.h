@@ -124,4 +124,5 @@ public:
 
 	// Club
 	void SetIronButtonVisible(bool visible);
+	void ResetClubButtons();
 };

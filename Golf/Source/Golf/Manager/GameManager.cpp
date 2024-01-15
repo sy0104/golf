@@ -35,6 +35,7 @@ void UGameManager::CreatePlayers(EPlayType PlayType)
 	player.TotalShot = 0;
 	player.Shot = 0;
 	player.LeftDistance = FVector::Dist(FVector(0.0, 0.0, 13.5), FVector(37303.0, -998.0, 0.0));
+	player.MaterialType = EMaterialType::Tee;
 	player.TurnEnd = false;
 
 	mPlayers.Add(player);
@@ -71,6 +72,7 @@ void UGameManager::Init()
 		mPlayers[i].Shot = 0;
 		//mPlayers[i].LeftDistance = FVector::Dist(FVector(0.0, 0.0, 13.5), FVector(37303.0, -998.0, 0.0));
 		mPlayers[i].LeftDistance = 373.16;
+		mPlayers[i].MaterialType = EMaterialType::Tee;
 		mPlayers[i].TurnEnd = false;
 	}
 }
