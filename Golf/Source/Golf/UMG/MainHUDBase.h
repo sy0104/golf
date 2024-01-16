@@ -36,7 +36,7 @@ private:
 	class UMenuBase*			mMenuBase;
 	class UGoodShotBase*		mGoodShotBase;
 	class UBallInfoBase*		mBallInfoBase;
-	
+
 public:
 	class UDistanceBase* GetDistanceBase()
 	{
