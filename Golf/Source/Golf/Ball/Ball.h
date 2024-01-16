@@ -181,6 +181,7 @@ private:
 	
 	bool		mIsStart;
 	bool		mIsEnd;
+	bool		mIsTeeShotEnd;
 
 	float		mMovingDis;
 	bool		mIsGoodShot;

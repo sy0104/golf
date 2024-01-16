@@ -113,6 +113,7 @@ ABall::ABall()
 
 	mIsStart = false;
 	mIsEnd = false;
+	mIsTeeShotEnd = false;
 	
 	mMovingDis = 0.f;
 	mIsGoodShot = false;
@@ -275,8 +276,8 @@ void ABall::Swing()
 		// Bunker
 		if (mHitMaterialType == EMaterialType::Bunker)
 		{
-			OutVelocity *= 0.6;
-			mBallInfo.BallArc *= 0.5;
+			OutVelocity *= 0.8;
+			mBallInfo.BallArc *= 0.7;
 		}
 
 		mStaticMesh->AddImpulse(OutVelocity);
@@ -567,6 +568,13 @@ void ABall::CheckMaterialCollision()
 void ABall::SetBallHitMaterial(FString MaterialName)
 {
 	//PrintViewport(1.f, FColor::Red, MaterialName);
+
+	if (GetActorLocation().X < 10.f)
+	{
+		mHitMaterialType = EMaterialType::Tee;
+		mMainHUD->SetCourseText("Tee");
+		return;
+	}
 
 	if (MaterialName == L"PM_LandscapeBase")
 	{
@@ -1156,13 +1164,13 @@ void ABall::CheckGoodShot()
 			mIsGoodShot = true;
 		break;
 	case EGolfClub::Wood:
-		if (mMovingDis / 100.f >= 150.f && mHitMaterialType == EMaterialType::Fairway)
-			mIsGoodShot = true;
+		//if (mMovingDis / 100.f >= 150.f && mHitMaterialType == EMaterialType::Fairway)
+		//	mIsGoodShot = true;
 		break;
 	case EGolfClub::Iron:
 	case EGolfClub::Wedge:
-		if (mHitMaterialType == EMaterialType::Green)
-			mIsGoodShot = true;
+		//if (mHitMaterialType == EMaterialType::Green)
+		//	mIsGoodShot = true;
 		break;
 	case EGolfClub::Putter:
 		break;
@@ -1442,7 +1450,7 @@ void ABall::UpdateWind()
 		mMainHUD->SetWindVisible(true);
 		mMainHUD->SetWindTextVisible(mWindType, false);
 
-		mWindType = EWindType(FMath::RandRange(0, 1));
+		mWindType = EWindType(FMath::RandRange(0, 3));
 		mWindPower = FMath::RandRange(mWindPowerMin, mWindPowerMax);
 
 		mMainHUD->SetWindTextVisible(mWindType, true);
