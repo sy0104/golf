@@ -6,6 +6,7 @@ void UBallInfoBase::NativeConstruct()
 
 	mDistanceCanvas = Cast<UCanvasPanel>(GetWidgetFromName(FName(TEXT("DistanceCanvas"))));
 	mDistanceText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("DistanceText"))));
+	mHeightText = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("HeightText"))));
 
 }
 
@@ -43,4 +44,7 @@ void UBallInfoBase::SetPuttingInfo(FVector ballPos, FVector destPos)
 
 	float leftDis = FVector::Dist(mballPos, mdestPos);
 	mDistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), leftDis / 100.f) + TEXT("m")));
+	
+	float leftHeight = mdestPos.Z - mballPos.Z;
+	mHeightText->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), leftHeight / 100.f) + TEXT("m")));
 }

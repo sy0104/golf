@@ -19,6 +19,7 @@ protected:
 private:
 	UCanvasPanel* mDistanceCanvas;
 	UTextBlock* mDistanceText;
+	UTextBlock* mHeightText;
 
 	FVector mballPos;
 	FVector mdestPos;
