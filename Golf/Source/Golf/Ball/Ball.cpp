@@ -148,13 +148,7 @@ ABall::ABall()
 	// Trailer
 	mTrailer = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Trailer"));
 	mTrailer->SetupAttachment(mStaticMesh);
-
-	const FString& niagaraPath = TEXT("/Game/Materials/N_BallTrail.N_BallTrail");
-	UNiagaraSystem* niagara = LoadObject<UNiagaraSystem>(nullptr, *niagaraPath);
-	if (IsValid(niagara))
-	{
-		mTrailer->SetAsset(niagara);
-	}
+	SetTrailer(EPlayer::Player1);
 	mTrailer->bAutoActivate = false;
 	mTrailer->Deactivate();
 
@@ -268,7 +262,6 @@ void ABall::Swing()
 	UGameplayStatics::PlaySound2D(this, mSwingSound, 1.f);
 
 	mIsEnableSwing = false;
-	mTrailer->Activate();
 	mSpringArm->CameraLagSpeed = mCameraLagSpeed;
 
 	// Club에 따라 볼 정보(dis, arc) 설정
@@ -321,6 +314,9 @@ void ABall::Swing()
 		{
 			mMainHUD->SetPlayerShotNumText(CurPlayerInfo.Shot, true);
 		}
+
+		// Trailer
+		SetTrailer(CurPlayer);
 	}
 
 	// UI Update
@@ -702,15 +698,30 @@ void ABall::CheckBallStopped()
 				mMainHUD->SetDistanceText(0.f);
 				mMainHUD->SetDistanceVisible(false);
 				mMainHUD->SetBallStateVisible(true);
-				mMainHUD->SetMiniMapVisible(true);
+				//mMainHUD->SetMiniMapVisible(true);
 				mMainHUD->SetBallDistance(mGolfClubType, mIronType);
 				mMainHUD->SetHoleMark(GetActorLocation(), mBallInfo.DestPos);
 				mMainHUD->SetCourseImage(true, mHitMaterialType);
 
 				if (mHitMaterialType == EMaterialType::Green)
-					SetPuttingMode(true);
+				{
+					// MiniMap
+					mMainHUD->SetMiniMapVisible(false);
+					// Club
+					mMainHUD->SetPuttingClub(true);
+					// Ball Info (Distance)
+					mMainHUD->SetPuttingInfo(GetActorLocation(), mBallInfo.DestPos);
+					mMainHUD->SetPuttingInfoVisible(true);
+				}
 				else
-					SetPuttingMode(false);	
+				{
+					// MiniMap
+					mMainHUD->SetMiniMapVisible(true);
+					// Club
+					mMainHUD->SetPuttingClub(false);
+					// Ball Info (Distance)
+					mMainHUD->SetPuttingInfoVisible(false);
+				}
 			}
 
 			else
@@ -736,7 +747,7 @@ void ABall::CheckBallStopped()
 
 		if (mIsStart)
 			mTrailer->Activate();
-
+			
 		if (mIsEnableSwing)
 			mTrailer->Deactivate();
 
@@ -1107,51 +1118,6 @@ void ABall::CheckGoodShot()
 	}
 }
 
-void ABall::SetPuttingMode(bool isPutting)
-{
-	if (isPutting)
-	{
-		// MiniMap
-		mMainHUD->SetMiniMapVisible(false);
-
-		// Club
-		mMainHUD->SetPuttingClub(true);
-
-		// Trailer
-		if (mTrailer->GetAsset()->GetEmitterHandle(1).IsValid() && mTrailer->GetAsset()->GetEmitterHandle(1).GetName() == "Ribbon" &&
-			mTrailer->GetAsset()->GetEmitterHandle(2).IsValid() && mTrailer->GetAsset()->GetEmitterHandle(2).GetName() == "Fire")
-		{
-			mTrailer->GetAsset()->GetEmitterHandle(2).SetIsEnabled(false, *mTrailer->GetAsset(), true);
-			mTrailer->GetAsset()->GetEmitterHandle(1).SetIsEnabled(true, *mTrailer->GetAsset(), true);
-		}
-
-		// Ball Info (Distance)
-		mMainHUD->SetPuttingInfo(GetActorLocation(), mBallInfo.DestPos);
-		mMainHUD->SetPuttingInfoVisible(true);
-	}
-	else
-	{
-		// MiniMap
-		mMainHUD->SetMiniMapVisible(true);
-
-		// Club
-		mMainHUD->SetPuttingClub(false);
-
-		// Trailer
-		if (mTrailer->GetAsset()->GetEmitterHandle(1).IsValid() && mTrailer->GetAsset()->GetEmitterHandle(1).GetName() == "Ribbon" &&
-			mTrailer->GetAsset()->GetEmitterHandle(2).IsValid() && mTrailer->GetAsset()->GetEmitterHandle(2).GetName() == "Fire")
-		{
-			mTrailer->GetAsset()->GetEmitterHandle(2).SetIsEnabled(true, *mTrailer->GetAsset(), true);
-			//mTrailer->GetAsset()->GetEmitterHandle(1).SetIsEnabled(true, *mTrailer->GetAsset(), true);
-		}
-
-		// Ball Info (Distance)
-		mMainHUD->SetPuttingInfoVisible(false);
-
-	}
-
-}
-
 void ABall::ChangeCamera(float DeltaTime)
 {
 	if (!mIsEnableSwing && mGolfClubType == EGolfClub::Driver && !mIsChangeCamera)
@@ -1191,6 +1157,41 @@ void ABall::Cheat()
 
 	FVector loc = FVector(37248.8, -1010.9, 2.475);
 	SetActorLocation(loc);
+}
+
+void ABall::SetTrailer(EPlayer CurPlayer)
+{
+	if(CurPlayer == EPlayer::Player1)
+	{
+		const FString& niagaraPath = TEXT("/Game/Materials/N_BallTrail_Player1.N_BallTrail_Player1");
+		UNiagaraSystem* niagara = LoadObject<UNiagaraSystem>(nullptr, *niagaraPath);
+		if (IsValid(niagara))
+			mTrailer->SetAsset(niagara);
+	}
+	else if (CurPlayer == EPlayer::Player2)
+	{
+		const FString& niagaraPath = TEXT("/Game/Materials/N_BallTrail_Player2.N_BallTrail_Player2");
+		UNiagaraSystem* niagara = LoadObject<UNiagaraSystem>(nullptr, *niagaraPath);
+		if (IsValid(niagara))
+			mTrailer->SetAsset(niagara);
+	}
+
+	if (mGolfClubType == EGolfClub::Putter)
+	{
+		if (mTrailer->GetAsset()->GetEmitterHandle(1).IsValid() && mTrailer->GetAsset()->GetEmitterHandle(1).GetName() == "Sprite")
+		{
+			mTrailer->GetAsset()->GetEmitterHandle(1).SetIsEnabled(false, *mTrailer->GetAsset(), true);
+		}
+	}
+	else
+	{
+		if (mTrailer->GetAsset()->GetEmitterHandle(1).IsValid() && mTrailer->GetAsset()->GetEmitterHandle(1).GetName() == "Sprite")
+		{
+			mTrailer->GetAsset()->GetEmitterHandle(1).SetIsEnabled(true, *mTrailer->GetAsset(), true);
+		}
+	}
+
+	mTrailer->Activate();
 }
 
 void ABall::NextGame()
