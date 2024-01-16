@@ -29,6 +29,12 @@ private:
 	UButton*		mIron8Button;
 	UButton*		mIron9Button;
 
+	UImage*			mDriverFrame;
+	UImage*			mWoodFrame;
+	UImage*			mIronFrame;
+	UImage*			mWedgeFrame;
+	UImage*			mPutterFrame;
+
 	UImage*			mIron5Frame;
 	UImage*			mIron6Frame;
 	UImage*			mIron7Frame;

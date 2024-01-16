@@ -19,6 +19,13 @@ void UGolfClubBase::NativeConstruct()
 
 	mDriverButton->SetIsEnabled(false);
 
+	// Club Frame
+	mDriverFrame = Cast<UImage>(GetWidgetFromName(FName(TEXT("DriverFrame"))));
+	mWoodFrame = Cast<UImage>(GetWidgetFromName(FName(TEXT("WoodFrame"))));
+	mIronFrame = Cast<UImage>(GetWidgetFromName(FName(TEXT("IronFrame"))));
+	mWedgeFrame = Cast<UImage>(GetWidgetFromName(FName(TEXT("WedgeFrame"))));
+	mPutterFrame = Cast<UImage>(GetWidgetFromName(FName(TEXT("PutterFrame"))));
+
 	// Iron
 	mIron5Button = Cast<UButton>(GetWidgetFromName(FName(TEXT("Iron5Button"))));
 	mIron6Button = Cast<UButton>(GetWidgetFromName(FName(TEXT("Iron6Button"))));
@@ -206,6 +213,11 @@ void UGolfClubBase::SetPuttingClub(bool isPutting)
 		mIronButton->SetVisibility(ESlateVisibility::Hidden);
 		mWedgeButton->SetVisibility(ESlateVisibility::Hidden);
 
+		mDriverFrame->SetVisibility(ESlateVisibility::Hidden);
+		mWoodFrame->SetVisibility(ESlateVisibility::Hidden);
+		mIronFrame->SetVisibility(ESlateVisibility::Hidden);
+		mWedgeFrame->SetVisibility(ESlateVisibility::Hidden);
+
 		ABall* Ball = Cast<ABall>(GetWorld()->GetFirstPlayerController()->GetPawn());
 		if (IsValid(Ball))
 			Ball->SetGolfClubType(EGolfClub::Putter);
@@ -218,6 +230,11 @@ void UGolfClubBase::SetPuttingClub(bool isPutting)
 		mWoodButton->SetVisibility(ESlateVisibility::Visible);
 		mIronButton->SetVisibility(ESlateVisibility::Visible);
 		mWedgeButton->SetVisibility(ESlateVisibility::Visible);
+
+		mDriverFrame->SetVisibility(ESlateVisibility::Visible);
+		mWoodFrame->SetVisibility(ESlateVisibility::Visible);
+		mIronFrame->SetVisibility(ESlateVisibility::Visible);
+		mWedgeFrame->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 
