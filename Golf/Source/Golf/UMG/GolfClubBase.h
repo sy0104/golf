@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Components\Button.h>
+#include <Components\Image.h>
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
@@ -27,6 +28,12 @@ private:
 	UButton*		mIron7Button;
 	UButton*		mIron8Button;
 	UButton*		mIron9Button;
+
+	UImage*			mIron5Frame;
+	UImage*			mIron6Frame;
+	UImage*			mIron7Frame;
+	UImage*			mIron8Frame;
+	UImage*			mIron9Frame;
 
 public:
 	UFUNCTION()

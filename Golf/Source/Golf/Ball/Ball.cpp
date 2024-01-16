@@ -81,22 +81,8 @@ ABall::ABall()
 	mSideCamera->bConstrainAspectRatio = true;
 	mSideCamera->SetAutoActivate(false);
 
-	//// Sound Effect
-	// Swing Sound
-	mSwingSound = CreateDefaultSubobject<USoundBase>(TEXT("SwingSound"));
-	const FString& SwingSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Assets/Sound/Interface_And_Item_Sounds/WAV/Special_Musical_01.Special_Musical_01'");
-	USoundBase* SwingSoundBase = LoadObject<USoundBase>(nullptr, *SwingSoundPath);
-
-	if (IsValid(SwingSoundBase))
-		mSwingSound = SwingSoundBase;
-
-	// GoodShot Sound
-	mGoodShotSound = CreateDefaultSubobject<USoundBase>(TEXT("GoodShotSound"));
-	const FString& GoodShotSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Assets/Sound/Interface_And_Item_Sounds/WAV/Special_Powerup_08.Special_Powerup_08'");
-	USoundBase* GoodShotSoundBase = LoadObject<USoundBase>(nullptr, *GoodShotSoundPath);
-
-	if (IsValid(GoodShotSoundBase))
-		mGoodShotSound = GoodShotSoundBase;
+	// Sound
+	LoadSound();
 
 	//// Ball Info
 	mBallInfo.StartPos = FVector(0.0, 0.0, 0.0);
@@ -265,7 +251,8 @@ void ABall::Swing()
 		mIsStart = true;
 
 	// Sound Effect
-	UGameplayStatics::PlaySound2D(this, mSwingSound, 1.f);
+	//UGameplayStatics::PlaySound2D(this, mSwingSound, 1.f);
+	//UGameplayStatics::Sound
 
 	mIsEnableSwing = false;
 	mTrailer->Activate();
@@ -365,6 +352,65 @@ void ABall::AddForceToSide()
 
 		mStaticMesh->AddForce(CrossVec * mBallInfo.SpinPower * mBallInfo.SpinRatio);
 	}
+}
+
+void ABall::LoadSound()
+{
+	// Driver Sound
+	mDriverSound = CreateDefaultSubobject<USoundBase>(TEXT("DriverSound"));
+	const FString& DriverSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Assets/Sound/Driver.Driver'");
+	USoundBase* DriverSoundBase = LoadObject<USoundBase>(nullptr, *DriverSoundPath);
+
+	if (IsValid(DriverSoundBase))
+		mDriverSound = DriverSoundBase;
+
+	// Wood Sound
+	mWoodSound = CreateDefaultSubobject<USoundBase>(TEXT("WoodSound"));
+	const FString& WoodSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Assets/Sound/Wood.Wood'");
+	USoundBase* WoodSoundBase = LoadObject<USoundBase>(nullptr, *WoodSoundPath);
+
+	if (IsValid(WoodSoundBase))
+		mWoodSound = WoodSoundBase;
+
+	// Iron Sound
+	mIronSound = CreateDefaultSubobject<USoundBase>(TEXT("IronSound"));
+	const FString& IronSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Assets/Sound/Iron.Iron'");
+	USoundBase* IronSoundBase = LoadObject<USoundBase>(nullptr, *IronSoundPath);
+
+	if (IsValid(IronSoundBase))
+		mIronSound = IronSoundBase;
+
+	// Wedge Sound
+	mWedgeSound = CreateDefaultSubobject<USoundBase>(TEXT("WedgeSound"));
+	const FString& WedgeSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Assets/Sound/Wedge.Wedge'");
+	USoundBase* WedgeSoundBase = LoadObject<USoundBase>(nullptr, *WedgeSoundPath);
+
+	if (IsValid(WedgeSoundBase))
+		mWedgeSound = WedgeSoundBase;
+
+	// Putter Sound
+	mPutterSound = CreateDefaultSubobject<USoundBase>(TEXT("PutterSound"));
+	const FString& PutterSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Assets/Sound/Putter.Putter'");
+	USoundBase* PutterSoundBase = LoadObject<USoundBase>(nullptr, *PutterSoundPath);
+
+	if (IsValid(PutterSoundBase))
+		mPutterSound = PutterSoundBase;
+
+	// GoodShot Sound
+	mGoodShotSound = CreateDefaultSubobject<USoundBase>(TEXT("GoodShotSound"));
+	const FString& GoodShotSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Assets/Sound/GoodShot.GoodShot'");
+	USoundBase* GoodShotSoundBase = LoadObject<USoundBase>(nullptr, *GoodShotSoundPath);
+
+	if (IsValid(GoodShotSoundBase))
+		mGoodShotSound = GoodShotSoundBase;
+
+	// HoleIn Sound
+	mHoleInSound = CreateDefaultSubobject<USoundBase>(TEXT("HoleInSound"));
+	const FString& HoleInSoundPath = TEXT("/Script/Engine.SoundWave'/Game/Assets/Sound/HoleIn.HoleIn'");
+	USoundBase* HoleInSoundBase = LoadObject<USoundBase>(nullptr, *HoleInSoundPath);
+
+	if (IsValid(HoleInSoundBase))
+		mHoleInSound = HoleInSoundBase;
 }
 
 void ABall::SetBallDetail(float scale)
@@ -751,14 +797,17 @@ void ABall::SetBallInfoByClub(EGolfClub club)
 	switch (club)
 	{
 	case EGolfClub::Driver:	// 최대 300m 정도
+		UGameplayStatics::PlaySound2D(this, mDriverSound, 1.f);
 		mBallInfo.BallPower = 2300.f;
 		mBallInfo.BallArc = 0.6f;
 		break;
 	case EGolfClub::Wood:	// 최대 215m 정도
+		UGameplayStatics::PlaySound2D(this, mWoodSound, 1.f);
 		mBallInfo.BallPower = 1600.f;
 		mBallInfo.BallArc = 0.7f;
 		break;
 	case EGolfClub::Iron:	// 최대 170m 정도
+		UGameplayStatics::PlaySound2D(this, mIronSound, 1.f);
 		mBallInfo.BallArc = 0.7f;
 
 		switch (mIronType)
@@ -781,10 +830,12 @@ void ABall::SetBallInfoByClub(EGolfClub club)
 		}
 		break;
 	case EGolfClub::Wedge:	// 최대 70m 정도
+		UGameplayStatics::PlaySound2D(this, mWedgeSound, 1.f);
 		mBallInfo.BallPower = 550.f;
 		mBallInfo.BallArc = 0.5f;
 		break;
 	case EGolfClub::Putter:	// 최대 20m 정도
+		UGameplayStatics::PlaySound2D(this, mPutterSound, 1.f);
 		mBallInfo.BallPower = 1000.f;
 		mBallInfo.BallArc = 1.f;
 		break;

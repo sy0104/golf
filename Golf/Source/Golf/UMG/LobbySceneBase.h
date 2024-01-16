@@ -3,6 +3,7 @@
 #include <Components\Image.h>
 #include <Components\Button.h>
 #include <Components\TextBlock.h>
+#include <Components\Border.h>
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
@@ -17,7 +18,6 @@ protected:
 	virtual void NativeConstruct();
 
 private:
-	UImage*			mPlayer2BackImage;
 	UImage*			mPlayer2Image;
 	UTextBlock*		mPlayer2Text;
 

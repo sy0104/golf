@@ -17,6 +17,8 @@ void UGolfClubBase::NativeConstruct()
 	mWedgeButton->OnClicked.AddDynamic(this, &UGolfClubBase::OnWedgeButtonClicked);
 	mPutterButton->OnClicked.AddDynamic(this, &UGolfClubBase::OnPutterButtonClicked);
 
+	mDriverButton->SetIsEnabled(false);
+
 	// Iron
 	mIron5Button = Cast<UButton>(GetWidgetFromName(FName(TEXT("Iron5Button"))));
 	mIron6Button = Cast<UButton>(GetWidgetFromName(FName(TEXT("Iron6Button"))));
@@ -29,6 +31,19 @@ void UGolfClubBase::NativeConstruct()
 	mIron7Button->OnClicked.AddDynamic(this, &UGolfClubBase::OnIron7ButtonClicked);
 	mIron8Button->OnClicked.AddDynamic(this, &UGolfClubBase::OnIron8ButtonClicked);
 	mIron9Button->OnClicked.AddDynamic(this, &UGolfClubBase::OnIron9ButtonClicked);
+
+	// Iron Frame
+	mIron5Frame = Cast<UImage>(GetWidgetFromName(FName(TEXT("Iron5Frame"))));
+	mIron6Frame = Cast<UImage>(GetWidgetFromName(FName(TEXT("Iron6Frame"))));
+	mIron7Frame = Cast<UImage>(GetWidgetFromName(FName(TEXT("Iron7Frame"))));
+	mIron8Frame = Cast<UImage>(GetWidgetFromName(FName(TEXT("Iron8Frame"))));
+	mIron9Frame = Cast<UImage>(GetWidgetFromName(FName(TEXT("Iron9Frame"))));
+
+	mIron5Frame->SetVisibility(ESlateVisibility::Hidden);
+	mIron6Frame->SetVisibility(ESlateVisibility::Hidden);
+	mIron7Frame->SetVisibility(ESlateVisibility::Hidden);
+	mIron8Frame->SetVisibility(ESlateVisibility::Hidden);
+	mIron9Frame->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UGolfClubBase::OnDriverButtonClicked()
@@ -215,6 +230,12 @@ void UGolfClubBase::SetIronButtonVisible(bool visible)
 		mIron7Button->SetVisibility(ESlateVisibility::Visible);
 		mIron8Button->SetVisibility(ESlateVisibility::Visible);
 		mIron9Button->SetVisibility(ESlateVisibility::Visible);
+
+		mIron5Frame->SetVisibility(ESlateVisibility::Visible);
+		mIron6Frame->SetVisibility(ESlateVisibility::Visible);
+		mIron7Frame->SetVisibility(ESlateVisibility::Visible);
+		mIron8Frame->SetVisibility(ESlateVisibility::Visible);
+		mIron9Frame->SetVisibility(ESlateVisibility::Visible);
 	}
 
 	else
@@ -224,6 +245,12 @@ void UGolfClubBase::SetIronButtonVisible(bool visible)
 		mIron7Button->SetVisibility(ESlateVisibility::Hidden);
 		mIron8Button->SetVisibility(ESlateVisibility::Hidden);
 		mIron9Button->SetVisibility(ESlateVisibility::Hidden);
+
+		mIron5Frame->SetVisibility(ESlateVisibility::Hidden);
+		mIron6Frame->SetVisibility(ESlateVisibility::Hidden);
+		mIron7Frame->SetVisibility(ESlateVisibility::Hidden);
+		mIron8Frame->SetVisibility(ESlateVisibility::Hidden);
+		mIron9Frame->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 

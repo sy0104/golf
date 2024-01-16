@@ -7,7 +7,6 @@ void ULobbySceneBase::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	mPlayer2BackImage = Cast<UImage>(GetWidgetFromName(FName(TEXT("Player2BackImage"))));
 	mPlayer2Image = Cast<UImage>(GetWidgetFromName(FName(TEXT("Player2Image"))));
 	mPlayer2Text = Cast<UTextBlock>(GetWidgetFromName(FName(TEXT("Player2Text"))));
 
@@ -44,7 +43,6 @@ void ULobbySceneBase::OnAddPlayer2ButtonClicked()
 	if (IsValid(Tex2D))
 		mPlayer2Image->SetBrushFromTexture(Tex2D);
 
-	mPlayer2BackImage->SetVisibility(ESlateVisibility::Visible);
 	mPlayer2Image->SetVisibility(ESlateVisibility::Visible);
 	mPlayer2Text->SetVisibility(ESlateVisibility::Visible);
 
@@ -64,7 +62,6 @@ void ULobbySceneBase::OnAddPlayer2ButtonClicked()
 
 void ULobbySceneBase::OnDeletePlayer2ButtonClicked()
 {
-	mPlayer2BackImage->SetVisibility(ESlateVisibility::Hidden);
 	mPlayer2Image->SetVisibility(ESlateVisibility::Hidden);
 	mPlayer2Text->SetVisibility(ESlateVisibility::Hidden);
 

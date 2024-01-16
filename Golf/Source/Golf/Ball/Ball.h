@@ -22,6 +22,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
+	// Sound
+	void LoadSound();
+
 	// Swing
 	void SetBallDetail(float scale);
 	void AddBallPower(float scale);
@@ -124,11 +127,27 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EWindType					mWindType;
 
+	// Sound
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	USoundBase*					mSwingSound;
+	USoundBase*					mDriverSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	USoundBase*					mWoodSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	USoundBase*					mIronSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	USoundBase*					mWedgeSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	USoundBase*					mPutterSound;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	USoundBase*					mGoodShotSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	USoundBase*					mHoleInSound;
 
 	FBallInfo	mBallInfo;
 	EPlayType	mPlayType;
@@ -198,6 +217,7 @@ public:
 
 	void SetInHole(bool InHole)
 	{
+		UGameplayStatics::PlaySound2D(this, mHoleInSound, 1.f);
 		mIsInHole = InHole;
 	}
 
