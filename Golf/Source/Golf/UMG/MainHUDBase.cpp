@@ -169,6 +169,11 @@ void UMainHUDBase::SetCourseText(FString CourseText)
 	mCourseBase->SetCourseText(CourseText);
 }
 
+void UMainHUDBase::SetCourseImage(bool visible, EMaterialType CourseImage)
+{
+	mCourseBase->SetCourseImage(visible, CourseImage);
+}
+
 void UMainHUDBase::SetWindVisible(bool visible)
 {
 	if (visible)

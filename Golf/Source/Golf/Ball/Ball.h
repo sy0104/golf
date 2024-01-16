@@ -71,15 +71,15 @@ private:
 	void ShowMenu();
 	void CheckGoodShot();
 
-	// Putting
-	void SetPuttingMode(bool isPutting);
-
 	// Camera
 	void ChangeCamera(float DeltaTime);
 
 	// Test
 	void TestKey();
 	void Cheat();
+
+	// Trailer
+	void SetTrailer(EPlayer CurPlayer);
 
 public:
 	void Init(bool isEnd);
