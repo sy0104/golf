@@ -85,6 +85,18 @@ void UMiniMap::SetBallTarget(FVector position, FVector direction, double targetD
 	leftdistanceCavasPos.X = miniMapHolePos.X - mLeftDistanceCanvasSize.X - 30.0;
 	leftdistanceCavasPos.Y = miniMapHolePos.Y - mLeftDistanceCanvasSize.Y / 2;
 
+	// panel °ãÄ¡´Â °æ¿ì
+	if (leftdistanceCavasPos.Y <= distanceCanvasPos.Y + mDistanceCanvasSize.Y &&
+		distanceCanvasPos.Y + mDistanceCanvasSize.Y <= leftdistanceCavasPos.Y + mLeftDistanceCanvasSize.Y)
+	{
+		distanceCanvasPos.Y = leftdistanceCavasPos.Y - mLeftDistanceCanvasSize.Y;
+	}
+	else if (leftdistanceCavasPos.Y - mLeftDistanceCanvasSize.Y <= distanceCanvasPos.Y &&
+		distanceCanvasPos.Y <= leftdistanceCavasPos.Y + mLeftDistanceCanvasSize.Y)
+	{
+		distanceCanvasPos.Y = leftdistanceCavasPos.Y + mLeftDistanceCanvasSize.Y;
+	}
+
 	mDistanceCanvas->SetRenderTranslation(distanceCanvasPos);
 	mLeftDistanceCanvas->SetRenderTranslation(leftdistanceCavasPos);
 }
